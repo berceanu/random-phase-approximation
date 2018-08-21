@@ -3,11 +3,10 @@
 RPA for zero and finite temperature, both FORTRAN (ground state) and C++ (excited states) codes.
 
 TODO:
-- unify input files
-- get rid of C++ console input request
 - write table to output file
 - create Python wrapper
 - make list of available nuclei
+- progress bar for C++ codes
 
 PARAMETERS TO VARY:
 - nucleus
@@ -19,4 +18,5 @@ WORKFLOW:
 - compile using `make run`
 - execute with `./run`
 - `dis.dat` -> FORTRAN -> `[q]rpa.wel` + `start.dat` -> C++ -> `lorvec.out`: Lorentzian isovector line shapes
-- for table: change `transerg` to `9.78` and `calc, xyprint` from `1` to `0`. Finaly, change `xyread` from `0` to `1` to avoid matrix elements calculation. Output on screen.
+- for table: change `transerg` to `9.78` (or other desired energy). Output on screen.
+- to avoid matrix elements calculation, change `calc, xyprint` from `1` to `0` and `xyread` from `0` to `1`.
