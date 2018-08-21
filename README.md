@@ -3,6 +3,8 @@
 RPA for zero and finite temperature, both FORTRAN (ground state) and C++ (excited states) codes.
 
 TODO:
+- unify input files
+- create Python wrapper
 - make list of available nuclei
 
 PARAMETERS TO VARY:
