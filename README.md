@@ -4,6 +4,8 @@ RPA for zero and finite temperature, both FORTRAN (ground state) and C++ (excite
 
 TODO:
 - unify input files
+- get rid of C++ console input request
+- write table to output file
 - create Python wrapper
 - make list of available nuclei
 
