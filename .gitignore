@@ -1,0 +1,15 @@
+*.bin
+*.con
+*.o
+*.out
+*.wel
+run
+*.20
+*.m
+T0*
+*.aka
+*.plo
+*.pot
+*.vpp
+*.wplo
+*.txt

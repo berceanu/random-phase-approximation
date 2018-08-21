@@ -1,0 +1,50 @@
+c-----------------------------------------------------------------------
+c     Parameters for spherical Dirac-Program
+c-----------------------------------------------------------------------
+c---- maximal number for GFV
+      parameter(igfv = 100)
+c
+c---- number of gauss-meshpoints
+      parameter (ngh = 40)
+c
+c---- number of H-meshpoints (for plot)
+      parameter (msh = 80)
+c
+c---- number of D-meshpoints
+      parameter (msd = 300)
+c
+c---- oscillator shells 
+c     number of major oscillator shells for fermions
+      parameter (n0fx = 60)
+c
+c     number of major oscillator shells for bosons
+      parameter (n0bx = 50)
+c
+c---- number of dummy common
+      parameter (nwork = 1000) 
+c
+c
+c======================================================================
+c     maximal number of levels for protons or neutrons
+      parameter (ntx = (n0fx+2)*(n0fx+3)/2-1)
+c
+c     maximal number of j-blocks
+      parameter (nbx = 2*n0fx+2)
+c
+c     maximal orbital angular momentum l
+      parameter (nlx = n0fx+1)
+c
+c     maximal radial quantum number nr
+      parameter (nrx = (n0fx+1)/2+1)
+      parameter (nox = n0bx/2+1)
+c
+c     ndx: maximal dimension of one j-block
+      parameter (ndx  = nrx)
+c
+      parameter (nd2x = ndx+ndx)
+      parameter (nqx  = ndx*ndx)
+      parameter (nq2x = 2*nqx)
+      parameter (nq4x = 4*nqx)
+      parameter (nb2x = nbx+nbx)
+c
+      parameter (ngx = ngh*nrx)
