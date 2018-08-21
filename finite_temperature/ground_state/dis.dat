@@ -1,9 +1,8 @@
 l6       =   10                     ! output file
 n0f      =   20   20                ! number of oscillator shells
-b0       =  -2.400                  ! oscillator parameter (fm**-1) of basis
-maxi     =  60                      ! maximal number of iterations
+b0       =   -1.6280835             ! oscillator parameter (fm**-1) of basis
+maxi     =  800                      ! maximal number of iterations
 xmix     =  0.2                     ! annealing parameter
-inin     =    2                     ! initialization of wavefunctions
 NI62                               ! nucleus under consideration
 Delta    =  0.000   0.000           ! Gapparameter for neutrons and  protons
 ipara    =  0                       ! parametrization type

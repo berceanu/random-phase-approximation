@@ -21,4 +21,4 @@ tc_cur     =   0                    ! calculate transition-currents 1:yes 0:no
 tc_iso     =   1                    ! isoscalar:0 isovector:1 for tr-cur
 tc_erg     =   12.36                ! energy for tr-curr, specify 2 digits
 qptresh    =   0.01      	    ! for lower occ inqp1noqp2-qp1pairs
-respair    =   0                    ! 1:pairing in residual inter. 0:no
+respair    =   1                    ! 1:pairing in residual inter. 0:no

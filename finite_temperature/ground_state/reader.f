@@ -52,7 +52,7 @@ c---- Parameter for the iteration:
       xmix0 = xmix
 c
 c---- Initialization of wavefunctions:
-      read(lin,'(10x,i5)') inin
+c     read(lin,'(10x,i5)') inin
       write(l6,'(a,i5)') ' Initial wavefunctions       :  ',inin
 c
 c---- Nucleus under consideration

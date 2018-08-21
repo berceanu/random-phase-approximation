@@ -3,23 +3,21 @@ l6       =   10                     ! output file
 n0f      =   20   20                ! number of oscillator shells 
 b0       =   -1.6280835             ! oscillator parameter (fm**-1) of basis
 maxi     =  800                     ! maximal number of iterations
-xmix     =  0.1                     ! annealing parameter
-inin     =   1    1                 ! init. of potentials and kappa
+xmix     =  0.2                     ! annealing parameter
 NI62                               ! nucleus under consideration
+
 Fixedgap = 00.000    00.000         ! Frozen Gapparmeter for neutr. and proton
 GA       = 00.000    00.000         ! Pairing-Constants GG = GA/A
 Init.Gap = 01.000    01.000         ! Initial values for the Gap parameters
 ivpair   =   1                      ! pair. ME: 0 read, 1 calc. 2 only calc.
 vfac     =  1.15                    ! vpair multiplication
+
 ipara    =  0                       ! parametrization type               
+
 blocking:   0  2  1  1              ! Blocking neutrons: y/n, j, ip, nr
 blocking:   0  0  0  0              ! Blocking protons:  y/n, j, ip, nr  
 
 # finite temperature
-!!b0       =  -2.400                  ! oscillator parameter (fm**-1) of basis
-!!maxi     =  60                      ! maximal number of iterations
-!!xmix     =  0.2                     ! mixing parameter
-!!inin     =    2                     ! initialization of wavefunctions
 Delta    =  0.000   0.000           ! Gapparameter for neutrons and  protons
 temp     =  2.0                     ! temperature
 filename =  T0   

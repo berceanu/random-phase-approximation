@@ -2,8 +2,7 @@ l6       =   10                     ! output file
 n0f      =   20   20                ! number of oscillator shells 
 b0       =   -1.6280835             ! oscillator parameter (fm**-1) of basis
 maxi     =  800                     ! maximal number of iterations
-xmix     =  0.1                     ! annealing parameter
-inin     =   1    1                 ! init. of potentials and kappa
+xmix     =  0.2                     ! annealing parameter
 NI62                               ! nucleus under consideration
 Fixedgap = 00.000    00.000         ! Frozen Gapparmeter for neutr. and proton
 GA       = 00.000    00.000         ! Pairing-Constants GG = GA/A
