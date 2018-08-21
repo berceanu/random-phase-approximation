@@ -12,6 +12,6 @@ PARAMETERS TO VARY:
 - parity pi
 
 WORKFLOW:
-compile using `make run`
-`dis.dat` -> FORTRAN -> [q]rpa.wel + start.dat -> C++ -> `lorvec.out`: Lorentzian isovector line shapes
+- compile using `make run`
+- `dis.dat` -> FORTRAN -> [q]rpa.wel + start.dat -> C++ -> `lorvec.out`: Lorentzian isovector line shapes
 - for table: change `transerg` to `9.78` and `calc, xyprint` from `1` to `0`. Finaly, change `xyread` from `0` to `1` to avoid matrix elements calculation. Output on screen.
