@@ -224,7 +224,8 @@ c     change of XMIX by reading from the console:
       if (inxt.eq.ii) then
          write(6,*) 
      &   'next stop? (0 right now, >0 fixed xmix, <0 autom. xmix)'
-         read(*,*)  inx
+c        read(*,*)  inx
+         inx = -300
          if (inx.eq.0) then
             itestc = 1
             return
@@ -237,7 +238,8 @@ c     change of XMIX by reading from the console:
          endif
          inxt = ii+iabs(inx)
          write(6,*) 'new value for xmix?'
-         read(*,*) xmix
+c        read(*,*) xmix
+         xmix = 0.2
          write(6,*) inxt,xmix
          xmix0 = xmix
       endif
