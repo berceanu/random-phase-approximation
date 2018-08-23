@@ -13,3 +13,7 @@ T0*
 *.vpp
 *.wplo
 *.txt
+.vscode
+__pycache__
+2.0*
+log
