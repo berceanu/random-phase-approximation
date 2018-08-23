@@ -33,6 +33,7 @@ c
       common /temper/ temp
       common /textex/ nucnam,tp(2),tis(2),tl(0:20),txtfor
       common /woodsa/ v0,akv,vso(2),r0v(2),av(2),rso(2),aso(2)
+      common /para/ ipara
 c
 c
 c---- nucleus
@@ -102,6 +103,10 @@ c      data del/5.0,5.0/
 c
 c---- temperture
       data temp/0.0/
+c
+c---- set default parametrization type to Typel & Walter
+c     ipara = 0
+      data ipara/0/
 c
 c---- parameters of the initial potentials
 c     inin = 0: fields read, 1: default, 2: saxon-wood, 3:oscillator

@@ -36,6 +36,7 @@ c
       common /ugugug/ itbl(2),jbl(2),ipbl(2),nbl(2),nrbl(2)
       common /woodsa/ v0,akv,vso(2),r0v(2),av(2),rso(2),aso(2)
       common /cpara/ a_s,b_s,c_s,d_s,a_v,b_v,c_v,d_v,a_tv,dsat 
+      common /para/ ipara
 c
 c
 c---- nucleus
@@ -230,6 +231,9 @@ c---- pairing
 c     data ga/22.,27./
       data ga/0.0,0.0/
 c
+c---- set default parametrization type to Typel & Walter
+c     ipara = 0
+      data ipara/0/
 c
 c---- parameters of the initial potentials
 c     inin = 0: fields read, 1: saxon-wood,

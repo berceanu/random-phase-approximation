@@ -64,7 +64,7 @@ c---- Gap-Parameters
       write(l6,'(a,2f10.3)') ' Gap Parameters             : ',dec
 c
 c---- Density dependence type  
-      read(lin,'(10x,i5)') ipara
+c     read(lin,'(10x,i5)') ipara
       write(l6,'(a,i5)') ' Ipara                : ',ipara
 c
 c---- Temperature

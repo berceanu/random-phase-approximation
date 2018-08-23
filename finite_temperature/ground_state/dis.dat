@@ -5,6 +5,5 @@ maxi     =  800                      ! maximal number of iterations
 xmix     =  0.2                     ! annealing parameter
 NI62                               ! nucleus under consideration
 Delta    =  0.000   0.000           ! Gapparameter for neutrons and  protons
-ipara    =  0                       ! parametrization type
 temp     =  2.0                     ! temperature
 filename =  T0   

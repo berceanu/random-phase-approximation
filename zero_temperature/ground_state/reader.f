@@ -86,7 +86,7 @@ c---- vfac factor for vpair multiplication
       read(lin,102) vfac
 
 c---- Parametrization type   
-      read(lin,100) ipara
+c     read(lin,100) ipara
       write(l6,101) ' Parametrization type       : ',ipara
 c
 c---- blocking
