@@ -32,6 +32,7 @@ def stream_process_stdout(process, log_fn):
     while True:
         line = process.stdout.readline().rstrip().decode('utf-8')
         if not line:
+            logging.info('No more lines.')
             break
 
         log_fn(line)
