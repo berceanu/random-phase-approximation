@@ -9,5 +9,5 @@ run: $(OBJ)
 	gfortran -o run $(OBJ)
 
 clean :
-	rm *.o *.out *.wel \
+	rm *.o *.out *.wel 2.0*\
            *.20 *.m run T0*
