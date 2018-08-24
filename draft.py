@@ -98,7 +98,7 @@ if __name__ == "__main__":
                                 "exccalc    =   1                    ! only calculating exc 1:yes 0:no\n"
                                 "transdens  =   0                    ! calculate trans-dens1:yes0:no\n"
                                 "transiso   =   0                    ! isosc:0 isovec:1 for tr-dens\n"
-                                "transerg   =   9.78                 ! energy for tr-dens, specify 2 digits\n"
+                                "transerg   =   0.00                 ! energy for tr-dens, specify 2 digits\n"
                                 "tc_cur     =   0                    ! calculate transition-currents 1:yes 0:no\n"
                                 "tc_iso     =   1                    ! isoscalar:0 isovector:1 for tr-cur\n"
                                 "tc_erg     =   12.36                ! energy for tr-curr, specify 2 digits\n"
