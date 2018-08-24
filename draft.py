@@ -147,3 +147,4 @@ if __name__ == "__main__":
 
     logger_one.join()
     logger_two.join()
+    logging.info('Ran excited states codes.')
