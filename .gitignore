@@ -17,3 +17,4 @@ T0*
 __pycache__
 2.0*
 log
+*.log
