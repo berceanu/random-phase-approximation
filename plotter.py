@@ -9,6 +9,8 @@ import numpy as np
 # (1) mpl.rc params
 # (2) customization via https://www.labri.fr/perso/nrougier/teaching/matplotlib
 # (3) update snippers
+# (4) extract data from Yifei paper
+# (5) create regression test within 3% margin
 
 def main():
     # define working folders
@@ -17,7 +19,7 @@ def main():
     _, ztes_dir, _, ftes_dir = [os.path.join(base_path, subf) for subf in subfolders]
 
     fname_zt = os.path.join(ztes_dir, "lorvec.out")
-    fname_ft = os.path.join(ftes_dir, "excvec.out")
+    fname_ft = os.path.join(ftes_dir, "lorvec.out")
 
     arr_zt = np.loadtxt(fname_zt)
     arr_ft = np.loadtxt(fname_ft)
@@ -33,8 +35,10 @@ def main():
     
     ax = fig.add_subplot(111)
     ax.plot(h_axis_zt, arr1d_zt, color="black", label="T = 0.0 MeV")
-    # ax.scatter(h_axis_ft, arr1d_ft, color="red", label="T = 2.0 MeV") # linestyle=":"
-    ax.vlines(h_axis_ft, 0, arr1d_ft, colors="red",  linestyles='dotted', label="T = 2.0 MeV")
+    ax.plot(h_axis_ft, arr1d_ft, color="red", linestyle=":", label="T = 2.0 MeV")  
+
+    # ax.scatter(h_axis_ft, arr1d_ft, color="red", label="T = 2.0 MeV")
+    # ax.vlines(h_axis_ft, 0, arr1d_ft, colors="red",  linestyles='dotted', label="T = 2.0 MeV")
 
     # ax.grid()
     ax.set(
