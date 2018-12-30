@@ -84,7 +84,7 @@ def main():
     # move them to unused folder
     for fname in not_in_makefile:
         path = os.path.join(src, fname)
-        shutil.copy(path, unused)
+        shutil.move(path, unused)
 
 if __name__ == "__main__":
     main()
