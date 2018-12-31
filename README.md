@@ -6,7 +6,11 @@ TODO:
 - write table to output file
 - create Python wrapper
 - make list of available nuclei
-- remove `filetest.py` and ``
+- remove `filetest.py` and `transerg.in`
+- write `generate_inputs` function
+- prepend all filenames with `working_dir` command line parameter, defaulting to `.`
+- implement `_read_last_line` condition function
+- mock `C++` and `Fortran` codes with minimal functionality
 
 
 PARAMETERS TO VARY:
