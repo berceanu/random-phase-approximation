@@ -7,7 +7,6 @@ TODO:
 - create Python wrapper
 - make list of available nuclei
 - remove `filetest.py` and `transerg.in`
-
 - `./run` codes and compare results with `lorentzian.png`
 - mock `C++` and `Fortran` codes with minimal functionality
 - prepend all filenames with `working_dir` command line parameter, defaulting to `.`
@@ -27,8 +26,6 @@ FILES:
 - `start.dat` : C++ input
 - `lorvec.out` : C++ output, Lorentzian line shapes (isovector)
 - `excvec.out` : C++ output, discrete line shapes (isovector)
-
-
 - `plotter.py` : generate `lorentzian.png` from `lorvec.out`
 - `draft.py` : run steps below
 
