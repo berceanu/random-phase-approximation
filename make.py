@@ -57,6 +57,8 @@ def extract_from(makefile):
         filenames = [f for f in filenames if os.path.splitext(f)[1] != '.o']
         prunefile = os.path.join(os.path.dirname(makefile), 'pruned.make')
         pruned_files = extract_pruned(prunefile)
+        logger.info('Make files missing from pruned files: %s', list(set(filenames).difference(set(pruned_files))))
+        filenames = pruned_files
         #
     elif re.search(fortrex, file_contents): # Fortran
         logger.info('Fortran makefile detected.')
@@ -68,7 +70,6 @@ def extract_from(makefile):
     # remove duplicates
     filenames = list(set(filenames))
     logger.info('%s distinct file names from Makefile.', len(filenames))
-    logger.info('Make files missing from pruned files: %s', list(set(filenames).difference(set(pruned_files))))
     return filenames
 
 def main(): 
@@ -91,7 +92,6 @@ def main():
 
     # files in `src` but not in Makefile
     not_in_makefile = list(set(src_files).difference(set(makefilenames)))
-    print(len(not_in_makefile))
     assert len(not_in_makefile) == len(src_files) - len(makefilenames) #check
     if not not_in_makefile:
         raise ValueError('Nothing to do, exiting.')
@@ -99,7 +99,7 @@ def main():
     # move them to unused folder
     for fname in not_in_makefile:
         path = os.path.join(src, fname)
-        shutil.copy(path, unused) # copy for safety
+        shutil.move(path, unused) # copy for safety
 
 if __name__ == "__main__":
     main()
