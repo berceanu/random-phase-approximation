@@ -29,7 +29,7 @@ def check_extensions(fnames, extensions):
     for f in fnames:
         _, ext = os.path.splitext(f)
         if ext not in extensions:
-            raise TypeError('Wrong file extension on %s', f)
+            raise TypeError('Wrong file extension on {}'.format(f))
     return None
 
 def extract_from(makefile):
@@ -58,7 +58,7 @@ def extract_from(makefile):
     return filenames
 
 def main(): 
-    base_path = str(sys.argv[1]) # eg., /home/berceanu/Development/rpa/finite_temperature/ground_state
+    base_path = str(sys.argv[1]) # eg., /home/berceanu/Development/rpa/zero_temperature/excited_states
     makefile = os.path.join(base_path, 'Makefile.old')
     makefilenames = extract_from(makefile) # extract file names from the Makefile
 
@@ -72,11 +72,13 @@ def main():
     # get contents of `src`
     src = os.path.join(base_path, 'src')
     src_files = os.listdir(src)
+    check_extensions(src_files, ['.cc', '.h'])
     logger.info('Distinct extensions in `src`: %s', distinct_extensions(src_files))
-    logger.info('%s distinct file names in `src`.', len(src_files))
+    logger.info('%s %s distinct file names in `src`.', len(src_files), len(set(src_files)))
 
     # files in `src` but not in Makefile
     not_in_makefile = list(set(src_files).difference(set(makefilenames)))
+    print(len(not_in_makefile))
     assert len(not_in_makefile) == len(src_files) - len(makefilenames) #check
     if not not_in_makefile:
         raise ValueError('Nothing to do, exiting.')
