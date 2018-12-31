@@ -15,6 +15,7 @@ PARAMETERS TO VARY:
 - parity pi
 
 
+FILES:
 - `dis.dat` : FORTRAN input
 - `[q]rpa.wel` : FORTRAN output
 - `start.dat` : C++ input
@@ -25,6 +26,8 @@ PARAMETERS TO VARY:
 - `plotter.py` : generate `lorentzian.png` from `lorvec.out`
 - `draft.py` : run steps below
 
+WORKFLOW:
+- `dis.dat` -> FORTRAN -> `[q]rpa.wel` + `start.dat` -> C++ -> `lorvec.out`
 1. `make clean`
 2. `make run`
 3. generate `start.dat` and `dis.dat`
@@ -32,6 +35,5 @@ PARAMETERS TO VARY:
 5. generate `[q]rpa.wel`
 6. run both excited state `C++` codes
 
-- `dis.dat` -> FORTRAN -> `[q]rpa.wel` + `start.dat` -> C++ -> `lorvec.out`
 - for table: change `transerg` to `9.78` (or other desired energy). Output on screen
 - to avoid matrix elements calculation, change `calc, xyprint` from `1` to `0` and `xyread` from `0` to `1`
