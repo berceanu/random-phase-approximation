@@ -15,15 +15,15 @@ PARAMETERS TO VARY:
 - parity pi
 
 
-`dis.dat` : FORTRAN input
-`[q]rpa.wel` : FORTRAN output
-`start.dat` : C++ input
-`lorvec.out` : C++ output, Lorentzian line shapes (isovector)
-`excvec.out` : C++ output, discrete line shapes (isovector)
+- `dis.dat` : FORTRAN input
+- `[q]rpa.wel` : FORTRAN output
+- `start.dat` : C++ input
+- `lorvec.out` : C++ output, Lorentzian line shapes (isovector)
+- `excvec.out` : C++ output, discrete line shapes (isovector)
 
 
-`plotter.py` : generate `lorentzian.png` from `lorvec.out`
-`draft.py` : run steps below
+- `plotter.py` : generate `lorentzian.png` from `lorvec.out`
+- `draft.py` : run steps below
 
 1. `make clean`
 2. `make run`
