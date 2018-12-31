@@ -11,7 +11,8 @@ TODO:
 - mock `C++` and `Fortran` codes with minimal functionality
 - prepend all filenames with `working_dir` command line parameter, defaulting to `.`
 - write `generate_inputs` function -- see `draft.py`
-- implement `_read_last_line` condition function
+- implement `_read_last_line` condition function; add "DONE" line to output
+- add compilation optimization flags
 
 PARAMETERS TO VARY:
 - nucleus
