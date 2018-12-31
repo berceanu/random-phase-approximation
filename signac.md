@@ -50,13 +50,8 @@ def run_this_second(job):
 ```
 
 - pass the "working directory" and then prepend all filenames with that directory
-
-
 - `return "fortran_executable {ws}".format(ws=job.workspace())`
-
-
 - [`_read_last_line`](https://stackoverflow.com/questions/3346430/what-is-the-most-efficient-way-to-get-first-and-last-line-of-a-text-file/18603065#18603065) sounds like it would do the trick.
-
 - your condition functions can be arbitrary python functions that take the job argument as first argument, you don't have to try to cramp everything into the decorator.
 
 ```
