@@ -6,6 +6,7 @@ TODO:
 - write table to output file
 - create Python wrapper
 - make list of available nuclei
+- remove `filetest.py` and ``
 
 
 PARAMETERS TO VARY:
