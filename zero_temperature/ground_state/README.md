@@ -3,6 +3,5 @@ contains transformation to canonical basis; adjusted for RQRPA.
 
 Zero temperature ground state calculation.
 
-
-
-Main file: `dis.f`
+`dis.f` : main program file
+`dis.par` : input file
