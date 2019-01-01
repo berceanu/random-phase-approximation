@@ -31,7 +31,11 @@ FILES:
 - `draft.py` : run steps below
 
 WORKFLOW:
-- `dis.dat` -> FORTRAN -> `[q]rpa.wel` + `start.dat` -> C++ -> `lorvec.out`
+zero temperature:
+- `dis.dat` -> FORTRAN -> `qrpa.wel` + `start.dat` -> C++ -> `lorvec.out`
+finite temperature:
+- `dis.dat` -> FORTRAN -> `rpa.wel` + `start.dat` -> C++ -> `lorvec.out`
+
 1. `make clean`
 2. `make run`
 3. generate `start.dat` and `dis.dat`
