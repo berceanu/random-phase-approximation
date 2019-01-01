@@ -7,8 +7,8 @@ TODO:
 - create Python wrapper
 - make list of available nuclei
 - remove `filetest.py` and `transerg.in`
-- `./run` codes and compare results with `lorentzian.png`
-- mock `C++` and `Fortran` codes with minimal functionality
+- `./run` codes and compare results with `lorentzian.png`; see the original [paper](http://dx.doi.org/10.1016/j.physletb.2009.10.046)
+- mock C++ and Fortran codes with minimal functionality
 - prepend all filenames with `working_dir` command line parameter, defaulting to `.`
 - write `generate_inputs` function -- see `draft.py`
 - implement `_read_last_line` condition function; add "DONE" line to output
