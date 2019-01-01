@@ -14,6 +14,7 @@ TODO:
 - implement `_read_last_line` condition function; add "DONE" line to output
 - add compilation optimization flags
 - organize into ground and excited states rather than 0 temp and finite temp
+- run in `run` folders
 
 PARAMETERS TO VARY:
 - nucleus
