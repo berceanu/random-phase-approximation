@@ -9,6 +9,6 @@ set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} -Wno-deprecated)
 # Compile.
 #
 file(GLOB_RECURSE sources  src/*.cc src/*.h )
-add_executable(run ${sources})
+add_executable(ztes ${sources})
 
-target_link_libraries(run m)
+target_link_libraries(ztes m)

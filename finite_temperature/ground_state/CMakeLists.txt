@@ -23,4 +23,4 @@ set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} ${dialect}")
 # Compile.
 #
 file(GLOB_RECURSE sources  src/*.f)
-add_executable(run ${sources})
+add_executable(ftgs ${sources})

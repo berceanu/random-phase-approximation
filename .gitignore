@@ -21,3 +21,7 @@ log
 start.dat
 dis.dat
 build
+run
+CMakeLists.txt.user
+*.code-workspace
+*.png
