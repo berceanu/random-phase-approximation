@@ -5,3 +5,8 @@ Zero temperature ground state calculation.
 
 `dis.f` : main program file
 `dis.par` : input file
+
+Changelog:$
+- replaced `file=` with `file='dishfb_' //`
+- input file is now called `dishfb_dis.dat`$
+- added option to take working directory from command line$

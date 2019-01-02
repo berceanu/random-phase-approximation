@@ -52,8 +52,8 @@ c
 c
 c---- BCS structure in the canonical basis:
 c
-      open(19,file='spenergyN.txt',status='unknown')
-      open(20,file='spenergyP.txt',status='unknown')
+      open(19,file='dish_' //'spenergyN.txt',status='unknown')
+      open(20,file='dish_' //'spenergyP.txt',status='unknown')
       if (npr.ge.2) write(l6,'(//,a)') tit(it)
       if (npr.eq.1) write(l6,100) tit(it)
   100    format(' single-particle energies and gaps ',

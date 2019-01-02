@@ -17,6 +17,7 @@ c
       integer argc
       character*100 argv(1)
 
+c --- takes working dir from command line
       argc=iargc()
       if (argc.eq.1) then 
             call getarg(1,argv(1))

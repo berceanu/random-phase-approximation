@@ -59,7 +59,7 @@ c
       if (lpr)
      &write(l6,*) ' ****** BEGIN CANOUT ******************************'
 c
-      open(lqrpa,file='qrpa.wel',status='unknown')
+      open(lqrpa,file='dish_' //'qrpa.wel',status='unknown')
       write(lqrpa,100) nucnam,nmas,nneu,npro
   100 format(1x,a2,8i4)
       write(lqrpa,'(a10,5f10.4)') txtfor,amsig,amome,amrho,amu

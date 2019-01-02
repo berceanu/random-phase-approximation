@@ -29,9 +29,9 @@ c
 c
 c
 c
-      if (l6.ne.6) open(l6,file='dis.out',status='unknown')
+      if (l6.ne.6) open(l6,file='dish_' //'dis.out',status='unknown')
       if (lin.eq.0) return
-      open(lin,file='dis.dat',status='old')
+      open(lin,file='dish_' //'dis.dat',status='old')
 
 c
 c

@@ -49,10 +49,10 @@ c----- plot for potentials
       ipx=92
       insx=93
       ipsx=94  
-      open(inx,file='xncen.pot',status='unknown')
-      open(ipx,file='xpcen.pot',status='unknown')
-      open(insx,file='xnspin.pot',status='unknown')
-      open(ipsx,file='xpspin.pot',status='unknown')
+      open(inx,file='dish_' //'xncen.pot',status='unknown')
+      open(ipx,file='dish_' //'xpcen.pot',status='unknown')
+      open(insx,file='dish_' //'xnspin.pot',status='unknown')
+      open(ipsx,file='dish_' //'xpspin.pot',status='unknown')
 c      do 10 it = it1,it2
       write(inx,'(/,a,i3)') '# n central it =',1
       write(ipx,'(/,a,i3)') '# p central it =',2
@@ -80,7 +80,7 @@ c      do 10 it = it1,it2
 c
 c---- plot for densities:
 
-      open(lplo,file='dis.plo',status='unknown')
+      open(lplo,file='dish_' //'dis.plo',status='unknown')
       do it = it1,it2
          write(lplo,'(/,a,i3)') '# scalar density it =',it
          r = zero

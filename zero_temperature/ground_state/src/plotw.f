@@ -53,7 +53,7 @@ c---- plot step in (fm)
 c---- plot for wavefunctions:
       mf  = ib + (it-1)*nbx
       k0 = ia(ib,1) + k
-      open(lplo,file='dis.wplo',status='unknown')
+      open(lplo,file='dish_' //'dis.wplo',status='unknown')
          write(lplo,101) '# wavefunction f(r)',
      &                   tit(it),txb(ip),k,v2(k0,it),eeqrpa(k,mf)
 101      format(a,a,a,' n =',i3,2f15.3)

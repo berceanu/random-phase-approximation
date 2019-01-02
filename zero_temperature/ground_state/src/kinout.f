@@ -42,7 +42,7 @@ c
       write(l6,*) ' ****** BEGIN KINOUT *******************************'
 c
       if ((is.eq.1.and.inink.eq.0).or.is.eq.2) 
-     &   open(laka,file='dis.aka',status='unknown')
+     &   open(laka,file='dish_' //'dis.aka',status='unknown')
 c
 c
 c---- loop over neutron and proton

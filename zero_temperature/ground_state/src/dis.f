@@ -7,7 +7,22 @@ c     Relativistic mean field theory mit HFB in a spherical basis
 c     contains transformation to canonical basis; adjusted for RQRPA
 c     Nov. 11, 2001
 c----------------------------------------------------------------------c
+      program dish
+
+      use chdir_mod
+
       implicit real*8(a-h,o-z)
+
+      integer iargc
+      integer argc
+      character*100 argv(1)
+
+c --- takes working dir from command line
+      argc=iargc()
+      if (argc.eq.1) then 
+            call getarg(1,argv(1))
+            call chdir(trim(adjustl(argv(1))))
+      end if
 c
 c---- reads in data     
       call reader

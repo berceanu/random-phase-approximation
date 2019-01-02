@@ -105,8 +105,8 @@ c---------- search for main oscillator component
 c---- add for printing out ei and vi
 c----print out occupation ni versus ei
 c
-      open(17,file='occup_n.txt',status='unknown')
-      open(18,file='occup_p.txt',status='unknown')
+      open(17,file='dish_' //'occup_n.txt',status='unknown')
+      open(18,file='dish_' //'occup_p.txt',status='unknown')
 
       do it=1,2
        do i=1,nt
