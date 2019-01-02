@@ -15,17 +15,13 @@ c
       
       integer iargc
       integer argc
-      character*100 argv(10)
-      character*100 :: workdir
+      character*100 argv(1)
 
       argc=iargc()
-      write (*,*) 'Number of arguments:', argc
-      do i=1,min(argc,10)
-        call getarg(i,argv(i))
-        write (*,*) 'Argument no',i,'=',argv(i)
-      enddo
-
-      call chdir("skys")
+      if (argc.eq.1) then 
+            call getarg(1,argv(1))
+            call chdir(trim(adjustl(argv(1))))
+      end if
 
 c---- reads in data     
       call reader
