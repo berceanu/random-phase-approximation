@@ -48,3 +48,9 @@ c
       parameter (nb2x = nbx+nbx)
 c
       parameter (ngx = ngh*nrx)
+
+c=====================================================================
+c---- prefix to append to all files
+c      CHARACTER kprefix*(*)
+c      PARAMETER (kprefix='skys') 
+c---- example usage: OPEN(unit=10, status="old", file=TRIM(ADJUSTL(fprefix))//"file1.dat")

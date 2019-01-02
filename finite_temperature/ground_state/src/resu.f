@@ -37,8 +37,8 @@ c
       common /fermi / ala(2),tz(2)
       common /file/ filename
 c
-      open(17,file=filename(1:4)//'occup_n.txt',status='unknown')
-      open(18,file=filename(1:4)//'occup_p.txt',status='unknown')
+      open(17,file=TRIM(filename(1:4))//'occup_n.txt',status='unknown')
+      open(18,file=TRIM(filename(1:4))//'occup_p.txt',status='unknown')
       write(l6,*) ' ****** BEGIN RESU *********************************'
 c
 c---- single particle energies

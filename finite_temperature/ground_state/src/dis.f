@@ -6,9 +6,27 @@ c======================================================================c
 c     Relativistic mean field theory in a spherical basis
 c----------------------------------------------------------------------c
 c
+      program SKYS
+
+      use chdir_mod
+
       implicit real*8 (a-h,o-z)
       common /temper/ temp
       
+      integer iargc
+      integer argc
+      character*100 argv(10)
+      character*100 :: workdir
+
+      argc=iargc()
+      write (*,*) 'Number of arguments:', argc
+      do i=1,min(argc,10)
+        call getarg(i,argv(i))
+        write (*,*) 'Argument no',i,'=',argv(i)
+      enddo
+
+      call chdir("skys")
+
 c---- reads in data     
       call reader
 c
