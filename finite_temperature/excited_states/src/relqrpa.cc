@@ -50,6 +50,7 @@ int main(int argc, char **argv) {
     int ab_read = 0;
     void qppair(int, int);
     
+    // change working folder to one provided as (optional) command line argument
     if (argc > 1) {
         cout  << "CWD: " << cwd(buf, sizeof buf) << endl;
 
