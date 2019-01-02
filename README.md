@@ -22,26 +22,26 @@ PARAMETERS TO VARY:
 
 
 FILES:
-- `dis.dat` : FORTRAN input
-- `[q]rpa.wel` : FORTRAN output
-- `start.dat` : C++ input
-- `lorvec.out` : C++ output, Lorentzian line shapes (isovector)
-- `excvec.out` : C++ output, discrete line shapes (isovector)
+- `_[q]rpa.wel` : FORTRAN output
+- `_start.dat` : C++ input
+- `_lorvec.out` : C++ output, Lorentzian line shapes (isovector)
+- `_excvec.out` : C++ output, discrete line shapes (isovector)
+
+UTILITIES in `util`:
 - `plotter.py` : generate `lorentzian.png` from `lorvec.out`
-- `draft.py` : run steps below
+- `draft.py` : run codes
+- `make.py` : convert `Makefile` to `CMakeLists.txt`
+- `prefix_resub.py` : add a prefix to all filenames in a codebase
 
 WORKFLOW:
 zero temperature:
-- `dis.dat` -> FORTRAN -> `qrpa.wel` + `start.dat` -> C++ -> `lorvec.out`
+- `dish_dis.dat` -> FORTRAN (`ztgs`) -> `dish_qrpa.wel` + `ztes_start.dat` -> C++ (`ztes`) -> `ztes_lorvec.out`
 finite temperature:
-- `dis.dat` -> FORTRAN -> `rpa.wel` + `start.dat` -> C++ -> `lorvec.out`
+- `skys_dis.dat` -> FORTRAN (`ftgs`) -> `skys_rpa.wel` + `ftes_start.dat` -> C++ (`ftes`) -> `ftes_lorvec.out`
 
-1. `make clean`
-2. `make run`
-3. generate `start.dat` and `dis.dat`
-4. run both ground state `Fortran` codes with `./run`
-5. generate `[q]rpa.wel`
-6. run both excited state `C++` codes
+1. generate `_start.dat` and `_dis.dat`
+2. run both ground state `Fortran` codes
+3. run both excited state `C++` codes
 
 - for table: change `transerg` to `9.78` (or other desired energy). Output on screen
 - to avoid matrix elements calculation, change `calc, xyprint` from `1` to `0` and `xyread` from `0` to `1`
