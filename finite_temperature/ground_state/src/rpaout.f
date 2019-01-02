@@ -73,7 +73,7 @@ c      common /parfac/ vfac
      &write(l6,*) ' ****** BEGIN CANOUT ******************************'
 c
       lqrpa=14
-      open(lqrpa,file='rpa.wel',status='unknown')
+      open(lqrpa,file='skys_' // 'rpa.wel',status='unknown')
       write(lqrpa,100) nucnam,nmas,nneu,npro
   100 format(1x,a2,8i4)
       write(lqrpa,'(a10,5f10.4)') txtfor,amsig,amome,amrho,amu
@@ -268,7 +268,7 @@ c                 write(6,*) ' check norm of part. f and g',s*rstep
       enddo !it
       close(lqrpa)
 
-       open(28, file='density.out',status='unknown')
+       open(28, file='skys_' // 'density.out',status='unknown')
        do istep=0, nmesh
            write(28,*) istep*rstep, dens0(istep)
        enddo

@@ -55,7 +55,7 @@ c
 c---- reading of meson fields from tape:
 c-------------------------------------
       if (is.eq.1) then
-         open(lwin,file='dis.wel',status='old')
+         open(lwin,file='skys_' // 'dis.wel',status='old')
          read(lwin,100) 
      &        nucnam1,nama1,npr1,ngh1,n0f1,n0b1,nb1,nt1
   100    format(1x,a2,8i4)
@@ -91,7 +91,7 @@ c
 c     writing of potentials to tape:
 c-----------------------------------
       else
-         open(lwou,file='dis.wel',status='unknown')
+         open(lwou,file='skys_' // 'dis.wel',status='unknown')
          write(lwou,100) nucnam,nama,npr,ngh,n0f,n0b,nb,nt
          write(lwou,'(5h b0 =,f12.6,6h  si =,f12.9,2f12.6)') 
      &              b0,si,ea,rms

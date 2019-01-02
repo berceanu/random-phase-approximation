@@ -10,7 +10,7 @@ c---------------------------------------------------------------------c
       include 'paramet'
 c
       implicit real*8 (a-h,o-z)
-      character*40 filename
+      character*4 filename
       logical lpr
 c
       dimension pn(nox),ri(64,2)
@@ -54,8 +54,8 @@ c---- plot step in (fm)
       stpl = 0.1
 c
 c---- plot for densities:
-      open(lplo,file=TRIM(filename(1:4))//'dens.pn',status='unknown')
-      open(54,file=TRIM(filename(1:4))//'dens.tot',status='unknown')     
+      open(lplo,file='skys_' // filename//'dens.pn',status='unknown')
+      open(54,file='skys_' // filename//'dens.tot',status='unknown')     
       do it = it1,it2
          write(lplo,'(/,a,i3)') ' #scalar density it =',it
          r = zero
@@ -98,8 +98,8 @@ c---- plot for densities:
       close(54)
 c      
 c---- plot for potentials
-      open(91,file=TRIM(filename(1:4))//'pot.cen',status='unknown')
-      open(92,file=TRIM(filename(1:4))//'pot.so',status='unknown')
+      open(91,file='skys_' // filename//'pot.cen',status='unknown')
+      open(92,file='skys_' // filename//'pot.so',status='unknown')
       do it = it1,it2
          write(91,'(/,a,i3)') ' #central potential it =',it
 	 write(92,'(/,a,i3)') ' #spin-orbit potential it =',it
@@ -117,7 +117,7 @@ c---- plot for potentials
       close(91)
       close(92)     
 c---- plot for effective masses
-      open(91,file=TRIM(filename(1:4))//'ameff',status='unknown')
+      open(91,file='skys_' // filename//'ameff',status='unknown')
       do it = it1,it2
          write(91,'(/,a,i3)') ' #effective mass it =',it
          r = zero
@@ -132,7 +132,7 @@ c---- plot for effective masses
       close(91)
       
 c---- plot for effective masses 2
-      open(99,file=TRIM(filename(1:4))//'ameff2',status='unknown')
+      open(99,file='skys_' // filename//'ameff2',status='unknown')
       do it = it1,it2
          write(99,'(/,a,i3)') ' #effective mass2 it =',it
          r = zero
@@ -252,7 +252,7 @@ c---------------------------------------------------------------------c
       include 'paramet'
 c
       implicit real*8 (a-h,o-z)
-      character*40 filename
+      character*4 filename
       logical lpr
 c
 c
@@ -276,7 +276,7 @@ c     plot step in (fm)
 c
 c     plot for wavefunctions:
 c----------------------------
-      open(lplo,file=TRIM(filename(1:4))//'dis.wplo',status='unknown')
+      open(lplo,file='skys_' // filename//'dis.wplo',status='unknown')
       write(lplo,'(a,3i3)') ' #wavefunction f(r)',it,ib,k
       r = zero
       s = zero

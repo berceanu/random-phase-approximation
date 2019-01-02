@@ -46,7 +46,7 @@ c
 c---- single-particle matix elements
       call singf(.false.)
 c
-c      open(20, file='ERSvT.txt')
+c      open(20, file='skys_' // 'ERSvT.txt')
 c      do i=0,15
 c      temp=i*0.2
 c---- iteration

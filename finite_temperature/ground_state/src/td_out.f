@@ -37,7 +37,7 @@ c     plot step in (fm)
 c
 c     plot for wavefunctions:
 c----------------------------
-      open(lplo,file='read3D.m',status='unknown')
+      open(lplo,file='skys_' // 'read3D.m',status='unknown')
       do it=it1,it2
           nstate(it)=0
           do ib=1,nb 

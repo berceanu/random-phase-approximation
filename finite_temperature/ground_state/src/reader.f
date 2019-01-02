@@ -10,7 +10,7 @@ c
       character*1 tp,tl,tis
       character*2 nucnam
       character*10 txtfor
-      character*40 filename
+      character*4 filename
 c
       common /baspar/ hom,hb0,b0
       common /dimens/ n0f,n0b,nrm,nlm
@@ -28,9 +28,9 @@ c
       common /file/ filename
 c
 c
-      if (l6.ne.6) open(l6,file='dis.out',status='unknown')
+      if (l6.ne.6) open(l6,file='skys_' // 'dis.out',status='unknown')
       if (lin.eq.0) return
-      open(lin,file='dis.dat',status='old')
+      open(lin,file='skys_' // 'dis.dat',status='old')
 c
 c
 c---- Output-File:            

@@ -10,7 +10,7 @@ c
       character*1 tp,tl,tis
       character*2 nucnam
       character*10 txtfor
-      character*40 filename
+      character*4 filename
       logical lpr
       dimension jpar(50),npar(50),lpar(50)
       dimension jhol(50),nhol(50),lhol(50)
@@ -37,8 +37,8 @@ c
       common /fermi / ala(2),tz(2)
       common /file/ filename
 c
-      open(17,file=TRIM(filename(1:4))//'occup_n.txt',status='unknown')
-      open(18,file=TRIM(filename(1:4))//'occup_p.txt',status='unknown')
+      open(17,file='skys_' // filename//'occup_n.txt',status='unknown')
+      open(18,file='skys_' // filename//'occup_p.txt',status='unknown')
       write(l6,*) ' ****** BEGIN RESU *********************************'
 c
 c---- single particle energies
@@ -98,7 +98,7 @@ c
 c      if (lpr) then
 c---- particle energies, hole energies
 c---- neutrons
-c      open(unit=17,file='PB208.n',status='old',form='formatted')
+c      open(unit=17,file='skys_' // 'PB208.n',status='old',form='formatted')
 c      read (17,*) epexp,ehexp   ! experimental values
 c      read (17,*) nump
 c      do j=1,nump
@@ -134,7 +134,7 @@ c      write(l6,104) eh/hnorm
 103   format('particles:',1x,f10.6)      
 104   format('holes:',1x,f10.6)
 c-----protons
-c      open(unit=18,file='PB208.p',status='old',form='formatted')
+c      open(unit=18,file='skys_' // 'PB208.p',status='old',form='formatted')
 c      read (18,*) epexp,ehexp   ! experimental values
 c      read (18,*) nump
 c      do j=1,nump
