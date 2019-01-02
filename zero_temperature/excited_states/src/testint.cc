@@ -35,7 +35,7 @@ void testint()
 
     // just a test for norm of wavefunction
 
-    testfile.open("normtest.out", ios::out | ios::app);
+    testfile.open("ztes_normtest.out", ios::out | ios::app);
 
    
     // correcting norm (1: yes, 0:no)

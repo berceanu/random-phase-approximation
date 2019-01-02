@@ -84,7 +84,7 @@ void incanon() {
     double fsum = zero;
     double gsum = zero;
     double1(testsum);
-    char* filename1 = "qrpa.wel";    
+    char* filename1 = "dish_qrpa.wel";    
     fstream savfile;
     int nmeshpro;
     double rmaxpro;
@@ -408,16 +408,16 @@ void incanon() {
     
     // test the wave functions
 
-    testfile.open("normtest.out",ios::out | ios::trunc);
+    testfile.open("ztes_normtest.out",ios::out | ios::trunc);
     if (!testfile) {
-	cerr << "\n*** Error opening file " << "normtest.out" << " ***\n";
+	cerr << "\n*** Error opening file " << "ztes_normtest.out" << " ***\n";
 	cerr << "Execution terminated !" << endl;
 	exit(1);
     }
 
-    wffile.open("wf.out",ios::out | ios::trunc);
+    wffile.open("ztes_wf.out",ios::out | ios::trunc);
     if (!testfile) {
-        cerr << "\n*** Error opening file " << "wf.out" << " ***\n";
+        cerr << "\n*** Error opening file " << "ztes_wf.out" << " ***\n";
         cerr << "Execution terminated !" << endl;
         exit(1);
     }
@@ -620,9 +620,9 @@ void incanon() {
 
 
     double1init(dens0_test,nmesh);    
-    densfile.open("dens0.out",ios::out | ios::trunc);
+    densfile.open("ztes_dens0.out",ios::out | ios::trunc);
     if (!densfile) {
-	cout << "\n*** Error opening file " << "dens0.out" << " ***\n";
+	cout << "\n*** Error opening file " << "ztes_dens0.out" << " ***\n";
 	cout << "program is terminating" << endl;
 	exit(1);
     }

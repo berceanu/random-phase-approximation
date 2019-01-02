@@ -45,7 +45,7 @@ int main(int argc, char **argv) {
     
     // Einlesen von start.dat
 
-    paramet("start.dat");
+    paramet("ztes_start.dat");
 
 
     if (lorchange == 1) 
@@ -140,7 +140,7 @@ int main(int argc, char **argv) {
 
 
     qppair(j, parity);
-    qppairout(j, parity, "qpair.out");
+    qppairout(j, parity, "ztes_qpair.out");
         
     cout << npair << " pairs found!" << endl;
     cout << npair_ph << "/" << npair_ah << 
@@ -210,8 +210,8 @@ int main(int argc, char **argv) {
 
         if (matprint == 1)
         {
-            mout(arpa,npair,6,"rel. RPA-Matrix A","arpa.con");
-            mout(brpa,npair,6,"rel. RPA-Matrix B","brpa.con");
+            mout(arpa,npair,6,"rel. RPA-Matrix A","ztes_arpa.con");
+            mout(brpa,npair,6,"rel. RPA-Matrix B","ztes_brpa.con");
         }
 
 	        		
@@ -224,15 +224,15 @@ int main(int argc, char **argv) {
 	    }
 	}
 	
-	mbout(arpac,npair,"arpa.bin");
-	mbout(brpac,npair,"brpa.bin");
+	mbout(arpac,npair,"ztes_arpa.bin");
+	mbout(brpac,npair,"ztes_brpa.bin");
 
 
     }
     else 
     {
-	mbin(arpac,npair,"arpa.bin");
-	mbin(brpac,npair,"brpa.bin");
+	mbin(arpac,npair,"ztes_arpa.bin");
+	mbin(brpac,npair,"ztes_brpa.bin");
 	
 	for (n = 0; n <= npair; n++) {
 	    for (m = 0; m <= npair; m++) 
@@ -334,17 +334,17 @@ int main(int argc, char **argv) {
 	
 	cout << "saving x- and y-matrices and energies on disk" << endl;
 		  
-	mbout(xrpac,npair,2*npair,"xrpa.bin");
-	mbout(yrpac,npair,2*npair,"yrpa.bin");
-	vbout(erpac,2*npair,"erpa.bin");
-	vbout(c_erpac,2*npair,"c_erpa.bin");
+	mbout(xrpac,npair,2*npair,"ztes_xrpa.bin");
+	mbout(yrpac,npair,2*npair,"ztes_yrpa.bin");
+	vbout(erpac,2*npair,"ztes_erpa.bin");
+	vbout(c_erpac,2*npair,"ztes_c_erpa.bin");
 
 
-            mout(xrpa,npair,6,"rel. RPA-X","xrpa.con");
-            mout(yrpa,npair,6,"rel. RPA-Y","yrpa.con");
+            mout(xrpa,npair,6,"rel. RPA-X","ztes_xrpa.con");
+            mout(yrpa,npair,6,"rel. RPA-Y","ztes_yrpa.con");
 
-//            mout(erpa,2*npair,6,"rel. RPA-eigenvalue","erpa.con");
-//            mout(c_erpa,2*npair,6,"rel. RPA-eigenvalue-c","c_erpa.con"); 	
+//            mout(erpa,2*npair,6,"rel. RPA-eigenvalue","ztes_erpa.con");
+//            mout(c_erpa,2*npair,6,"rel. RPA-eigenvalue-c","ztes_c_erpa.con"); 	
     
 //	delete[] xrpac;
 //	delete[] yrpac;
@@ -358,11 +358,11 @@ int main(int argc, char **argv) {
 
 
     cout << "calculating excitation-strength" << endl;	
-    excstr(erpa,xrpa,yrpa,npair,j,"excskal.out","excvec.out",
-	   "curve.out","neudens.out","prodens.out",
-	   "totdens.out", "lorskal.out", 
-	   "lorvec.out","pskal.out", "pvec.out", 
-	   "strength.out", 
+    excstr(erpa,xrpa,yrpa,npair,j,"ztes_excskal.out","ztes_excvec.out",
+	   "ztes_curve.out","ztes_neudens.out","ztes_prodens.out",
+	   "ztes_totdens.out", "ztes_lorskal.out", 
+	   "ztes_lorvec.out","ztes_pskal.out", "ztes_pvec.out", 
+	   "ztes_strength.out", 
 	   lorswidth, lorvwidth, 0);
   
     
@@ -435,11 +435,11 @@ int main(int argc, char **argv) {
 	rpaprobe(npair,arpa,brpa,xrpa,yrpa,erpa);
 
 	cout << "calculating hartree excitation-strength" << endl;	
-	excstr(erpa,xrpa,yrpa,npair,j,"harexcskal.out","harexcvec.out", 
-	       "harcurve.out","harneudens.out","harprodens.out",
-	       "hartotdens.out", "harlorskal.out", 
-	       "harlorvec.out", "harpskal.out", "harpvec.out", 
-	       "harstrength.out", hlorswidth, hlorvwidth, 1);
+	excstr(erpa,xrpa,yrpa,npair,j,"ztes_harexcskal.out","ztes_harexcvec.out", 
+	       "ztes_harcurve.out","ztes_harneudens.out","ztes_harprodens.out",
+	       "ztes_hartotdens.out", "ztes_harlorskal.out", 
+	       "ztes_harlorvec.out", "ztes_harpskal.out", "ztes_harpvec.out", 
+	       "ztes_harstrength.out", hlorswidth, hlorvwidth, 1);
     }
     
     goto ende;
@@ -450,12 +450,12 @@ int main(int argc, char **argv) {
   lorenzneu:
     if (lorchange == 1) 
     {	
-	lorneu("pskal.out", "pvec.out", "nlorskal.out",
-	       "nlorvec.out");
+	lorneu("ztes_pskal.out", "ztes_pvec.out", "ztes_nlorskal.out",
+	       "ztes_nlorvec.out");
 	
 	if (hartree == 1)
-	  lorneu("harpskal.out", "harpvec.out",
-		 "nharlorskal.out", "nharlorvec.out");
+	  lorneu("ztes_harpskal.out", "ztes_harpvec.out",
+		 "ztes_nharlorskal.out", "ztes_nharlorvec.out");
 
 	goto ende;	
     }
@@ -468,10 +468,10 @@ int main(int argc, char **argv) {
   
     // test if x and y and energies are on disk-file
 
-    xrpafile.open("xrpa.bin", ios::in);
-    yrpafile.open("yrpa.bin", ios::in);
-    erpafile.open("erpa.bin", ios::in);
-    c_erpafile.open("c_erpa.bin", ios::in);
+    xrpafile.open("ztes_xrpa.bin", ios::in);
+    yrpafile.open("ztes_yrpa.bin", ios::in);
+    erpafile.open("ztes_erpa.bin", ios::in);
+    c_erpafile.open("ztes_c_erpa.bin", ios::in);
     
     if ((!xrpafile) || (!yrpafile) || (!erpafile) ||
 	(!c_erpafile)) {
@@ -494,10 +494,10 @@ int main(int argc, char **argv) {
     double1init(erpa,2*npair);
     double1init(c_erpa,2*npair);
 
-    mbin(xrpac,npair,2*npair,"xrpa.bin");
-    mbin(yrpac,npair,2*npair,"yrpa.bin");
-    vbin(erpac,2*npair,"erpa.bin");
-    vbin(c_erpac,2*npair,"c_erpa.bin");	
+    mbin(xrpac,npair,2*npair,"ztes_xrpa.bin");
+    mbin(yrpac,npair,2*npair,"ztes_yrpa.bin");
+    vbin(erpac,2*npair,"ztes_erpa.bin");
+    vbin(c_erpac,2*npair,"ztes_c_erpa.bin");	
     
 
     for (n = 0; n <= npair; n++) {
@@ -538,11 +538,11 @@ int main(int argc, char **argv) {
     if (exccalc == 1)
     {
 	cout << "### calculating excitation-strength ###" << endl;	
-	excstr(erpa,xrpa,yrpa,npair,j,"excskal.out","excvec.out",
-	       "curve.out","neudens.out","prodens.out",
-	       "totdens.out", "lorskal.out", 
-	       "lorvec.out","pskal.out", "pvec.out", 
-	       "strength.out", 
+	excstr(erpa,xrpa,yrpa,npair,j,"ztes_excskal.out","ztes_excvec.out",
+	       "ztes_curve.out","ztes_neudens.out","ztes_prodens.out",
+	       "ztes_totdens.out", "ztes_lorskal.out", 
+	       "ztes_lorvec.out","ztes_pskal.out", "ztes_pvec.out", 
+	       "ztes_strength.out", 
 	       lorswidth, lorvwidth, 0);
     }
 
@@ -551,13 +551,13 @@ int main(int argc, char **argv) {
     if (transdens == 1) 
     {	
 	cout << "### calculating transitiondensities ###" << endl;	
-	trans(erpa,xrpa,yrpa,npair,j,"transdens.out","transsum.out",0);
+	trans(erpa,xrpa,yrpa,npair,j,"ztes_transdens.out","ztes_transsum.out",0);
     }
     
     if (tc_cur == 1)
     {
 	cout << "### calculating transition-currents ###" << endl;	
-	transcur(erpa,xrpa,yrpa,npair,j,"t_cur.out","t_vel.out",0);
+	transcur(erpa,xrpa,yrpa,npair,j,"ztes_t_cur.out","ztes_t_vel.out",0);
     }
     
 

@@ -70,8 +70,8 @@ void trans(double *erpa, double **xrpa,
     int i, k, index;
 
 
-    strcpy(filetransn,"transn.out");
-    strcpy(filetransp,"transp.out");
+    strcpy(filetransn,"ztes_transn.out");
+    strcpy(filetransp,"ztes_transp.out");
     
     // for j=1 transition- isovector dipole-operator
     neufact = (double(npro))/(double(npro+nneu));
