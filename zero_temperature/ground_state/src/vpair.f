@@ -178,7 +178,7 @@ c
 c
 c
 c---- writing and reading of pairing matrix elements
-      open(lvpp,file='dish_' //'dis.vpp',form='unformatted',status='unknown')
+      open(lvpp,file='dish_dis.vpp',form='unformatted',status='unknown')
       if (ivpair.eq.0) then
          read(lvpp)  txpair1,mv1
          if (txpair1.ne.txpair) stop ' in VPAIR: force is wrong'
