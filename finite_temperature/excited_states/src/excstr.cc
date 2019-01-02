@@ -424,10 +424,10 @@ void excstr(double *erpa, double **xrpa,
     lorvecfile.setf(ios::scientific);
     write_head(lorvecfile,1,hp);
    
-    lorskal2file.open("lorskal2.out", ios::out | ios::trunc);
+    lorskal2file.open("ftes_lorskal2.out", ios::out | ios::trunc);
     lorskal2file.setf(ios::scientific);
 
-    lorvec2file.open("lorvec2.out", ios::out | ios::trunc);
+    lorvec2file.open("ftes_lorvec2.out", ios::out | ios::trunc);
     lorvec2file.setf(ios::scientific);
  
 

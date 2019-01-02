@@ -92,7 +92,7 @@ void incanon() {
     double fsum = zero;
     double gsum = zero;
     double1(testsum);
-    char* filename1 = "rpa.wel";    
+    char* filename1 = "skys_rpa.wel";    
     fstream savfile;
     int nmeshpro;
     double rmaxpro;
@@ -435,30 +435,30 @@ void incanon() {
     
     // test the wave functions
 
-    testfile.open("normtest.out",ios::out | ios::trunc);
+    testfile.open("ftes_normtest.out",ios::out | ios::trunc);
     if (!testfile) {
-	cerr << "\n*** Error opening file " << "normtest.out" << " ***\n";
+	cerr << "\n*** Error opening file " << "ftes_normtest.out" << " ***\n";
 	cerr << "Execution terminated !" << endl;
 	exit(1);
     }
 
-    wffile.open("wf.out",ios::out | ios::trunc);
+    wffile.open("ftes_wf.out",ios::out | ios::trunc);
     if (!testfile) {
-        cerr << "\n*** Error opening file " << "wf.out" << " ***\n";
+        cerr << "\n*** Error opening file " << "ftes_wf.out" << " ***\n";
         cerr << "Execution terminated !" << endl;
         exit(1);
     }
     
-    wffileg.open("wfg.out",ios::out | ios::trunc);
+    wffileg.open("ftes_wfg.out",ios::out | ios::trunc);
     if (!testfile) {
-        cerr << "\n*** Error opening file " << "wfg.out" << " ***\n";
+        cerr << "\n*** Error opening file " << "ftes_wfg.out" << " ***\n";
         cerr << "Execution terminated !" << endl;
         exit(1);
     }
     
-    occfile.open("EV.out",ios::out | ios::trunc);
+    occfile.open("ftes_EV.out",ios::out | ios::trunc);
     if (!testfile) {
-        cerr << "\n*** Error opening file " << "EV.out" << " ***\n";
+        cerr << "\n*** Error opening file " << "ftes_EV.out" << " ***\n";
         cerr << "Execution terminated !" << endl;
         exit(1);
     }
@@ -729,9 +729,9 @@ void incanon() {
 
 
     double1init(dens0_test,nmesh);    
-    densfile.open("dens0.out",ios::out | ios::trunc);
+    densfile.open("ftes_dens0.out",ios::out | ios::trunc);
     if (!densfile) {
-	cout << "\n*** Error opening file " << "dens0.out" << " ***\n";
+	cout << "\n*** Error opening file " << "ftes_dens0.out" << " ***\n";
 	cout << "program is terminating" << endl;
 	exit(1);
     }
@@ -817,9 +817,9 @@ void incanon() {
     
 //  print out density changed from Gaussian points, directly read from ground state    
     
-    densfile2.open("dens02.out",ios::out | ios::trunc);
+    densfile2.open("ftes_dens02.out",ios::out | ios::trunc);
     if (!densfile2) {
-	cout << "\n*** Error opening file " << "dens02.out" << " ***\n";
+	cout << "\n*** Error opening file " << "ftes_dens02.out" << " ***\n";
 	cout << "program is terminating" << endl;
 	exit(1);
     }
@@ -867,26 +867,26 @@ void incanon() {
     
 //   use the density calculated from the wave function 
 
-    denssfile.open("denss.out",ios::out | ios::trunc);
+    denssfile.open("ftes_denss.out",ios::out | ios::trunc);
     if (!denssfile) {
-	cout << "\n*** Error opening file " << "denss.out" << " ***\n";
+	cout << "\n*** Error opening file " << "ftes_denss.out" << " ***\n";
 	cout << "program is terminating" << endl;
 	exit(1);
     }
     
     
     
-    densvfile.open("densv.out",ios::out | ios::trunc);
+    densvfile.open("ftes_densv.out",ios::out | ios::trunc);
     if (!densfile2) {
-	cout << "\n*** Error opening file " << "densv.out" << " ***\n";
+	cout << "\n*** Error opening file " << "ftes_densv.out" << " ***\n";
 	cout << "program is terminating" << endl;
 	exit(1);
     }
     
     
-    denstvfile.open("denstv.out",ios::out | ios::trunc);
+    denstvfile.open("ftes_denstv.out",ios::out | ios::trunc);
     if (!densfile2) {
-	cout << "\n*** Error opening file " << "denstv.out" << " ***\n";
+	cout << "\n*** Error opening file " << "ftes_denstv.out" << " ***\n";
 	cout << "program is terminating" << endl;
 	exit(1);
     }

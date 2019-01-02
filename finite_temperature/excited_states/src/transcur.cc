@@ -338,7 +338,7 @@ void transcur(double *erpa, double **xrpa,
     
     // summing up total j_plus and j_minus
 
-    jtotfile.open("t_jtotal.out", ios::out | ios::trunc);    
+    jtotfile.open("ftes_t_jtotal.out", ios::out | ios::trunc);    
     write_head(jtotfile,0,hp);
     jtotfile << "#total j_plus and j_minus for " << erpa[tr_st_ind] << " MeV" 
       << endl;
@@ -424,29 +424,29 @@ void transcur(double *erpa, double **xrpa,
 	}
     }
 
-    descfile.open("t_desc.out", ios::out | ios::trunc);    
+    descfile.open("ftes_t_desc.out", ios::out | ios::trunc);    
     write_head(descfile,0,hp);
     descfile << "#Transitioncurrents for " << erpa[tr_st_ind] << " MeV" 
       << endl;
     descfile << "# z \t rho \t j_z \t j_rho" << endl;
 
-    cur_tot_file.open("t_cur_tot.out", ios::out | ios::trunc);    
+    cur_tot_file.open("ftes_t_cur_tot.out", ios::out | ios::trunc);    
     cur_tot_file.setf(ios::scientific);
 
-    vel_tot_file.open("t_vel_tot.out", ios::out | ios::trunc);    
+    vel_tot_file.open("ftes_t_vel_tot.out", ios::out | ios::trunc);    
     vel_tot_file.setf(ios::scientific);
 
-    cur_neutron_file.open("t_cur_neutron.out", ios::out | ios::trunc);    
+    cur_neutron_file.open("ftes_t_cur_neutron.out", ios::out | ios::trunc);    
     cur_neutron_file.setf(ios::scientific);
     
-    vel_neutron_file.open("t_vel_neutron.out", ios::out | ios::trunc);    
+    vel_neutron_file.open("ftes_t_vel_neutron.out", ios::out | ios::trunc);    
     vel_neutron_file.setf(ios::scientific);
 
     
-    cur_proton_file.open("t_cur_proton.out", ios::out | ios::trunc);    
+    cur_proton_file.open("ftes_t_cur_proton.out", ios::out | ios::trunc);    
     cur_proton_file.setf(ios::scientific);
     
-    vel_proton_file.open("t_vel_proton.out", ios::out | ios::trunc);    
+    vel_proton_file.open("ftes_t_vel_proton.out", ios::out | ios::trunc);    
     vel_proton_file.setf(ios::scientific);
 
 

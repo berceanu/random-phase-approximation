@@ -145,7 +145,7 @@ void paramet(char *filename) {
       write_calc_parameters();
     else 
     {
-	calcfile.open("calc.out", ios::in);
+	calcfile.open("ftes_calc.out", ios::in);
 	if (!calcfile) {
 	    cout << "there should be a file named calc.out on disk"
 	      << endl;
@@ -170,7 +170,7 @@ void write_parameters()
     fstream paramf;
     
 
-    paramf.open("par.out", ios::out | ios::trunc);
+    paramf.open("ftes_par.out", ios::out | ios::trunc);
 
     paramf << "Parameters read from start.dat: " << endl;
     paramf << "j = " << j << endl;    
@@ -203,7 +203,7 @@ void write_calc_parameters()
 {
     fstream calcf;
     
-    calcf.open("calc.out", ios::out | ios::trunc);
+    calcf.open("ftes_calc.out", ios::out | ios::trunc);
 
     calcf << j << endl;    
     calcf << parity << endl;

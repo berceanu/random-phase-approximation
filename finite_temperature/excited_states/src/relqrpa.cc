@@ -71,7 +71,7 @@ int main(int argc, char **argv) {
     
     // Einlesen von start.dat
 
-    paramet("start.dat");
+    paramet("ftes_start.dat");
 
 
     if (lorchange == 1) 
@@ -166,7 +166,7 @@ int main(int argc, char **argv) {
 
 
     qppair(j, parity);
-    qppairout(j, parity, "qpair.out");
+    qppairout(j, parity, "ftes_qpair.out");
         
     cout << npair << " pairs found!" << endl;
     cout << npair_ph << "/" << npair_ah << 
@@ -237,8 +237,8 @@ int main(int argc, char **argv) {
 	
 	if (matprint == 1)
         {
-            mout(arpa,npair,6,"rel. RPA-Matrix A","arpa.con");
-            mout(brpa,npair,6,"rel. RPA-Matrix B","brpa.con");
+            mout(arpa,npair,6,"rel. RPA-Matrix A","ftes_arpa.con");
+            mout(brpa,npair,6,"rel. RPA-Matrix B","ftes_brpa.con");
         }
         
 	        		
@@ -251,15 +251,15 @@ int main(int argc, char **argv) {
 	    }
 	}
 	
-	mbout(arpac,npair,"arpa.bin");
-	mbout(brpac,npair,"brpa.bin");
+	mbout(arpac,npair,"ftes_arpa.bin");
+	mbout(brpac,npair,"ftes_brpa.bin");
 	
 	
     }
     else 
     {
-	mbin(arpac,npair,"arpa.bin");
-	mbin(brpac,npair,"brpa.bin");
+	mbin(arpac,npair,"ftes_arpa.bin");
+	mbin(brpac,npair,"ftes_brpa.bin");
 	
 	for (n = 0; n <= npair; n++) {
 	    for (m = 0; m <= npair; m++) 
@@ -361,16 +361,16 @@ int main(int argc, char **argv) {
 	
 	cout << "saving x- and y-matrices and energies on disk" << endl;
 		  
-	mbout(xrpac,npair,2*npair,"xrpa.bin");
-	mbout(yrpac,npair,2*npair,"yrpa.bin");
-	vbout(erpac,2*npair,"erpa.bin");
-	vbout(c_erpac,2*npair,"c_erpa.bin");
+	mbout(xrpac,npair,2*npair,"ftes_xrpa.bin");
+	mbout(yrpac,npair,2*npair,"ftes_yrpa.bin");
+	vbout(erpac,2*npair,"ftes_erpa.bin");
+	vbout(c_erpac,2*npair,"ftes_c_erpa.bin");
 	
         	
 // add print out
 
-            mout(xrpa,npair,6,"rel. RPA-X","xrpa.con");
-            mout(yrpa,npair,6,"rel. RPA-Y","yrpa.con");
+            mout(xrpa,npair,6,"rel. RPA-X","ftes_xrpa.con");
+            mout(yrpa,npair,6,"rel. RPA-Y","ftes_yrpa.con");
 
 
     
@@ -386,11 +386,11 @@ int main(int argc, char **argv) {
 
 
     cout << "calculating excitation-strength" << endl;	
-    excstr(erpa,xrpa,yrpa,npair,j,"excskal.out","excvec.out",
-	   "curve.out","neudens.out","prodens.out",
-	   "totdens.out", "lorskal.out", 
-	   "lorvec.out","pskal.out", "pvec.out", 
-	   "strength.out", 
+    excstr(erpa,xrpa,yrpa,npair,j,"ftes_excskal.out","ftes_excvec.out",
+	   "ftes_curve.out","ftes_neudens.out","ftes_prodens.out",
+	   "ftes_totdens.out", "ftes_lorskal.out", 
+	   "ftes_lorvec.out","ftes_pskal.out", "ftes_pvec.out", 
+	   "ftes_strength.out", 
 	   lorswidth, lorvwidth, 0);
   
     
@@ -463,11 +463,11 @@ int main(int argc, char **argv) {
 	rpaprobe(npair,arpa,brpa,xrpa,yrpa,erpa);
 
 	cout << "calculating hartree excitation-strength" << endl;	
-	excstr(erpa,xrpa,yrpa,npair,j,"harexcskal.out","harexcvec.out", 
-	       "harcurve.out","harneudens.out","harprodens.out",
-	       "hartotdens.out", "harlorskal.out", 
-	       "harlorvec.out", "harpskal.out", "harpvec.out", 
-	       "harstrength.out", hlorswidth, hlorvwidth, 1);
+	excstr(erpa,xrpa,yrpa,npair,j,"ftes_harexcskal.out","ftes_harexcvec.out", 
+	       "ftes_harcurve.out","ftes_harneudens.out","ftes_harprodens.out",
+	       "ftes_hartotdens.out", "ftes_harlorskal.out", 
+	       "ftes_harlorvec.out", "ftes_harpskal.out", "ftes_harpvec.out", 
+	       "ftes_harstrength.out", hlorswidth, hlorvwidth, 1);
     }
     
     goto ende;
@@ -478,12 +478,12 @@ int main(int argc, char **argv) {
   lorenzneu:
     if (lorchange == 1) 
     {	
-	lorneu("pskal.out", "pvec.out", "nlorskal.out",
-	       "nlorvec.out");
+	lorneu("ftes_pskal.out", "ftes_pvec.out", "ftes_nlorskal.out",
+	       "ftes_nlorvec.out");
 	
 	if (hartree == 1)
-	  lorneu("harpskal.out", "harpvec.out",
-		 "nharlorskal.out", "nharlorvec.out");
+	  lorneu("ftes_harpskal.out", "ftes_harpvec.out",
+		 "ftes_nharlorskal.out", "ftes_nharlorvec.out");
 
 	goto ende;	
     }
@@ -496,10 +496,10 @@ int main(int argc, char **argv) {
   
     // test if x and y and energies are on disk-file
 
-    xrpafile.open("xrpa.bin", ios::in);
-    yrpafile.open("yrpa.bin", ios::in);
-    erpafile.open("erpa.bin", ios::in);
-    c_erpafile.open("c_erpa.bin", ios::in);
+    xrpafile.open("ftes_xrpa.bin", ios::in);
+    yrpafile.open("ftes_yrpa.bin", ios::in);
+    erpafile.open("ftes_erpa.bin", ios::in);
+    c_erpafile.open("ftes_c_erpa.bin", ios::in);
     
     if ((!xrpafile) || (!yrpafile) || (!erpafile) ||
 	(!c_erpafile)) {
@@ -522,10 +522,10 @@ int main(int argc, char **argv) {
     double1init(erpa,2*npair);
     double1init(c_erpa,2*npair);
 
-    mbin(xrpac,npair,2*npair,"xrpa.bin");
-    mbin(yrpac,npair,2*npair,"yrpa.bin");
-    vbin(erpac,2*npair,"erpa.bin");
-    vbin(c_erpac,2*npair,"c_erpa.bin");	
+    mbin(xrpac,npair,2*npair,"ftes_xrpa.bin");
+    mbin(yrpac,npair,2*npair,"ftes_yrpa.bin");
+    vbin(erpac,2*npair,"ftes_erpa.bin");
+    vbin(c_erpac,2*npair,"ftes_c_erpa.bin");	
     
 
     for (n = 0; n <= npair; n++) {
@@ -566,11 +566,11 @@ int main(int argc, char **argv) {
     if (exccalc == 1)
     {
 	cout << "### calculating excitation-strength ###" << endl;	
-	excstr(erpa,xrpa,yrpa,npair,j,"excskal.out","excvec.out",
-	       "curve.out","neudens.out","prodens.out",
-	       "totdens.out", "lorskal.out", 
-	       "lorvec.out","pskal.out", "pvec.out", 
-	       "strength.out", 
+	excstr(erpa,xrpa,yrpa,npair,j,"ftes_excskal.out","ftes_excvec.out",
+	       "ftes_curve.out","ftes_neudens.out","ftes_prodens.out",
+	       "ftes_totdens.out", "ftes_lorskal.out", 
+	       "ftes_lorvec.out","ftes_pskal.out", "ftes_pvec.out", 
+	       "ftes_strength.out", 
 	       lorswidth, lorvwidth, 0);
     }
 
@@ -579,13 +579,13 @@ int main(int argc, char **argv) {
     if (transdens == 1) 
     {	
 	cout << "### calculating transitiondensities ###" << endl;	
-	trans(erpa,xrpa,yrpa,npair,j,"transdens.out","transsum.out",0);
+	trans(erpa,xrpa,yrpa,npair,j,"ftes_transdens.out","ftes_transsum.out",0);
     }
     
     if (tc_cur == 1)
     {
 	cout << "### calculating transition-currents ###" << endl;	
-	transcur(erpa,xrpa,yrpa,npair,j,"t_cur.out","t_vel.out",0);
+	transcur(erpa,xrpa,yrpa,npair,j,"ftes_t_cur.out","ftes_t_vel.out",0);
     }
     
 
