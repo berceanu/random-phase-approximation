@@ -1,3 +1,14 @@
+#ifdef _WIN32
+#include <direct.h>
+// MSDN recommends against using getcwd & chdir names
+#define cwd _getcwd
+#define cd _chdir
+#else
+#include "unistd.h"
+#define cwd getcwd
+#define cd chdir
+#endif
+
 #include "common.h"
 #include "base.h"
 #include "sla.h"
@@ -12,6 +23,8 @@ double1(rmass);
 int lmax;
 double gcoul;
 int natural_parity;
+
+char buf[4096]; // never know how much is needed
 
 int main(int argc, char **argv) {
 
@@ -37,6 +50,16 @@ int main(int argc, char **argv) {
     int ab_read = 0;
     void qppair(int, int);
     
+    if (argc > 1) {
+        cout  << "CWD: " << cwd(buf, sizeof buf) << endl;
+
+        // Change working directory and test for success
+        if (0 == cd(argv[1])) {
+        cout << "CWD changed to: " << cwd(buf, sizeof buf) << endl;
+        }
+    } else {
+        cout << "No directory provided." << endl;
+    }    
 
     Eigenvalue *ev;
     
