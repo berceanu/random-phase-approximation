@@ -20,6 +20,8 @@ log
 start.dat
 dis.dat
 build
+Release/
+Debug/
 run
 CMakeLists.txt.user
 *.code-workspace
