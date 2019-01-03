@@ -10,3 +10,4 @@ Changelog:$
 - replaced `file=` with `file='dish_' //`
 - input file is now called `dish_dis.dat`
 - added option to take working directory from command line
+

@@ -49,7 +49,7 @@ c
 c     plot for wavefunctions:
 c----------------------------
 c      k0 = ia(ib) + k
-c      open(lplo,file='dis.wplo',status='unknown')
+c      open(lplo,file='dish_' //'dis.wplo',status='unknown')
 c         write(lplo,101) ' wavefunction f(r)',
 c     &                   tit(it),txb(ip),k,v2(k0,it)
 c  101    format(a,a,a,' n =',i3,f15.3)
