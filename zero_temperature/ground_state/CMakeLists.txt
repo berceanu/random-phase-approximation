@@ -1,26 +1,17 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.5)
 
-project(ztgs)
-enable_language(Fortran)
+project(dish Fortran)
 
-#if(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
-#    set(dialect "-ffree-form -std=f2008 -fimplicit-none")
-#    set(bounds "-fbounds-check")
-#endif()
-#if(CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
-#    set(dialect "-stand f08 -free -implicitnone")
-#    set(bounds "-check bounds")
-#endif()
-#if(CMAKE_Fortran_COMPILER_ID MATCHES "PGI")
-#    set(dialect "-Mfreeform -Mdclchk -Mstandard -Mallocatable=03")
-#    set(bounds "-C")
-#endif()
+# Add our local modlues to the module path
+SET(CMAKE_MODULE_PATH "../../cmake_fortran/Modules/")
 
-set(CMAKE_Fortran_FLAGS_DEBUG "${CMAKE_Fortran_FLAGS_DEBUG} ${bounds}")
-set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} ${dialect}")
+# This INCLUDE statement executes code that sets the compile flags for DEBUG,
+# RELEASE, and TESTING.  You should  review this file and make sure the flags 
+# are to your liking.
+INCLUDE(${CMAKE_MODULE_PATH}/SetFortranFlags.cmake)
 
 #
 # Compile.
 #
-file(GLOB_RECURSE sources  src/*.f)
-add_executable(ztgs ${sources})
+file(GLOB sources  src/*.f)
+add_executable(dish ${sources})
