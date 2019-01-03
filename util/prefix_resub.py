@@ -28,9 +28,9 @@ def sed_inplace(filename, pattern, repl):
 
 
 def main():
-    prefix = r'ztes_'
+    prefix = r'ftes_'
 
-    files = sys.argv[1:] # eg., /home/berceanu/Development/rpa/zero_temperature/excited_states/src/*.cc
+    files = sys.argv[1:] # eg., /home/berceanu/Development/rpa/finite_temperature/excited_states/unused/*.cc
 
     for f in files:
         sed_inplace(f, r'\"(?P<filename>[\w]+)(?P<ext>\.[A-Za-z]{3})\"',

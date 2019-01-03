@@ -421,11 +421,11 @@ void excstr(double *erpa, double **xrpa,
     write_head(strengthfile,-1,hp);
     
  //add    
-    lorskalfile1.open("REsca.out", ios::out | ios::trunc);
+    lorskalfile1.open("ftes_REsca.out", ios::out | ios::trunc);
     lorskalfile1.setf(ios::scientific);
     write_head(lorskalfile1,0,hp);
     
-    lorvecfile1.open("REvec.out", ios::out | ios::trunc);
+    lorvecfile1.open("ftes_REvec.out", ios::out | ios::trunc);
     lorvecfile1.setf(ios::scientific);
     write_head(lorvecfile1,1,hp);
 
@@ -1129,7 +1129,7 @@ static void write_head(fstream &resfile, int ispar, int ihar)
 	    resfile << "#please makes sure that binary matrices" 
 	      << "matching your calculation" << endl;
 	    resfile << "#relevant interaction parameters " 
-	      << "from file start.dat"
+	      << "from file ftes_start.dat"
 		<< endl;
 	    resfile << "#j = " << j << endl;
 	    resfile << "#parity = " << parity << endl;
