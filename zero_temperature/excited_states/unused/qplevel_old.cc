@@ -196,7 +196,7 @@ void qplevel() {
     }
          
 
-    levfile.open("qplevel.out", ios::out | ios::trunc);
+    levfile.open("ztes_qplevel.out", ios::out | ios::trunc);
 
     levfile.precision(10);
     

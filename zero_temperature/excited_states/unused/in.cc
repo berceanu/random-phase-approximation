@@ -65,7 +65,7 @@ void in() {
     double fsum = zero;
     double gsum = zero;
     double1(testsum);
-    char* filename1 = "rpa.wel";    
+    char* filename1 = "ztes_rpa.wel";    
     fstream savfile;
     int nmeshpro;
     double rmaxpro;
@@ -373,9 +373,9 @@ void in() {
 
 
     double1init(dens0_test,nmesh);    
-    densfile.open("dens0.out",ios::out | ios::trunc);
+    densfile.open("ztes_dens0.out",ios::out | ios::trunc);
     if (!densfile) {
-	cout << "\n*** Error opening file " << "dens0.out" << " ***\n";
+	cout << "\n*** Error opening file " << "ztes_dens0.out" << " ***\n";
 	cout << "program is terminating" << endl;
 	exit(1);
     }

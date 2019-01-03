@@ -148,7 +148,7 @@ void level() {
     sortier(npartprot,enpart,partic,2);
         
 
-    levfile.open("level.out", ios::out | ios::trunc);
+    levfile.open("ztes_level.out", ios::out | ios::trunc);
     
 
     levfile << "levels in " << nucnam << nama << endl << endl;
