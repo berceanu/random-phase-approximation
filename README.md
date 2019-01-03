@@ -1,18 +1,14 @@
 # rpa
 
 RPA for zero and finite temperature, both FORTRAN (ground state) and C++ (excited states) codes.
+See the original [paper](http://dx.doi.org/10.1016/j.physletb.2009.10.046).
 
 TODO:
 - write table to output file
-- create Python wrapper
 - make list of available nuclei
 - remove `filetest.py` and `transerg.in`
-- `./run` codes and compare results with `lorentzian.png`; see the original [paper](http://dx.doi.org/10.1016/j.physletb.2009.10.046)
-- mock C++ and Fortran codes with minimal functionality
-- prepend all filenames with `working_dir` command line parameter, defaulting to `.`
 - write `generate_inputs` function -- see `draft.py`
 - implement `_read_last_line` condition function; add "DONE" line to output
-- add compilation optimization flags
 
 PARAMETERS TO VARY:
 - nucleus
