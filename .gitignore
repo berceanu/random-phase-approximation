@@ -12,7 +12,6 @@ T0*
 *.pot
 *.vpp
 *.wplo
-*.txt
 .vscode
 __pycache__
 2.0*
