@@ -259,7 +259,7 @@ void transcur(double *erpa, double **xrpa,
 	cout << tr_st_set << " valid energies found!" << endl;
 	cout << "exact one matching energy is allowed" << endl;	
 	cout << "program is terminating" << endl;
-	cout << "Transition-energy in start.dat = " << tc_erg << endl;
+	cout << "Transition-energy in ftes_start.dat = " << tc_erg << endl;
 	exit(1);
     }
     
@@ -843,7 +843,7 @@ static void write_head(fstream &resfile, int ispar, int ihar)
 	    resfile << "#please makes sure that binary matrices" 
 	      << "matching your calculation" << endl;
 	    resfile << "#relevant interaction parameters " 
-	      << "from file start.dat"
+	      << "from file ftes_start.dat"
 		<< endl;
 	    resfile << "#j = " << j << endl;
 	    resfile << "#parity = " << parity << endl;

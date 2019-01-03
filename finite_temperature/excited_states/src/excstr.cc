@@ -1085,7 +1085,7 @@ static void write_head(fstream &resfile, int ispar, int ihar)
 	    resfile << "#please makes sure that binary matrices" 
 	      << "matching your calculation" << endl;
 	    resfile << "#relevant interaction parameters " 
-	      << "from file start.dat"
+	      << "from file ftes_start.dat"
 		<< endl;
 	    resfile << "#j = " << j << endl;
 	    resfile << "#parity = " << parity << endl;

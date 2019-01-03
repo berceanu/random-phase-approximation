@@ -69,7 +69,7 @@ int main(int argc, char **argv) {
     gcoul = (1./137.03602);
     
     
-    // Einlesen von start.dat
+    // Einlesen von ftes_start.dat
 
     paramet("ftes_start.dat");
 
@@ -132,7 +132,7 @@ int main(int argc, char **argv) {
     lmax = j + 1;
         
 
-    // reading file qrpa.wel
+    // reading file skys_rpa.wel
     incanon(); 
 
     // preparing the Gaussian-integration on double-mesh
