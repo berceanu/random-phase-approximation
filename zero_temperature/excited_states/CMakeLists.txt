@@ -10,13 +10,13 @@ if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
     set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 endif()
 
-#
-# Compile.
-#
+set (source_dir "${PROJECT_SOURCE_DIR}/src/")
+set (include_dir "${PROJECT_SOURCE_DIR}/include/")
 
-file (GLOB source_files src/*.cc include/*.h)
+file (GLOB source_files "${source_dir}/*.cc")
+file (GLOB include_files "${include_dir}/*.h")
 
-add_executable (ztes ${source_files})
+add_executable (ztes ${source_files} ${include_files})
 
-target_include_directories(ztes PRIVATE include/)
+target_include_directories(ztes PRIVATE ${include_dir})
 target_link_libraries(ztes m)
