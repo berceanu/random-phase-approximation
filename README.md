@@ -35,9 +35,9 @@ UTILITIES in `util`:
 
 WORKFLOW:
 zero temperature:
-- `dish_dis.dat` -> FORTRAN (`ztgs`) -> `dish_qrpa.wel` + `ztes_start.dat` -> C++ (`ztes`) -> `ztes_lorvec.out`
+- `dish_dis.dat` -> FORTRAN (`dish`) -> `dish_qrpa.wel` + `ztes_start.dat` -> C++ (`ztes`) -> `ztes_lorvec.out`
 finite temperature:
-- `skys_dis.dat` -> FORTRAN (`ftgs`) -> `skys_rpa.wel` + `ftes_start.dat` -> C++ (`ftes`) -> `ftes_lorvec.out`
+- `skys_dis.dat` -> FORTRAN (`skys`) -> `skys_rpa.wel` + `ftes_start.dat` -> C++ (`ftes`) -> `ftes_lorvec.out`
 
 1. generate `_start.dat` and `_dis.dat`
 2. run both ground state `Fortran` codes
