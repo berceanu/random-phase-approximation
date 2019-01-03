@@ -67,7 +67,7 @@ int main(int argc, char **argv) {
     gcoul = (1./137.03602);
     
     
-    // Einlesen von start.dat
+    // Einlesen von ztes_start.dat
 
     paramet("ztes_start.dat");
 

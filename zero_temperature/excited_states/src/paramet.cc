@@ -172,7 +172,7 @@ void write_parameters()
 
     paramf.open("ztes_par.out", ios::out | ios::trunc);
 
-    paramf << "Parameters read from start.dat: " << endl;
+    paramf << "Parameters read from ztes_start.dat: " << endl;
     paramf << "j = " << j << endl;    
     paramf << "parity = " << parity << endl;
     paramf << "ediffmaxu = " << ediffmaxu << endl;
