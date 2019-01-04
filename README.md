@@ -6,7 +6,7 @@ See the original [paper](http://dx.doi.org/10.1016/j.physletb.2009.10.046).
 TODO:
 - write table to output file
 - remove `filetest.py` and `transerg.in`
-- write `generate_inputs` function -- see `draft.py`
+- write `generate_inputs` function
 - implement `_read_last_line` condition function; add "DONE" line to output
 
 PARAMETERS TO VARY:
