@@ -1,7 +1,7 @@
 # To generate the depfile:
 # make clean
 # make CPPFLAGS:=-MMD
-# cat *.d | sed -e 's/\\//g' -e 's/:/ /g' -e 's/ \+/\n/g' | sort -u > depfile.txt
+# cat *.d | sed -e 's/\\//g' -e 's/:/ /g' -e 's/ \+/\n/g' | sort -u
 
 base.h
 bin.h
