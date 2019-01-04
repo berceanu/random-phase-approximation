@@ -5,8 +5,8 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 import numpy as np
 
 def main():
-    fname_zt = "out/ztes_lorvec.out"
-    fname_ft = "out/ftes_lorvec.out"
+    fname_zt = "out_no_matrix/ztes_lorvec.out"
+    fname_ft = "out_no_matrix/ftes_lorvec.out"
 
     arr_zt = np.loadtxt(fname_zt)
     arr_ft = np.loadtxt(fname_ft)
@@ -38,7 +38,7 @@ def main():
     ax.legend()
     ax.set_title(r"${}^{62} Ni \; 1^{-}$")
     
-    canvas.print_figure("out/lorentzian.png")
+    canvas.print_figure("out_no_matrix/lorentzian.png")
 
 if __name__ == '__main__':
     main()
