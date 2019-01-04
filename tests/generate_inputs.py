@@ -26,7 +26,7 @@ if __name__ == "__main__":
     finite_temp_gstate_block = (
         "Delta    =  0.000   0.000           ! Gapparameter for neutrons and  protons\n"
         "temp     =  2.0                     ! temperature\n"
-        "filename =  T0\n"
+        "filename =  T0__\n"
     )
     common_estate_block = (
         "j          =   1                    ! resulting j of ph-pairs\n"
