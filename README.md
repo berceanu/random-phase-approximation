@@ -8,6 +8,7 @@ TODO:
 - remove `filetest.py` and `transerg.in`
 - write `generate_inputs` function
 - implement `_read_last_line` condition function; add "DONE" line to output
+- implement `signac` workflow - see `signac.md`
 
 PARAMETERS TO VARY:
 - nucleus under consideration: `NI56`, `NI60`, `NI62`, `NI68`, `ZR90`, `SN132`, `PB208`
