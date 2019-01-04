@@ -11,13 +11,12 @@ TODO:
 
 PARAMETERS TO VARY:
 - nucleus under consideration: `NI56`, `NI60`, `NI62`, `NI68`, `ZR90`, `SN132`, `PB208`
-	- these isotopes have different mass number `A`
+	- note the various isotopes of Ni
 - angular momentum of particle-hole pairs `j` : `1` or `0`
-- `parity` of particle-hole pairs: `+` or `-` (`1` or `0`)
+- `parity` of particle-hole pairs: + or - (`1` or `0`)
 - temperature `temp` : `1.0` or `2.0` (in MeV)
 - transition energy for calculating transition amplitudes `transerg` : `9.78`, `10.03` etc (in MeV)
 	- we must avoid the whole matrix elements calculation when looking at different transition energies
-
 
 FILES:
 - `_[q]rpa.wel` : FORTRAN output
