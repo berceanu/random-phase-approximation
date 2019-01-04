@@ -25,7 +25,7 @@ FILES:
 UTILITIES in `util`:
 - `plotter.py` : generate `lorentzian.png` from `lorvec.out`
 - `draft.py` : run codes
-- `make.py` : convert `Makefile` to `CMakeLists.txt`
+- `parse_makefile.py` : convert `Makefile` to `CMakeLists.txt`
 - `prefix_resub.py` : add a prefix to all filenames in a codebase
 
 WORKFLOW:
