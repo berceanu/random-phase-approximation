@@ -29,10 +29,8 @@ UTILITIES in `util`:
 - `prefix_resub.py` : add a prefix to all filenames in a codebase
 
 WORKFLOW:
-zero temperature:
-- `dish_dis.dat` -> FORTRAN (`dish`) -> `dish_qrpa.wel` + `ztes_start.dat` -> C++ (`ztes`) -> `ztes_lorvec.out`
-finite temperature:
-- `skys_dis.dat` -> FORTRAN (`skys`) -> `skys_rpa.wel` + `ftes_start.dat` -> C++ (`ftes`) -> `ftes_lorvec.out`
+- `dish_dis.dat` -> FORTRAN (`dish`) -> `dish_qrpa.wel` + `ztes_start.dat` -> C++ (`ztes`) -> `ztes_lorvec.out` zero temperature
+- `skys_dis.dat` -> FORTRAN (`skys`) -> `skys_rpa.wel` + `ftes_start.dat` -> C++ (`ftes`) -> `ftes_lorvec.out` finite temperature
 
 1. generate `_start.dat` and `_dis.dat`
 2. run both ground state `Fortran` codes
@@ -41,3 +39,8 @@ finite temperature:
 - for table: change `transerg` to `9.78` (or other desired energy). Output on screen
 - to avoid matrix elements calculation, change `calc, xyprint` from `1` to `0` and `xyread` from `0` to `1`
 
+ACRONYMS:
+- HFB : Hartree–Fock Bogoliubov
+- RMF : Relativistic Mean-Field
+- FTRRPA : self-consistent Finite-Temperature Relativistic Random Phase Approximation
+- QRPA : Quasiparticle Random Phase Approximation
