@@ -25,7 +25,6 @@ Debug/
 run
 CMakeLists.txt.user
 *.code-workspace
-*.png
 ftes_*
 ztes_*
 skys_*
