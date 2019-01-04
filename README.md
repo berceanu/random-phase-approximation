@@ -10,10 +10,13 @@ TODO:
 - implement `_read_last_line` condition function; add "DONE" line to output
 
 PARAMETERS TO VARY:
-- nucleus
-- temperature
-- angular momentum J
-- parity $\Pi$
+- nucleus under consideration: `NI56`, `NI60`, `NI62`, `NI68`, `ZR90`, `SN132`, `PB208`
+	- these isotopes have different mass number `A`
+- angular momentum of particle-hole pairs `j` : `1` or `0`
+- `parity` of particle-hole pairs: `+` or `-` (`1` or `0`)
+- temperature `temp` : `1.0` or `2.0` (in MeV)
+- transition energy for calculating transition amplitudes `transerg` : `9.78`, `10.03` etc (in MeV)
+	- we must avoid the whole matrix elements calculation when looking at different transition energies
 
 
 FILES:
@@ -40,7 +43,7 @@ WORKFLOW:
 - to avoid matrix elements calculation, change `calc, xyprint` from `1` to `0` and `xyread` from `0` to `1`
 
 ACRONYMS:
-- HFB : Hartree–Fock Bogoliubov
-- RMF : Relativistic Mean-Field
-- FTRRPA : self-consistent Finite-Temperature Relativistic Random Phase Approximation
-- QRPA : Quasiparticle Random Phase Approximation
+- _HFB_ : Hartree–Fock Bogoliubov
+- _RMF_ : Relativistic Mean-Field
+- _FTRRPA_ : self-consistent Finite-Temperature Relativistic Random Phase Approximation
+- _QRPA_ : Quasiparticle Random Phase Approximation
