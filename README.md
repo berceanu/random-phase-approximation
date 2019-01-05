@@ -42,8 +42,10 @@ WORKFLOW:
 
 - for table: change `transerg` to `9.78` (or other desired energy). Output on screen
 - to avoid matrix elements calculation, change `calc, xyprint` from `1` to `0` and `xyread` from `0` to `1`
-	- doing this will require the files : `(z|f)tes_arpa.bin`, `(z|f)tes_brpa.bin`, `(z|f)tes_xrpa.bin`, `(z|f)tes_yrpa.bin`, `(z|f)tes_erpa.bin`, `(z|f)tes_c_erpa.bin`
-	- it seems the generated `out_no_matrix/lorentzian.png` looks different in this case
+	- doing this will require the files : `(z|f)tes_arpa.bin`, `(z|f)tes_brpa.bin`,
+	 `(z|f)tes_xrpa.bin`, `(z|f)tes_yrpa.bin`, `(z|f)tes_erpa.bin`, `(z|f)tes_c_erpa.bin`
+	 so the code has to be run before to generate these files
+	- possible bug: it seems the generated `out_no_matrix/lorentzian.png` looks different in this case
 
 ACRONYMS:
 - _HFB_ : Hartree–Fock Bogoliubov
