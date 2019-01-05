@@ -25,3 +25,5 @@ cp full_calc_out/ftes_c_erpa.bin out_no_matrix/
 ./skys out_no_matrix/ > out_no_matrix/skys_stdout.txt 2> out_no_matrix/skys_stderr.txt
 ./ztes out_no_matrix/ > out_no_matrix/ztes_stdout.txt 2> out_no_matrix/ztes_stderr.txt
 ./ftes out_no_matrix/ > out_no_matrix/ftes_stdout.txt 2> out_no_matrix/ftes_stderr.txt
+
+./plot_lorentzian.py
