@@ -3,17 +3,15 @@
 import os
 import sys
 import sh
+import argparse
 
 import logging
 from collections import defaultdict
 
 level = logging.INFO
 format = '  %(message)s'
-handlers = [logging.FileHandler('filename.log'), logging.StreamHandler()]
+handlers = [logging.FileHandler('run_codes.log'), logging.StreamHandler()]
 logging.basicConfig(level = level, format = format, handlers = handlers)
-
-logging.info('Hey, this is working!')
-
 
 
 CODE_NAME = { # mapping from executable names to what they represent
@@ -24,23 +22,15 @@ CODE_NAME = { # mapping from executable names to what they represent
     'finite' : {
         'ground' : 'skys',
         'excited' : 'ftes' 
-    }}
-
-
-    # 'zero_temp_ground_state'    CODE_NAME['zero']['ground']
-    # 'finite_temp_ground_state'  CODE_NAME['finite']['ground']
-    # 'zero_temp_excited_state'   CODE_NAME['zero']['excited']
-    # 'finite_temp_excited_state' CODE_NAME['finite']['excited']
-
-            
+    }
+}
 
 def generate_inputs(nuleus="NI62", angular_momentum=1, parity="-", temperature=2.0, transition_energy=9.78,
-                    out_path='.',
-                    compute_matrix=True):
+                    out_path=os.getcwd(), load_matrix=False):
     """Generates input files dish_dis.dat, skys_dis.dat and (z|f)tes_start.dat.
 
     When looking at different transition energies for the same nucleus, one can avoid re-calculating
-    the matrix elements by passing compute_matrix=False
+    the matrix elements by passing load_matrix=True
 
     Args:
         nuleus: nucleus under consideration, eg. NI56, NI60, NI62, NI68, ZR90, SN132, PB208
@@ -48,7 +38,7 @@ def generate_inputs(nuleus="NI62", angular_momentum=1, parity="-", temperature=2
         parity: + or -
         temperature: eg. 2.0 (in MeV)
         transition_energy: eg. 9.78 (in MeV)
-        compute_matrix: flag that controls the matrix elements calculation, default is to perform the calculation
+        load_matrix: flag that controls the matrix elements calculation, default is to perform the calculation
 
         out_path: path of folder to write files to
     
@@ -60,10 +50,10 @@ def generate_inputs(nuleus="NI62", angular_momentum=1, parity="-", temperature=2
 
     parameters = { # dictionary containing parameters for string substitution
         'transerg':transition_energy,
-        'calc':int(compute_matrix),
-        'xyprint':int(compute_matrix),
-        'xyread':int(not compute_matrix), # this is 0 when compute_matrix is True
-        'xyprobe':int(not compute_matrix),
+        'calc':int(not load_matrix), # do not calculate when you load the matrix
+        'xyprint':int(not load_matrix),
+        'xyread':int(load_matrix),
+        'xyprobe':int(load_matrix),
         'j':angular_momentum,
         'parity':actual_parity[parity],
         'temp':temperature,
@@ -73,7 +63,7 @@ def generate_inputs(nuleus="NI62", angular_momentum=1, parity="-", temperature=2
     block = defaultdict(dict)
 
     # define blocks for FORTRAN input files
-    common_gstate_block = (
+    block['zero']['ground'] = block['finite']['ground'] = ( # common gs block
         "l6       =   10                     ! output file\n"
         "n0f      =   20   20                ! number of oscillator shells\n"
         "b0       =   -1.6280835             ! oscillator parameter (fm**-1) of basis\n"
@@ -82,7 +72,7 @@ def generate_inputs(nuleus="NI62", angular_momentum=1, parity="-", temperature=2
         "{XA}                                ! nucleus under consideration\n"
     ).format(**parameters) # substitute parameter values into string
 
-    block['zero']['ground'] = (
+    block['zero']['ground'] += ( # append to common gs block
         "Fixedgap = 00.000    00.000         ! Frozen Gapparmeter for neutr. and proton\n"
         "GA       = 00.000    00.000         ! Pairing-Constants GG = GA/A\n"
         "Init.Gap = 01.000    01.000         ! Initial values for the Gap parameters\n"
@@ -92,14 +82,14 @@ def generate_inputs(nuleus="NI62", angular_momentum=1, parity="-", temperature=2
         "blocking:   0  0  0  0              ! Blocking protons:  y/n, j, ip, nr\n"
     )
 
-    block['finite']['ground'] = (
+    block['finite']['ground'] += ( # append to common gs block
         "Delta    =  0.000   0.000           ! Gapparameter for neutrons and  protons\n"
         "temp     =  {temp}                  ! temperature\n"
         "filename =  T0__\n"
     ).format(**parameters)
 
     # define block for C++ input files
-    common_estate_block = (
+    block['zero']['excited'] = block['finite']['excited'] = ( # common excited state block
         "j          =   {j}                  ! resulting j of ph-pairs\n"
         "parity     =   {parity}             ! parity of ph-pairs 1:+ 0:-\n"
         "ediffmaxu  =   200.0                ! maximal excitation-energy particles\n"
@@ -130,33 +120,20 @@ def generate_inputs(nuleus="NI62", angular_momentum=1, parity="-", temperature=2
         fpath = os.path.join(out_path, fname)
         with open(fpath, "w") as f:
             f.write(block_to_write)
-        print("Wrote {}.".format(fpath))
-        
-    # create C++ input files
-    for t in ('zero', 'finite'):
-        write_params_to(CODE_NAME[t]['excited'] + "_start.dat", common_estate_block)
-         
+        logging.info("Wrote {}.".format(fpath))
+    
+    for temp in ('zero', 'finite'): # create input files
+        for state, suffix in zip(('ground', 'excited'), ("_dis.dat", "_start.dat")):
+            write_params_to(CODE_NAME[temp][state] + suffix, block[temp][state])
 
-    # create FORTRAN input files
-    for t in ('zero', 'finite'):
-        write_params_to(CODE_NAME[t]['ground'] + '_dis.dat', common_gstate_block + block[t]['ground'])
-
-    print('Generated all input files.')
+    logging.info('Generated all input files.')
 
     return
 
 
-def get_all_codenames():
-    codes = []
-    for temp in ('zero', 'finite'):
-        for state in ('ground', 'excited'):
-            codes.append(CODE_NAME[temp][state])
-    return codes
-
-
-def run_executable_names(exenames=['dish','skys','ztes','ftes'], out_path='.', exepath='../bin',
-                         compute_matrix=True):
-    """Run the executable_names in the list, according to pattern.
+def run_executables(exenames=['dish','skys','ztes','ftes'], out_path=os.getcwd(), exepath='../bin',
+                         load_matrix=False):
+    """Run the executable names in the list, according to pattern.
 
     {binary} {path} > {path}/{binary_stdout.txt} 2> {path}/{binary_stderr.txt}
     """
@@ -168,9 +145,9 @@ def run_executable_names(exenames=['dish','skys','ztes','ftes'], out_path='.', e
         stderr_file = os.path.join(out_path,f+"_stderr.txt")
 
         run[f](out_path, _out=stdout_file, _err=stderr_file)
-        print("Finished running {}.".format(f))
+        logging.info("Finished running {}.".format(f))
     
-    print('Finished all executables.')
+    logging.info('Finished running all executables.')
     
     return
 
@@ -178,71 +155,110 @@ def run_executable_names(exenames=['dish','skys','ztes','ftes'], out_path='.', e
 def plot_lorvec():
     pass
 
-
-
-if __name__ == "__main__":
-    """Generates the inputs based on the command line arguments."""
-
-    script_name = sys.argv[0]
-
-    # did we get 2 command line args?
-    if len(sys.argv) - 1 != 2:
-        sys.exit("""Usage:
-    {} read_matrix/ --no-matrix
-    {} calc_matrix/ --with-matrix""".format(script_name, script_name))
-
-    # parse second command line arg
-    try:
-        matrix_flag = sys.argv[2] # --no-matrix if we want to avoid matrix calculation
-    except IndexError:
-        sys.exit("Didn't provide --with-matrix or --no-matrix argument, exiting.")
-    else:
-        if matrix_flag == "--no-matrix":
-            compute_matrix = False
-        elif matrix_flag == "--with-matrix":
-            compute_matrix = True
-        else:
-            sys.exit("Invalid command line argument {}, exiting.".format(matrix_flag))
-
-    # parse first command line arg
-    try:
-        out_path = sys.argv[1] # get output folder from command line, eg. out/
-    except IndexError:
-        sys.exit('Need to provide output folder, exiting.')
-    else:
-        try:
-            os.makedirs(out_path)
-        except OSError:
-            if os.path.exists(out_path):
-                sys.exit("Folder {} already exists, exiting.".format(out_path))
-            else:
-                sys.exit("Error creating {} folder. Check permissions. Exiting.".format(out_path))
-
-
-    # get executable names for passing to functions
-    executable_names = get_all_codenames()
+def main_generate(args):
+    # create output folder
+    mkdir_if_not_exists(args.workspace)
 
     # generate input files for FORTRAN and C++ 
-    generate_inputs(out_path=out_path, compute_matrix=compute_matrix,
+    generate_inputs(out_path=args.workspace, load_matrix=args.load_matrix,
                     nuleus="NI62", angular_momentum=1, parity="-", temperature=2.0, transition_energy=9.78)
 
+def main_run(args):
+    def get_all_codenames():
+        codes = []
+        for temp in ('zero', 'finite'):
+            for state in ('ground', 'excited'):
+                codes.append(CODE_NAME[temp][state])
+        return codes
+
+    # get list of executable names
+    executable_names = get_all_codenames()
+
+    # check if executables are actually on disk
+    for f in executable_names:
+        fpath = os.path.join(args.code_dir, f)
+        if not os.path.isfile(fpath):
+            sys.exit("Executable {} not found, exiting.".format(fpath))
+
+    # generate input files
+    main_generate(args)
 
     # run the FORTRAN and C++ 
-    run_executable_names(out_path=out_path, compute_matrix=compute_matrix,
-                         exenames=executable_names, exepath='../bin')
+    run_executables(out_path=args.workspace, load_matrix=args.load_matrix,
+                         exenames=executable_names, exepath=args.code_dir)
 
+
+def main_plot(args):
     # post-process the output of the FORTRAN and C++                         
     plot_lorvec()
 
-    #TODO: parse command line args using argparse
+
+def mkdir_if_not_exists(folder):
+    try: # try creating the working directory
+        os.makedirs(folder)
+    except OSError:
+        if os.path.exists(folder):
+            sys.exit("Folder {} already exists, exiting.".format(folder))
+        else:
+            sys.exit("Error creating {} folder. Check permissions. Exiting.".format(folder))
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="this script can generate input files, run the "
+                    "FORTAN and C++ codes and plot the results.")
+    parser.add_argument(
+        'workspace',
+        type=str,
+        help="The path to the workspace directory.")
+    parser.add_argument(
+        '--load-matrix',
+        action='store_true',
+        help="Load matrix from disk, skipping calculation.")
+    subparsers = parser.add_subparsers()
+
+    parser_generate = subparsers.add_parser('generate')
+    parser_generate.set_defaults(func=main_generate)
+
+    parser_run = subparsers.add_parser('run')
+    parser_run.add_argument(
+        '--code-dir',
+        type=str,
+        default='../bin',
+        help="The path to the compiled codes directory.")    
+    parser_run.set_defaults(func=main_run)
+
+    parser_plot = subparsers.add_parser('plot')
+    parser_plot.set_defaults(func=main_plot)
+
+
+    args = parser.parse_args()
+    # print(args.load_matrix)
+
+    # generate, run, or plot must be selected
+    if not hasattr(args, 'func'):
+        parser.print_usage()
+        sys.exit(2)
+    
+    # call generate, run or plot
+    args.func(args)
+
+
+
+if __name__ == '__main__':
+    main()
+
+
+
+
+
     #TODO: add plotting function
     #TODO: copy files as in run_no_matrix.sh, based on --no-matrix flag
     #TODO: convert into module and import into signac program
     #TODO: create install script such that I can do python setup.py install --user
     #TODO: use virtualenv, see https://click.palletsprojects.com/en/7.x/quickstart/
-    #TODO: logging to file and console
     #TODO: subprocess.call(cmd, shell=True)
-    #TODO: top-level constant: nested dictionary
+    #TODO: add timing information to the log
 
 
 
