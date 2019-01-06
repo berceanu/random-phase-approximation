@@ -5,9 +5,15 @@ import sys
 # import sh
 import argparse
 import subprocess
+import shutil
 
 import logging
 from collections import defaultdict
+
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+import numpy as np
+
 
 level = logging.INFO
 format = '  %(message)s'
@@ -25,6 +31,8 @@ CODE_NAME = { # mapping from executable names to what they represent
         'excited' : 'ftes' 
     }
 }
+
+
 
 def generate_inputs(nuleus="NI62", angular_momentum=1, parity="-", temperature=2.0, transition_energy=9.78,
                     out_path=os.getcwd(), load_matrix=False):
@@ -132,11 +140,8 @@ def generate_inputs(nuleus="NI62", angular_momentum=1, parity="-", temperature=2
     return
 
 
-def run_executables(exenames=['dish','skys','ztes','ftes'], out_path=os.getcwd(), exepath='../bin',
-                         load_matrix=False):
+def run_executables(exenames=['dish','skys','ztes','ftes'], out_path=os.getcwd(), exepath='../bin'):
     """Run the executable names in the list, redirecting their outputs to files"""
-
-    # run = {exefile : sh.Command(os.path.join(exepath, exefile)) for exefile in exenames}
 
     for f in exenames:
         program=os.path.join(exepath, f)
@@ -144,10 +149,9 @@ def run_executables(exenames=['dish','skys','ztes','ftes'], out_path=os.getcwd()
         stdout_file = os.path.join(out_path,f+"_stdout.txt")
         stderr_file = os.path.join(out_path,f+"_stderr.txt")
         cmd = f"{program} {path} > {stdout_file} 2> {stderr_file}"
-        print(cmd)
+        logging.info(cmd)
         subprocess.run(cmd, shell=True).returncode
 
-        # run[f](out_path, _out=stdout_file, _err=stderr_file)
         logging.info(f"Finished running {f}.")
     
     logging.info('Finished running all executables.')
@@ -155,10 +159,52 @@ def run_executables(exenames=['dish','skys','ztes','ftes'], out_path=os.getcwd()
     return
 
 
-def plot_lorvec():
-    pass
+def plot_lorvec(workspace=os.getcwd()):
+    plotparams = {
+        'zero' : {'color':'black', 'label':'T = 0.0 MeV'},
+        'finite' : {'color':'red', 'linestyle':':', 'label':'T = 2.0 MeV'}
+    }
+
+    for temp in ('zero', 'finite'):
+        fpath = os.path.join(workspace, CODE_NAME[temp]['excited'] + "_lorvec.out")
+        if not os.path.isfile(fpath):
+            sys.exit(f"{fpath} not found, exiting.")
+
+        arr = np.loadtxt(fpath)
+        h_axis = arr[:,0]
+        arr1d = arr[:,1]
+
+        fig = Figure(figsize=(10, 6))
+        canvas = FigureCanvas(fig)
+    
+        ax = fig.add_subplot(111)
+        ax.plot(h_axis, arr1d, **plotparams[temp])
+
+        ax.grid()
+        ax.set(
+            xlim=[0, 30],
+            ylim=[0, 4.5],
+            ylabel=r"$%s \;(e^2fm^2/MeV)$" % "R",
+            xlabel="E (MeV)",
+        )
+        ax.text(0.02, 0.95, "", transform=ax.transAxes, color="firebrick")
+        ax.legend()
+        ax.set_title(r"${}^{62} Ni \; 1^{-}$")
+    
+        pngfile = os.path.join(workspace, CODE_NAME[temp]['excited'] + "_lorvec.png")
+        canvas.print_figure(pngfile)
+
 
 def main_generate(args):
+    def mkdir_if_not_exists(folder):
+        try: # try creating the working directory
+            os.makedirs(folder)
+        except OSError:
+            if os.path.exists(folder):
+                sys.exit("Folder {} already exists, exiting.".format(folder))
+            else:
+                sys.exit("Error creating {} folder. Check permissions. Exiting.".format(folder))
+
     # create output folder
     mkdir_if_not_exists(args.workspace)
 
@@ -181,29 +227,43 @@ def main_run(args):
     for f in executable_names:
         fpath = os.path.join(args.code_dir, f)
         if not os.path.isfile(fpath):
-            sys.exit("Executable {} not found, exiting.".format(fpath))
+            sys.exit(f"Executable {fpath} not found, exiting.")
 
-    # generate input files
-    main_generate(args)
+    # check if input files are present in the workspace
+    for temp in ('zero', 'finite'): # create input files
+        for state, suffix in zip(('ground', 'excited'), ("_dis.dat", "_start.dat")):
+            fpath = os.path.join(args.workspace, CODE_NAME[temp][state] + suffix)
+            if not os.path.isfile(fpath):
+                sys.exit(f"{fpath} not found, exiting.")
+
+    if args.load_matrix:
+        flist = ['_arpa.bin', '_brpa.bin', '_xrpa.bin', '_yrpa.bin' ,'_erpa.bin' ,'_c_erpa.bin']
+        for f in flist:
+            for temp in ('zero', 'finite'):
+                fpath = os.path.join(args.load_mat_from, CODE_NAME[temp]['excited'] + f)
+                shutil.copy(fpath, args.workspace)
+                logging.info(f'Copied {fpath} to {args.workspace}.')
+                
 
     # run the FORTRAN and C++ 
-    run_executables(out_path=args.workspace, load_matrix=args.load_matrix,
-                         exenames=executable_names, exepath=args.code_dir)
+    run_executables(out_path=args.workspace,
+                    exenames=executable_names, exepath=args.code_dir)
 
 
 def main_plot(args):
     # post-process the output of the FORTRAN and C++                         
-    plot_lorvec()
+    plot_lorvec(workspace=args.workspace)
 
 
-def mkdir_if_not_exists(folder):
-    try: # try creating the working directory
-        os.makedirs(folder)
-    except OSError:
-        if os.path.exists(folder):
-            sys.exit("Folder {} already exists, exiting.".format(folder))
-        else:
-            sys.exit("Error creating {} folder. Check permissions. Exiting.".format(folder))
+def main_all(args):
+    # generate input files
+    main_generate(args)
+
+    # run all codes
+    main_run(args)
+
+    # plot the results
+    main_plot(args)
 
 
 def main():
@@ -211,57 +271,75 @@ def main():
         description="this script can generate input files, run the "
                     "FORTAN and C++ codes and plot the results.")
     parser.add_argument(
-        'workspace',
+        '-w', '--workspace',
         type=str,
+        required=True,
         help="The path to the workspace directory.")
     parser.add_argument(
         '--load-matrix',
         action='store_true',
         help="Load matrix from disk, skipping calculation.")
+    parser.add_argument(
+        '--load-mat-from',
+        type=str,
+        help="Where to load the matrix from.")
     subparsers = parser.add_subparsers()
+
+    parser_all = subparsers.add_parser('all')
+    parser_all.set_defaults(func=main_all)
 
     parser_generate = subparsers.add_parser('generate')
     parser_generate.set_defaults(func=main_generate)
 
     parser_run = subparsers.add_parser('run')
-    parser_run.add_argument(
-        '--code-dir',
-        type=str,
-        default='../bin',
-        help="The path to the compiled codes directory.")    
+    for subparser in [parser_all, parser_run]:
+        subparser.add_argument(
+            '--code-dir',
+            type=str,
+            default='../bin',
+            help="The path to the compiled codes directory.")    
     parser_run.set_defaults(func=main_run)
 
     parser_plot = subparsers.add_parser('plot')
     parser_plot.set_defaults(func=main_plot)
 
 
-    args = parser.parse_args()
-    # print(args.load_matrix)
+    args = parser.parse_args() # load command line args
 
-    # generate, run, or plot must be selected
-    if not hasattr(args, 'func'):
+    if args.load_matrix and not args.load_mat_from:
+        parser.error('The --load-matrix flag requires --load-mat-from')
+
+    # must specify: generate, run, plot or all
+    if not hasattr(args, 'func'): 
         parser.print_usage()
         sys.exit(2)
+    try: # call generate, run or plot or all
+        args.func(args)
+    except KeyboardInterrupt:
+        sys.stderr.write("\n")
+        sys.stderr.write("Interrupted.\n")
+        sys.exit(1)
+    except Exception as error:
+        sys.stderr.write('{}\n'.format(str(error)))
+        sys.exit(1)
+    else:
+        sys.exit(0)
     
-    # call generate, run or plot
-    args.func(args)
 
 
+
+
+
+    
 
 if __name__ == '__main__':
     main()
 
 
-
-
-
-    #TODO: add plotting function
     #TODO: copy files as in run_no_matrix.sh, based on --no-matrix flag
     #TODO: convert into module and import into signac program
     #TODO: create install script such that I can do python setup.py install --user
     #TODO: use virtualenv, see https://click.palletsprojects.com/en/7.x/quickstart/
-    #TODO: subprocess.call(cmd, shell=True)
-    #TODO: add timing information to the log
 
 
 
