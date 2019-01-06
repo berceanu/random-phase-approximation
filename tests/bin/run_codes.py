@@ -211,7 +211,8 @@ if __name__ == "__main__":
     # post-process the output of the FORTRAN and C++ codes                        
     plot_lorvec()
 
-        
+    #TODO: add plotting function, copy files as in run_no_matrix.sh, based on --no-matrix flag
+
 
 
 
