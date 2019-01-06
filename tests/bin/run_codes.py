@@ -2,9 +2,20 @@
 
 import os
 import sys
+import sh
+
+
+name_of_code = { # mapping from executable names to what they represent
+    'zero_temp_ground_state':'dish',
+    'finite_temp_ground_state':'skys',
+    'zero_temp_excited_state':'ztes',
+    'finite_temp_excited_state':'ftes'
+}
+
+
 
 def generate_inputs(nuleus="NI62", angular_momentum=1, parity="-", temperature=2.0, transition_energy=9.78,
-                    path='.',
+                    out_path='.',
                     compute_matrix=True):
     """Generates input files dish_dis.dat, skys_dis.dat and (z|f)tes_start.dat.
 
@@ -19,10 +30,10 @@ def generate_inputs(nuleus="NI62", angular_momentum=1, parity="-", temperature=2
         transition_energy: eg. 9.78 (in MeV)
         compute_matrix: flag that controls the matrix elements calculation, default is to perform the calculation
 
-        path: path of folder to write files to
+        out_path: path of folder to write files to
     
     Returns:
-        Writes files to path (current folder by default).
+        Writes files to out_path (current folder by default).
     """
 
     actual_parity = {"-" : 0, "+": 1} # map to the parity as it is defined in the input file
@@ -93,34 +104,69 @@ def generate_inputs(nuleus="NI62", angular_momentum=1, parity="-", temperature=2
         "respair    =   1                    ! 1:pairing in residual inter. 0:no\n"
     ).format(**parameters)
 
-
+    def write_params_to(fname_prefix, fname_postfix, blocks_to_write):
+        fname = fname_prefix + fname_postfix
+        fpath = os.path.join(out_path, fname)
+        with open(fpath, "w") as f:
+            for block in blocks_to_write:
+                f.write(block)
+        print("Wrote {}.".format(fpath))
+        
     # create C++ input files
-    with open(os.path.join(path, "ztes_start.dat"), "w") as f:
-        f.write(common_estate_block)
-    #
-    with open(os.path.join(path, "ftes_start.dat"), "w") as f:
-        f.write(common_estate_block)
-
+    for codename in (name_of_code['zero_temp_excited_state'],\
+                     name_of_code['finite_temp_excited_state']):
+        write_params_to(codename, "_start.dat", [common_estate_block])
+                    
     # create FORTRAN input files
-    with open(os.path.join(path, "dish_dis.dat"), "w") as f:
-        f.write(common_gstate_block)
-        f.write(zero_temp_gstate_block)
+    fort_postfix = '_dis.dat'
+    write_params_to(name_of_code['zero_temp_ground_state'], fort_postfix,
+                   [common_gstate_block, zero_temp_gstate_block])
     #
-    with open(os.path.join(path, "skys_dis.dat"), "w") as f:
-        f.write(common_gstate_block)
-        f.write(finite_temp_gstate_block)
+    write_params_to(name_of_code['finite_temp_ground_state'], fort_postfix,
+                   [common_gstate_block, finite_temp_gstate_block])
 
+    print('Generated all input files.')
+
+    return
+
+
+
+def run_executable_names(exenames=['dish','skys','ztes','ftes'], out_path='.', exepath='../bin',
+                         compute_matrix=True):
+    """Run the executable_names in the list, according to pattern.
+
+    {binary} {path} > {path}/{binary_stdout.txt} 2> {path}/{binary_stderr.txt}
+    """
+
+    run = {exefile : sh.Command(os.path.join(exepath, exefile)) for exefile in exenames}
+
+    for f in exenames:
+        stdout_file = os.path.join(out_path,f+"_stdout.txt")
+        stderr_file = os.path.join(out_path,f+"_stderr.txt")
+
+        run[f](out_path, _out=stdout_file, _err=stderr_file)
+        print("Finished running {}.".format(f))
+    
+    print('Finished all executables.')
+    
+    return
+
+
+def plot_lorvec():
+    pass
 
 
 
 if __name__ == "__main__":
     """Generates the inputs based on the command line arguments."""
 
+    script_name = sys.argv[0]
+
     # did we get 2 command line args?
     if len(sys.argv) - 1 != 2:
         sys.exit("""Usage:
-    ./generate_inputs.py read_matrix/ --no-matrix
-    ./generate_inputs.py calc_matrix/ --with-matrix""")
+    {} read_matrix/ --no-matrix
+    {} calc_matrix/ --with-matrix""".format(script_name, script_name))
 
     # parse second command line arg
     try:
@@ -129,28 +175,47 @@ if __name__ == "__main__":
         sys.exit("Didn't provide --with-matrix or --no-matrix argument, exiting.")
     else:
         if matrix_flag == "--no-matrix":
-            with_matrix = False
+            compute_matrix = False
         elif matrix_flag == "--with-matrix":
-            with_matrix = True
+            compute_matrix = True
         else:
             sys.exit("Invalid command line argument {}, exiting.".format(matrix_flag))
 
     # parse first command line arg
     try:
-        base_path = sys.argv[1] # get output folder from command line, eg. out/
+        out_path = sys.argv[1] # get output folder from command line, eg. out/
     except IndexError:
-        sys.exit('Need to provide an folder. Try {} . for using current folder. Exiting.'.format(sys.argv[0]))
+        sys.exit('Need to provide output folder, exiting.')
     else:
         try:
-            os.makedirs(base_path)
+            os.makedirs(out_path)
         except OSError:
-            if os.path.exists(base_path):
-                sys.exit("Folder {} already exists, exiting.".format(base_path))
+            if os.path.exists(out_path):
+                sys.exit("Folder {} already exists, exiting.".format(out_path))
             else:
-                sys.exit("Error creating {} folder. Check permissions. Exiting.".format(base_path))
+                sys.exit("Error creating {} folder. Check permissions. Exiting.".format(out_path))
 
 
+    # get executable names for passing to functions
+    executable_names = list(name_of_code.values())
 
-    # call main function
-    generate_inputs(path=base_path, compute_matrix=with_matrix,
+    # generate input files for FORTRAN and C++ codes
+    generate_inputs(out_path=out_path, compute_matrix=compute_matrix,
                     nuleus="NI62", angular_momentum=1, parity="-", temperature=2.0, transition_energy=9.78)
+
+
+    # run the FORTRAN and C++ codes
+    run_executable_names(out_path=out_path, compute_matrix=compute_matrix,
+                         exenames=executable_names, exepath='../bin')
+
+    # post-process the output of the FORTRAN and C++ codes                        
+    plot_lorvec()
+
+        
+
+
+
+
+
+
+
