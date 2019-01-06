@@ -2,8 +2,9 @@
 
 import os
 import sys
-import sh
+# import sh
 import argparse
+import subprocess
 
 import logging
 from collections import defaultdict
@@ -133,19 +134,21 @@ def generate_inputs(nuleus="NI62", angular_momentum=1, parity="-", temperature=2
 
 def run_executables(exenames=['dish','skys','ztes','ftes'], out_path=os.getcwd(), exepath='../bin',
                          load_matrix=False):
-    """Run the executable names in the list, according to pattern.
+    """Run the executable names in the list, redirecting their outputs to files"""
 
-    {binary} {path} > {path}/{binary_stdout.txt} 2> {path}/{binary_stderr.txt}
-    """
-
-    run = {exefile : sh.Command(os.path.join(exepath, exefile)) for exefile in exenames}
+    # run = {exefile : sh.Command(os.path.join(exepath, exefile)) for exefile in exenames}
 
     for f in exenames:
+        program=os.path.join(exepath, f)
+        path=out_path
         stdout_file = os.path.join(out_path,f+"_stdout.txt")
         stderr_file = os.path.join(out_path,f+"_stderr.txt")
+        cmd = f"{program} {path} > {stdout_file} 2> {stderr_file}"
+        print(cmd)
+        subprocess.run(cmd, shell=True).returncode
 
-        run[f](out_path, _out=stdout_file, _err=stderr_file)
-        logging.info("Finished running {}.".format(f))
+        # run[f](out_path, _out=stdout_file, _err=stderr_file)
+        logging.info(f"Finished running {f}.")
     
     logging.info('Finished running all executables.')
     
