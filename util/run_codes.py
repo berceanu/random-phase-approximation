@@ -190,18 +190,6 @@ def plot_lorvec(workspace=os.getcwd()):
 
 
 def main_generate(args):
-    def mkdir_if_not_exists(folder):
-        try: # try creating the working directory
-            os.makedirs(folder)
-        except OSError:
-            if os.path.exists(folder):
-                sys.exit("Folder {} already exists, exiting.".format(folder))
-            else:
-                sys.exit("Error creating {} folder. Check permissions. Exiting.".format(folder))
-
-    # create output folder
-    mkdir_if_not_exists(args.workspace)
-
     # generate input files for FORTRAN and C++ 
     generate_inputs(out_path=args.workspace, load_matrix=args.load_matrix,
                     nuleus="NI62", angular_momentum=1, parity="-", temperature=2.0, transition_energy=9.78)
@@ -302,6 +290,10 @@ def main():
 
     if args.load_matrix and not args.load_mat_from:
         parser.error('The --load-matrix flag requires --load-mat-from')
+    
+    if not os.path.exists(args.workspace):
+        sys.stderr.write(f'Cannot find workspace folder {args.workspace}\n')
+        sys.exit(1)
 
     logfile = os.path.join(args.workspace, 'run_codes.log')
     handlers = [logging.FileHandler(logfile), logging.StreamHandler()] # also log to console
