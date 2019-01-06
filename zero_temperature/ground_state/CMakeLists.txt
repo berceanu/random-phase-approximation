@@ -15,3 +15,6 @@ INCLUDE(${CMAKE_MODULE_PATH}/SetFortranFlags.cmake)
 #
 file(GLOB sources  src/*.f)
 add_executable(dish ${sources})
+
+SET(CMAKE_INSTALL_PREFIX ../../..)
+INSTALL(TARGETS dish RUNTIME DESTINATION bin)
