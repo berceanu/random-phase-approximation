@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-rm -rf Debug
-mkdir Debug
-cd Debug
+rm -rf build-debug
+mkdir build-debug
+cd build-debug
 cmake -DCMAKE_BUILD_TYPE=DEBUG ..
-make -j 72
+cmake --build . --target all
 
 # Note: TYPE=TESTING is also available
