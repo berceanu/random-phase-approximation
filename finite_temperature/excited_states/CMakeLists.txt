@@ -19,3 +19,6 @@ add_executable (ftes ${source_files} ${include_files})
 
 target_include_directories(ftes PRIVATE ${include_dir})
 target_link_libraries(ftes m)
+
+SET(CMAKE_INSTALL_PREFIX ../../..)
+INSTALL(ftes RUNTIME DESTINATION bin)
