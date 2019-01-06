@@ -21,4 +21,4 @@ target_include_directories(ftes PRIVATE ${include_dir})
 target_link_libraries(ftes m)
 
 SET(CMAKE_INSTALL_PREFIX ../../..)
-INSTALL(ftes RUNTIME DESTINATION bin)
+INSTALL(TARGETS ftes RUNTIME DESTINATION bin)
