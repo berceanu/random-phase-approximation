@@ -15,12 +15,6 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 import numpy as np
 
 
-level = logging.INFO
-format = '  %(message)s'
-handlers = [logging.FileHandler('run_codes.log'), logging.StreamHandler()]
-logging.basicConfig(level = level, format = format, handlers = handlers)
-
-
 CODE_NAME = { # mapping from executable names to what they represent
     'zero' : {
         'ground' : 'dish',
@@ -308,6 +302,10 @@ def main():
 
     if args.load_matrix and not args.load_mat_from:
         parser.error('The --load-matrix flag requires --load-mat-from')
+
+    logfile = os.path.join(args.workspace, 'run_codes.log')
+    handlers = [logging.FileHandler(logfile), logging.StreamHandler()] # also log to console
+    logging.basicConfig(level=logging.INFO, format='  %(message)s', handlers=handlers)
 
     # must specify: generate, run, plot or all
     if not hasattr(args, 'func'): 
