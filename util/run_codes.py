@@ -4,15 +4,35 @@ import os
 import sys
 import sh
 
+import logging
+from collections import defaultdict
 
-name_of_code = { # mapping from executable names to what they represent
-    'zero_temp_ground_state':'dish',
-    'finite_temp_ground_state':'skys',
-    'zero_temp_excited_state':'ztes',
-    'finite_temp_excited_state':'ftes'
-}
+level = logging.INFO
+format = '  %(message)s'
+handlers = [logging.FileHandler('filename.log'), logging.StreamHandler()]
+logging.basicConfig(level = level, format = format, handlers = handlers)
+
+logging.info('Hey, this is working!')
 
 
+
+CODE_NAME = { # mapping from executable names to what they represent
+    'zero' : {
+        'ground' : 'dish',
+        'excited' : 'ztes'
+    },
+    'finite' : {
+        'ground' : 'skys',
+        'excited' : 'ftes' 
+    }}
+
+
+    # 'zero_temp_ground_state'    CODE_NAME['zero']['ground']
+    # 'finite_temp_ground_state'  CODE_NAME['finite']['ground']
+    # 'zero_temp_excited_state'   CODE_NAME['zero']['excited']
+    # 'finite_temp_excited_state' CODE_NAME['finite']['excited']
+
+            
 
 def generate_inputs(nuleus="NI62", angular_momentum=1, parity="-", temperature=2.0, transition_energy=9.78,
                     out_path='.',
@@ -50,6 +70,8 @@ def generate_inputs(nuleus="NI62", angular_momentum=1, parity="-", temperature=2
         'XA':nuleus
     }
 
+    block = defaultdict(dict)
+
     # define blocks for FORTRAN input files
     common_gstate_block = (
         "l6       =   10                     ! output file\n"
@@ -60,7 +82,7 @@ def generate_inputs(nuleus="NI62", angular_momentum=1, parity="-", temperature=2
         "{XA}                                ! nucleus under consideration\n"
     ).format(**parameters) # substitute parameter values into string
 
-    zero_temp_gstate_block = (
+    block['zero']['ground'] = (
         "Fixedgap = 00.000    00.000         ! Frozen Gapparmeter for neutr. and proton\n"
         "GA       = 00.000    00.000         ! Pairing-Constants GG = GA/A\n"
         "Init.Gap = 01.000    01.000         ! Initial values for the Gap parameters\n"
@@ -70,7 +92,7 @@ def generate_inputs(nuleus="NI62", angular_momentum=1, parity="-", temperature=2
         "blocking:   0  0  0  0              ! Blocking protons:  y/n, j, ip, nr\n"
     )
 
-    finite_temp_gstate_block = (
+    block['finite']['ground'] = (
         "Delta    =  0.000   0.000           ! Gapparameter for neutrons and  protons\n"
         "temp     =  {temp}                  ! temperature\n"
         "filename =  T0__\n"
@@ -104,31 +126,32 @@ def generate_inputs(nuleus="NI62", angular_momentum=1, parity="-", temperature=2
         "respair    =   1                    ! 1:pairing in residual inter. 0:no\n"
     ).format(**parameters)
 
-    def write_params_to(fname_prefix, fname_postfix, blocks_to_write):
-        fname = fname_prefix + fname_postfix
+    def write_params_to(fname, block_to_write):
         fpath = os.path.join(out_path, fname)
         with open(fpath, "w") as f:
-            for block in blocks_to_write:
-                f.write(block)
+            f.write(block_to_write)
         print("Wrote {}.".format(fpath))
         
     # create C++ input files
-    for codename in (name_of_code['zero_temp_excited_state'],\
-                     name_of_code['finite_temp_excited_state']):
-        write_params_to(codename, "_start.dat", [common_estate_block])
-                    
+    for t in ('zero', 'finite'):
+        write_params_to(CODE_NAME[t]['excited'] + "_start.dat", common_estate_block)
+         
+
     # create FORTRAN input files
-    fort_postfix = '_dis.dat'
-    write_params_to(name_of_code['zero_temp_ground_state'], fort_postfix,
-                   [common_gstate_block, zero_temp_gstate_block])
-    #
-    write_params_to(name_of_code['finite_temp_ground_state'], fort_postfix,
-                   [common_gstate_block, finite_temp_gstate_block])
+    for t in ('zero', 'finite'):
+        write_params_to(CODE_NAME[t]['ground'] + '_dis.dat', common_gstate_block + block[t]['ground'])
 
     print('Generated all input files.')
 
     return
 
+
+def get_all_codenames():
+    codes = []
+    for temp in ('zero', 'finite'):
+        for state in ('ground', 'excited'):
+            codes.append(CODE_NAME[temp][state])
+    return codes
 
 
 def run_executable_names(exenames=['dish','skys','ztes','ftes'], out_path='.', exepath='../bin',
@@ -197,21 +220,30 @@ if __name__ == "__main__":
 
 
     # get executable names for passing to functions
-    executable_names = list(name_of_code.values())
+    executable_names = get_all_codenames()
 
-    # generate input files for FORTRAN and C++ codes
+    # generate input files for FORTRAN and C++ 
     generate_inputs(out_path=out_path, compute_matrix=compute_matrix,
                     nuleus="NI62", angular_momentum=1, parity="-", temperature=2.0, transition_energy=9.78)
 
 
-    # run the FORTRAN and C++ codes
+    # run the FORTRAN and C++ 
     run_executable_names(out_path=out_path, compute_matrix=compute_matrix,
                          exenames=executable_names, exepath='../bin')
 
-    # post-process the output of the FORTRAN and C++ codes                        
+    # post-process the output of the FORTRAN and C++                         
     plot_lorvec()
 
-    #TODO: add plotting function, copy files as in run_no_matrix.sh, based on --no-matrix flag
+    #TODO: parse command line args using argparse
+    #TODO: add plotting function
+    #TODO: copy files as in run_no_matrix.sh, based on --no-matrix flag
+    #TODO: convert into module and import into signac program
+    #TODO: create install script such that I can do python setup.py install --user
+    #TODO: use virtualenv, see https://click.palletsprojects.com/en/7.x/quickstart/
+    #TODO: logging to file and console
+    #TODO: subprocess.call(cmd, shell=True)
+    #TODO: top-level constant: nested dictionary
+
 
 
 
