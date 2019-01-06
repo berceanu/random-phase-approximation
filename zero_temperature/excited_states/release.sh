@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-rm -rf Release
-mkdir Release
-cd Release
+rm -rf build-release
+mkdir build-release
+cd build-release
 cmake -DCMAKE_BUILD_TYPE=Release ..
-make -j 72
+cmake --build . --target install

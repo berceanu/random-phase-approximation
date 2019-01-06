@@ -20,3 +20,6 @@ add_executable (ztes ${source_files} ${include_files})
 
 target_include_directories(ztes PRIVATE ${include_dir})
 target_link_libraries(ztes m)
+
+SET(CMAKE_INSTALL_PREFIX ../../..)
+INSTALL(ztes RUNTIME DESTINATION bin)

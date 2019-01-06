@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-rm -rf Debug
-mkdir Debug
-cd Debug
-cmake -G"CodeLite - Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug ..
+rm -rf build-debug
+mkdir build-debug
+cd build-debug
+cmake -G "CodeLite - Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug ..
