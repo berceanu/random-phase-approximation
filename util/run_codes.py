@@ -320,16 +320,19 @@ def main():
 
 
 
-    
+# Usage example:
+# ./run_codes.py -w ../tests/full_calc all  // runtime: 23 minutes
+# ./run_codes.py -w ../tests/load_mat --load-matrix --load-mat-from ../tests/full_calc all  // runtime: 5 minutes
 
 if __name__ == '__main__':
     main()
 
 
-    #TODO: copy files as in run_no_matrix.sh, based on --no-matrix flag
-    #TODO: convert into module and import into signac program
-    #TODO: create install script such that I can do python setup.py install --user
-    #TODO: use virtualenv, see https://click.palletsprojects.com/en/7.x/quickstart/
+#TODO: copy files as in run_no_matrix.sh, based on --no-matrix flag
+#TODO: convert into module and import into signac program
+#TODO: create install script such that I can do python setup.py install --user
+#TODO: use virtualenv, see https://click.palletsprojects.com/en/7.x/quickstart/
+#TODO: change --load-mat-from to --from
 
 
 

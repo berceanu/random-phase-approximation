@@ -41,7 +41,7 @@ WORKFLOW:
 3. run both excited state `C++` codes
 
 - for table: change `transerg` to `9.78` (or other desired energy). Output on screen
-- to avoid matrix elements calculation, change `calc, xyprint` from `1` to `0`, `xyread` from `0` to `1`, `xyprobe` from `0` to `1`
+- to avoid matrix elements calculation, change `calc, xyprint` from `1` to `0`, `xyread`, `xyprobe` from `0` to `1`
 	- doing this will require the files : `(z|f)tes_arpa.bin`, `(z|f)tes_brpa.bin`,
 	 `(z|f)tes_xrpa.bin`, `(z|f)tes_yrpa.bin`, `(z|f)tes_erpa.bin`, `(z|f)tes_c_erpa.bin`
 	 so the code has to be run before to generate these files
