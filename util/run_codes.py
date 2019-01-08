@@ -222,7 +222,7 @@ def main_run(args):
         flist = ['_arpa.bin', '_brpa.bin', '_xrpa.bin', '_yrpa.bin' ,'_erpa.bin' ,'_c_erpa.bin']
         for f in flist:
             for temp in ('zero', 'finite'):
-                fpath = os.path.join(args.load_mat_from, CODE_NAME[temp]['excited'] + f)
+                fpath = os.path.join(args.from, CODE_NAME[temp]['excited'] + f)
                 shutil.copy(fpath, args.workspace)
                 logging.info(f'Copied {fpath} to {args.workspace}.')
                 
@@ -262,8 +262,9 @@ def main():
         action='store_true',
         help="Load matrix from disk, skipping calculation.")
     parser.add_argument(
-        '--load-mat-from',
+        '--from',
         type=str,
+        default=os.getcwd(),
         help="Where to load the matrix from.")
     subparsers = parser.add_subparsers()
 
@@ -288,8 +289,8 @@ def main():
 
     args = parser.parse_args() # load command line args
 
-    if args.load_matrix and not args.load_mat_from:
-        parser.error('The --load-matrix flag requires --load-mat-from')
+    if args.load_matrix and not args.from:
+        parser.error('The --load-matrix flag requires --from')
     
     if not os.path.exists(args.workspace):
         sys.stderr.write(f'Cannot find workspace folder {args.workspace}\n')
@@ -322,7 +323,7 @@ def main():
 
 # Usage example:
 # ./run_codes.py -w ../tests/full_calc all  // runtime: 23 minutes
-# ./run_codes.py -w ../tests/load_mat --load-matrix --load-mat-from ../tests/full_calc all  // runtime: 5 minutes
+# ./run_codes.py -w ../tests/load_mat --load-matrix --from ../tests/full_calc all  // runtime: 5 minutes
 
 if __name__ == '__main__':
     main()
@@ -332,7 +333,6 @@ if __name__ == '__main__':
 #TODO: convert into module and import into signac program
 #TODO: create install script such that I can do python setup.py install --user
 #TODO: use virtualenv, see https://click.palletsprojects.com/en/7.x/quickstart/
-#TODO: change --load-mat-from to --from
 
 
 
