@@ -335,6 +335,7 @@ def main():
 # == mock run ==
 # mkdir ../tests/out/full_calc_mock
 # ./run_codes.py -w ../tests/out/full_calc_mock all --mock
+#TODO: implement mock run for --load-matrix case
 
 if __name__ == '__main__':
     main()
