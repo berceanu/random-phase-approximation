@@ -1,56 +1,50 @@
 #!/usr/bin/env bash
 
-version="0.1"
+# Usage: dish.sh [PATH]
+path=$1
 
-while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do case $1 in
-  -V | --version )
-    echo $version
-    exit
-    ;;
-  -h | --help )
-    echo "Usage: $(basename $0) [-p PATH] [-f]"
-    exit
-    ;;
-  -p | --path )
-    shift; path=$1
-    ;;
-  -f | --flag )
-    flag=1
-    ;;
-esac; shift; done
-if [[ "$1" == '--' ]]; then shift; fi
-
-# workdir=$(dirname)
-
-# working dir can be passed via -p, defaults to current dir
+# working dir can be passed, defaults to current dir
 path=${path:-$PWD}
 
-echo "Working path: ${path}"
-# echo "${flag}"
+cd "${path}"
+echo "Working path: $PWD"
 
-if [[ -e "file.txt" ]]; then
-  echo "file exists"
-fi
-
-# f"{program} {path} > {stdout_file} 2> {stderr_file}"
 
 # check that dish_dis.dat exists
-# output dish_qrpa.wel
-# write something to stdout
+if [[ ! -f "dish_dis.dat" ]]; then
+  echo "dish_dis.dat not found!"
+  exit 1
+fi
 
-echo ""
-echo ""
+# simulate intense computation
+sleep 5s
+
+# write to stdout
+echo
+echo
 echo " ********************************************************************"
 echo " *   Iteration converged after  72 steps   si =     0.0000008921    *"
 echo " ********************************************************************"
-echo ""
+echo
+
+# write dish_qrpa.wel
+outfile="dish_qrpa.wel"
+touch $outfile
+echo "  0.133714478346E-09  0.111073811607E-09  0.921960173368E-10  0.764680841449E-10" >> $outfile
+echo "  0.633747321351E-10  0.524831938961E-10  0.434303050245E-10  0.359115635970E-10" >> $outfile
+echo "  0.296718666476E-10  0.244976736384E-10  0.202103830482E-10  0.166607392860E-10" >> $outfile
+echo "  0.137241138642E-10  0.112965277146E-10  0.929130121495E-11  0.763623536321E-11" >> $outfile
+echo "  0.627124197615E-11" >> $outfile
+echo >> $outfile
 
 
+# write to stderr
+>&2 echo "STOP  FINAL STOP"
+>&2 echo
 
- ********************************************************************
- *   Iteration converged after  72 steps   si =     0.0000008921    *
- ********************************************************************
+# ./dish.sh out/ > dish_stdout.txt 2> dish_stderr.txt
 
 # POST-conditions
-# dish_stderr.txt must contain "FINAL STOP"
+# dish_stderr.txt must end with "FINAL STOP"
 # dish_stdout.txt must end with "Iteration converged after"
+# dish_qrpa.wel must exist and not be empty
