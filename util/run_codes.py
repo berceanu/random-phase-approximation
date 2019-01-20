@@ -134,7 +134,8 @@ def generate_inputs(nuleus="NI62", angular_momentum=1, parity="-", temperature=2
     return
 
 
-def run_executables(exenames=['dish','skys','ztes','ftes'], out_path=os.getcwd(), exepath='../bin'):
+def run_executables(exenames=['dish','skys','ztes','ftes'], out_path=os.getcwd(), mock=False,
+                    exepath='../bin'):
     """Run the executable names in the list, redirecting their outputs to files"""
 
     for f in exenames:
@@ -142,7 +143,10 @@ def run_executables(exenames=['dish','skys','ztes','ftes'], out_path=os.getcwd()
         path=out_path
         stdout_file = os.path.join(out_path,f+"_stdout.txt")
         stderr_file = os.path.join(out_path,f+"_stderr.txt")
-        cmd = f"{program} {path} > {stdout_file} 2> {stderr_file}"
+        if mock: # use bash scripts instead
+            cmd = f"{program}.sh {path} > {stdout_file} 2> {stderr_file}"
+        else:
+            cmd = f"{program} {path} > {stdout_file} 2> {stderr_file}"
         logging.info(cmd)
         subprocess.run(cmd, shell=True).returncode
 
@@ -228,7 +232,7 @@ def main_run(args):
                 
 
     # run the FORTRAN and C++ 
-    run_executables(out_path=args.workspace,
+    run_executables(out_path=args.workspace, mock=args.mock,
                     exenames=executable_names, exepath=args.code_dir)
 
 
@@ -280,7 +284,11 @@ def main():
             '--code-dir',
             type=str,
             default='../bin',
-            help="The path to the compiled codes directory.")    
+            help="The path to the compiled codes directory.")
+        subparser.add_argument(
+            '--mock',
+            action='store_true',
+            help='Do a mock run, using bash scripts instead of real codes.')
     parser_run.set_defaults(func=main_run)
 
     parser_plot = subparsers.add_parser('plot')
@@ -319,10 +327,14 @@ def main():
 
 
 # Usage example:
+# == real run ==
 # mkdir ../tests/out/full_calc
 # mkdir ../tests/out/load_mat
 # ./run_codes.py -w ../tests/out/full_calc all // runtime: 23 minutes
 # ./run_codes.py -w ../tests/out/load_mat --load-matrix --from-dir ../tests/out/full_calc all  // runtime: 5 minutes
+# == mock run ==
+# mkdir ../tests/out/full_calc_mock
+# ./run_codes.py -w ../tests/out/full_calc_mock all --mock
 
 if __name__ == '__main__':
     main()
