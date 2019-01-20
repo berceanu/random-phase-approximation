@@ -73,7 +73,7 @@ c---- plotting of wavefunctions in the canonical basis in coordinate space
       ip = 2
       k  = 6
       call plotw(it,j,ip,k,.true.)
-c      stop ' FINAL STOP'
+      stop ' FINAL STOP'
 c-end-DISHFB
       end
 
