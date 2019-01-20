@@ -318,9 +318,6 @@ def main():
     
 
 
-
-
-
 # Usage example:
 # mkdir ../tests/out/full_calc
 # mkdir ../tests/out/load_mat
@@ -335,12 +332,3 @@ if __name__ == '__main__':
 #TODO: convert into module and import into signac program
 #TODO: create install script such that I can do python setup.py install --user
 #TODO: use virtualenv, see https://click.palletsprojects.com/en/7.x/quickstart/
-
-
-
-
-
-
-
-
-
