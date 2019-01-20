@@ -51,3 +51,7 @@ echo
 # ztes_lorvec.out must exist and not be empty
 
 # Note: need to run also in case of --load-matrix
+
+#TODO: generate the .bin files for every run
+#TODO: check param values in ztes_start.dat
+      #  if params don't require full matrix calculation, check that the .bin files are present
