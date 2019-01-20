@@ -52,5 +52,5 @@ echo ""
  ********************************************************************
 
 # POST-conditions
-# dish_stderr.txt must be empty
+# dish_stderr.txt must contain "FINAL STOP"
 # dish_stdout.txt must end with "Iteration converged after"
