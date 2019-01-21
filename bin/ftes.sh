@@ -22,6 +22,29 @@ if [[ ! -f "skys_rpa.wel" ]]; then
   exit 1
 fi
 
+CALC=`grep "^calc" ftes_start.dat | awk '{print $3}'`
+
+BinFiles=('ftes_arpa.bin' 'ftes_brpa.bin' 'ftes_xrpa.bin' 'ftes_yrpa.bin' 'ftes_erpa.bin' 'ftes_c_erpa.bin')
+
+
+if [[ $CALC -eq 1 ]]; then
+  echo "Doing the full calculation."
+  # generate all the .bin files
+  for i in "${BinFiles[@]}"; do
+    echo -n $'\x01' > $i
+  done
+elif [[ $CALC -eq 0 ]]; then
+  echo "Loading pre-computed matrix."
+  # check that the .bin files are present
+  for i in "${BinFiles[@]}"; do
+    if [[ ! -f $i ]]; then
+      echo "${i} not found!"
+      exit 1
+    fi
+  done
+fi
+
+
 # simulate intense computation
 sleep 5s
 

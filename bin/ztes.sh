@@ -22,6 +22,29 @@ if [[ ! -f "dish_qrpa.wel" ]]; then
   exit 1
 fi
 
+CALC=`grep "^calc" ztes_start.dat | awk '{print $3}'`
+
+BinFiles=('ztes_arpa.bin' 'ztes_brpa.bin' 'ztes_xrpa.bin' 'ztes_yrpa.bin' 'ztes_erpa.bin' 'ztes_c_erpa.bin')
+
+
+if [[ $CALC -eq 1 ]]; then
+  echo "Doing the full calculation."
+  # generate all the .bin files
+  for i in "${BinFiles[@]}"; do
+    echo -n $'\x02' > $i
+  done
+elif [[ $CALC -eq 0 ]]; then
+  echo "Loading pre-computed matrix."
+  # check that the .bin files are present
+  for i in "${BinFiles[@]}"; do
+    if [[ ! -f $i ]]; then
+      echo "${i} not found!"
+      exit 1
+    fi
+  done
+fi
+
+
 # simulate intense computation
 sleep 5s
 
@@ -51,7 +74,3 @@ echo
 # ztes_lorvec.out must exist and not be empty
 
 # Note: need to run also in case of --load-matrix
-
-#TODO: generate the .bin files for every run
-#TODO: check param values in ztes_start.dat
-      #  if params don't require full matrix calculation, check that the .bin files are present
