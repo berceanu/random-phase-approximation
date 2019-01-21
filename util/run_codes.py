@@ -334,8 +334,9 @@ def main():
 # ./run_codes.py -w ../tests/out/load_mat --load-matrix --from-dir ../tests/out/full_calc all  // runtime: 5 minutes
 # == mock run ==
 # mkdir ../tests/out/full_calc_mock
+# mkdir ../tests/out/load_mat_mock
 # ./run_codes.py -w ../tests/out/full_calc_mock all --mock
-#TODO: implement mock run for --load-matrix case
+# ./run_codes.py -w ../tests/out/load_mat_mock --load-matrix --from-dir ../tests/out/full_calc_mock all --mock
 
 if __name__ == '__main__':
     main()
