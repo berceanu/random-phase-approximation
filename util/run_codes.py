@@ -342,7 +342,6 @@ if __name__ == '__main__':
     main()
 
 
-#TODO: copy files as in run_no_matrix.sh, based on --no-matrix flag
 #TODO: convert into module and import into signac program
 #TODO: create install script such that I can do python setup.py install --user
 #TODO: use virtualenv, see https://click.palletsprojects.com/en/7.x/quickstart/
