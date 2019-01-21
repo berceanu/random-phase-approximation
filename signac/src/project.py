@@ -64,10 +64,6 @@ def progress(job):
 def sample(job):
     "Sample operation."
     import logging
-    import hoomd
-    from hoomd import md
-    if hoomd.context.exec_conf is None:
-        hoomd.context.initialize('')
     with job:
         with hoomd.context.SimulationContext():
             hoomd.init.read_gsd('init.gsd', restart='restart.gsd')
