@@ -82,3 +82,27 @@ OTHER:
 - you need to add the `--progress` option for that
 - since your operations are bash commands, you can just pipe your output into a specific file like you would normally; so you would do something like : `return "your command > {}".format(job.fn('outputfile.txt'))`
 - if you run locally a simple `--parallel` appended to the run command will invoke parallel execution
+
+```
+Project.operation
+Project.post(data_available)
+def look_for_previous_results(job):
+    project = get_project()
+    previous_results = project.find_jobs({'a': job.sp.a, 'b': job.sp.b})
+    if len(previous_results):
+        # copy previous results
+        job.doc.need_full_calculation = False
+    else:
+        job.doc.need_full_calculation = True
+
+Project.operation
+Project.pre.true('need_full_calculation')
+Project.post(data_available)
+def full_calculation(job):
+    # code for full calculation
+```
+
+```
+python src/init.py
+python src/project.py run
+```
