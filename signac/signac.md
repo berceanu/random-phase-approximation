@@ -3,15 +3,16 @@
 @cmd
 @Project.post.isfile('rpa.wel')
 def run_this_first(job):
-    return "fortran_executable {ws}".format(ws=job.workspace())
+    return f"fortran_executable {job.workspace()}"
 
 @Project.operation
 @cmd
 @Project.post.after(run_this_first):
 def run_this_second(job):
-    return "your command > {}".format(job.fn('outputfile.txt'))
-    return "matlab -r 'prog {job.sp.foo} {job.sp.bar}' > {job.ws}/output.txt"
+    return f"cpp_executable {job.sp.a} {job.sp.b} > {job.fn('output.txt')}"
 ```
+
+- `job.fn('output.txt')` equiv to `os.path.join(job.workspace(), 'output.txt')`
 
 ```python
 @Project.label
@@ -26,7 +27,13 @@ def compute_volume(job):
         file.write(str(volume) + '\n')
 ```
 
+- the `volume_computed()` function is a condition function. It's also decorated as a label-function, which means it's going to show up in the status summary, but not every condition function has to be a label function
+- your condition functions can be arbitrary python functions that take the job argument as first argument, you don't have to try to cramp everything into the decorator
+- replacing the `pre(volume_computed)` condition with `pre.after(compute_volume)`, which is a short-cut to reuse all of `compute_volume()`’s post-conditions as pre-conditions for the `store_volume_in_json_file()` operation
+
 ```python
+# for --load-matrix case
+
 @Project.operation
 @Project.post(data_available)
 def look_for_previous_results(job):
@@ -47,8 +54,8 @@ def full_calculation(job):
 
 - operation function is eligible for execution if all pre-conditions are met, at least one post-condition is not met and the operation is not currently submitted or running
 - operation is considered completed when all its post conditions are met, and it is up to the user to define those post conditions
-- the `volume_computed()` function is a condition function. It's also decorated as a label-function, which means it's going to show up in the status summary, but not every condition function has to be a label function
-- your condition functions can be arbitrary python functions that take the job argument as first argument, you don't have to try to cramp everything into the decorator
+- cheap conditions should be placed before expensive conditions; the same holds for post-conditions
+
 
 ## OTHER
 

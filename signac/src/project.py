@@ -17,6 +17,8 @@ class Project(FlowProject):
 # import module run_codes.py
 # generate inputs
 # define the 4 operations basic operations corresponding to the 4 codes
+# define all pre and post-conditions
+# tackle --load-matrix case
 
 
 @Project.operation
