@@ -1,22 +1,8 @@
-```python
-% prog(arg1, arg2) matlab code
-
-@FlowProject.operation
-@flow.cmd
-def compute_volume(job):
-    return "matlab -r 'prog {job.sp.foo} {job.sp.bar}' > {job.ws}/output.txt"
-```
-
 - write a function `generate_inputs` that can take the parameters as inputs, and will generate `dis.dat` and `start.dat`
 - `generate_inputs` creates `dis.dat` with `a=4` and `start.dat` with `b=5` say and they are copied to `run_a4_b5`
 
 
 ```python
-from flow import FlowProject, cmd
-
-class Project(FlowProject):
-    pass
-
 @Project.operation
 @cmd
 @Project.post.isfile('rpa.wel')
@@ -24,9 +10,11 @@ def run_this_first(job):
     return "$FORTRAN_SCRIPT"
 
 @Project.operation
+@cmd
 @Project.post.after(run_this_first):
 def run_this_second(job):
-    return $CPP_SCRIPT
+    return "$CPP_SCRIPT"
+    return "matlab -r 'prog {job.sp.foo} {job.sp.bar}' > {job.ws}/output.txt"
 ```
 
 - pass the "working directory" and then prepend all filenames with that directory

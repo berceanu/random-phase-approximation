@@ -8,11 +8,14 @@ line with
 
 See also: $ python src/project.py --help
 """
-from flow import FlowProject
+from flow import FlowProject, cmd
 
 
 class Project(FlowProject):
     pass
+
+
+# define the 4 operations basic operations corresponding to the 4 codes
 
 
 @Project.operation
