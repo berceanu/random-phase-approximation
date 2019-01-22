@@ -1,4 +1,4 @@
-```
+```python
 % prog(arg1, arg2) matlab code
 
 @FlowProject.operation
@@ -11,7 +11,7 @@ def compute_volume(job):
 - `generate_inputs` creates `dis.dat` with `a=4` and `start.dat` with `b=5` say and they are copied to `run_a4_b5`
 
 
-```
+```python
 from flow import FlowProject, cmd
 
 class Project(FlowProject):
@@ -34,7 +34,7 @@ def run_this_second(job):
 
 - your condition functions can be arbitrary python functions that take the job argument as first argument, you don't have to try to cramp everything into the decorator.
 
-```
+```python
 # project.py
 from flow import FlowProject
 
@@ -66,7 +66,7 @@ OTHER:
 - [`_read_last_line`](https://stackoverflow.com/questions/3346430/what-is-the-most-efficient-way-to-get-first-and-last-line-of-a-text-file/18603065#18603065) sounds like it would do the trick.
 
 
-```
+```python
 Project.operation
 Project.post(data_available)
 def look_for_previous_results(job):
@@ -85,7 +85,7 @@ def full_calculation(job):
     # code for full calculation
 ```
 
-```
+```bash
 python src/init.py
 python src/project.py run
 ```
