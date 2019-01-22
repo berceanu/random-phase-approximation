@@ -49,6 +49,12 @@ def run_zero_temp_ground_state(job):
 
     return f"{program} {path} > {stdout_file} 2> {stderr_file}"
 
+# POST-conditions
+# dish_stderr.txt must end with "FINAL STOP"
+# dish_stdout.txt must end with "Iteration converged after"
+# Note: don't need to run in case of --load-matrix
+
+
 @Project.operation
 @cmd
 @Project.pre.after(run_zero_temp_ground_state)
@@ -63,13 +69,18 @@ def run_zero_temp_excited_state(job):
 
     return f"{program} {path} > {stdout_file} 2> {stderr_file}"
 
+# POST-conditions
+# ztes_stderr.txt must be empty
+# ztes_stdout.txt must end with "program terminated without errors"
+# Note: need to run also in case of --load-matrix
+
 
 # @Project.operation
 # @Project.operation
 # @Project.operation
 
 
-# define all pre and post-conditions; see .sh scripts
+# define all pre and post-conditions
 # tackle --load-matrix case
 
 

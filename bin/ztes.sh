@@ -63,14 +63,3 @@ echo
 
 
 # ./ztes.sh out/ > ztes_stdout.txt 2> ztes_stderr.txt
-
-# PRE-condition
-# ztes_start.dat exists and nonempty
-# dish_qrpa.wel exists and nonempty
-
-# POST-conditions
-# ztes_stderr.txt must be empty
-# ztes_stdout.txt must end with "program terminated without errors"
-# ztes_lorvec.out must exist and not be empty
-
-# Note: need to run also in case of --load-matrix

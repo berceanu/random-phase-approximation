@@ -41,13 +41,3 @@ echo >> $outfile
 >&2 echo
 
 # ./dish.sh out/ > dish_stdout.txt 2> dish_stderr.txt
-
-# PRE-condition
-# dish_dis.dat exists and nonempty
-
-# POST-conditions
-# dish_stderr.txt must end with "FINAL STOP"
-# dish_stdout.txt must end with "Iteration converged after"
-# dish_qrpa.wel must exist and not be empty
-
-# Note: don't need to run in case of --load-matrix
