@@ -12,6 +12,7 @@ def run_this_second(job):
     return f"cpp_executable {job.sp.a} {job.sp.b} > {job.fn('output.txt')}"
 ```
 
+- `post.after(run_this_first)` reuses all of `run_this_first()`'s post conditions as pre-conditions for the `run_this_second()` operation
 - `job.fn('output.txt')` equiv to `os.path.join(job.workspace(), 'output.txt')`
 
 ```python
