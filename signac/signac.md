@@ -7,18 +7,14 @@
 @cmd
 @Project.post.isfile('rpa.wel')
 def run_this_first(job):
-    return "$FORTRAN_SCRIPT"
+    return "fortran_executable {ws}".format(ws=job.workspace())
 
 @Project.operation
 @cmd
 @Project.post.after(run_this_first):
 def run_this_second(job):
-    return "$CPP_SCRIPT"
     return "matlab -r 'prog {job.sp.foo} {job.sp.bar}' > {job.ws}/output.txt"
 ```
-
-- pass the "working directory" and then prepend all filenames with that directory
-- `return "fortran_executable {ws}".format(ws=job.workspace())`
 
 - your condition functions can be arbitrary python functions that take the job argument as first argument, you don't have to try to cramp everything into the decorator.
 
