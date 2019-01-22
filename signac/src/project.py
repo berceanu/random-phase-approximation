@@ -40,6 +40,10 @@ def geninputs(job):
 @cmd
 @Project.pre.isfile('dish_dis.dat')
 @Project.post.isfile('dish_qrpa.wel')
+@Project.post.isfile('dish_stdout.txt')
+@Project.post.isfile('dish_stderr.txt')
+@Project.post(lambda job: 'FINAL STOP' in list(open(job.fn('dish_stderr.txt')))[-2])
+@Project.post(lambda job: 'Iteration converged after' in list(open(job.fn('dish_stdout.txt')))[-3])
 def run_zero_temp_ground_state(job):
     """Run dish FORTRAN code"""
     program = 'bin/dish.sh'
@@ -49,9 +53,6 @@ def run_zero_temp_ground_state(job):
 
     return f"{program} {path} > {stdout_file} 2> {stderr_file}"
 
-# POST-conditions
-# dish_stderr.txt must end with "FINAL STOP"
-# dish_stdout.txt must end with "Iteration converged after"
 # Note: don't need to run in case of --load-matrix
 
 
@@ -60,6 +61,10 @@ def run_zero_temp_ground_state(job):
 @Project.pre.after(run_zero_temp_ground_state)
 @Project.pre.isfile('ztes_start.dat')
 @Project.post.isfile('ztes_lorvec.out')
+@Project.post.isfile('ztes_stderr.txt') # exists and is empty
+@Project.post.isfile('ztes_stdout.txt')
+@Project.post(lambda job: os.stat(job.fn('ztes_stderr.txt')).st_size==0)
+@Project.post(lambda job: 'program terminated without errors' in list(open(job.fn('ztes_stdout.txt')))[-2])
 def run_zero_temp_excited_state(job):
     """Run ztes C++ code"""
     program = 'bin/ztes.sh'
@@ -69,25 +74,14 @@ def run_zero_temp_excited_state(job):
 
     return f"{program} {path} > {stdout_file} 2> {stderr_file}"
 
-# POST-conditions
-# ztes_stderr.txt must be empty
-# ztes_stdout.txt must end with "program terminated without errors"
 # Note: need to run also in case of --load-matrix
 
 
-# @Project.operation
+
 # @Project.operation
 # @Project.operation
 
-
-# define all pre and post-conditions
 # tackle --load-matrix case
-@Project.operation
-@Project.post.isfile('result.txt')
-@Project.post(lambda job: 'Iteration converged' in list(open(job.fn('file.txt'))[-2])
-def calculation(job):
-    pass
-
 
 if __name__ == '__main__':
     Project().main()
