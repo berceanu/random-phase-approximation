@@ -85,7 +85,7 @@ def full_calculation(job):
     # code for full calculation
 ```
 
-```bash
-python src/init.py
-python src/project.py run
+```console
+$ python src/init.py
+$ python src/project.py run
 ```
