@@ -36,7 +36,6 @@ def run_this_second(job):
 
 ```python
 # project.py
-from flow import FlowProject
 
 @Project.label
 def volume_computed(job):
@@ -49,10 +48,6 @@ def compute_volume(job):
     volume = job.sp.N * job.sp.kT / job.sp.p
     with open(job.fn('volume.txt'), 'w') as file:
         file.write(str(volume) + '\n')
-
-
-if __name__ == '__main__':
-    Project().main()
 ```
 
 The `volume_computed()` function is a condition function. It's also decorated as a label-function, which means it's going to show up in the status summary, but not every condition function has to be a label function.
