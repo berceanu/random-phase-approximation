@@ -17,7 +17,7 @@ class Project(FlowProject):
 # import module run_codes.py
 # generate inputs
 # define the 4 operations basic operations corresponding to the 4 codes
-# define all pre and post-conditions
+# define all pre and post-conditions; see .sh scripts
 # tackle --load-matrix case
 
 
@@ -25,7 +25,6 @@ class Project(FlowProject):
 @Project.post.isfile('init.gsd')
 def initialize(job):
     "Initialize the simulation configuration."
-    import hoomd
     from math import ceil
     if hoomd.context.exec_conf is None:
         hoomd.context.initialize('')

@@ -69,6 +69,7 @@ def full_calculation(job):
 
 ## OTHER
 
+- to temporarily switch the current working directory while storing data for a specific job, we can use the Job object as context manager. This means that we switch into the workspace directory associated with the job after entering, and switch back into the original working directory after exiting
 - you can use the `-d` or `--detailed` option to show it on a per-job level
 - you need to add the `--progress` option for that
 - if you run locally a simple `--parallel` appended to the run command will invoke parallel execution
