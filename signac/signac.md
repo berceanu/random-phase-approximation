@@ -7,7 +7,7 @@ def run_this_first(job):
 
 @Project.operation
 @cmd
-@Project.post.after(run_this_first):
+@Project.pre.after(run_this_first):
 def run_this_second(job):
     return f"cpp_executable {job.sp.a} {job.sp.b} > {job.fn('output.txt')}"
 ```
