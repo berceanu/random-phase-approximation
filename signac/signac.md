@@ -62,8 +62,8 @@ OTHER:
 
 
 ```python
-Project.operation
-Project.post(data_available)
+@Project.operation
+@Project.post(data_available)
 def look_for_previous_results(job):
     project = get_project()
     previous_results = project.find_jobs({'a': job.sp.a, 'b': job.sp.b})
@@ -73,9 +73,9 @@ def look_for_previous_results(job):
     else:
         job.doc.need_full_calculation = True
 
-Project.operation
-Project.pre.true('need_full_calculation')
-Project.post(data_available)
+@Project.operation
+@Project.pre.true('need_full_calculation')
+@Project.post(data_available)
 def full_calculation(job):
     # code for full calculation
 ```
