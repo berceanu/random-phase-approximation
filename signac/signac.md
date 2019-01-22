@@ -16,8 +16,6 @@ def run_this_second(job):
     return "matlab -r 'prog {job.sp.foo} {job.sp.bar}' > {job.ws}/output.txt"
 ```
 
-- your condition functions can be arbitrary python functions that take the job argument as first argument, you don't have to try to cramp everything into the decorator.
-
 ```python
 @Project.label
 def volume_computed(job):
@@ -31,7 +29,8 @@ def compute_volume(job):
         file.write(str(volume) + '\n')
 ```
 
-The `volume_computed()` function is a condition function. It's also decorated as a label-function, which means it's going to show up in the status summary, but not every condition function has to be a label function.
+- the `volume_computed()` function is a condition function. It's also decorated as a label-function, which means it's going to show up in the status summary, but not every condition function has to be a label function.
+- your condition functions can be arbitrary python functions that take the job argument as first argument, you don't have to try to cramp everything into the decorator.
 
 ```python
 @Project.operation
