@@ -45,6 +45,8 @@ def full_calculation(job):
     # code for full calculation
 ```
 
+- operation function is eligible for execution if all pre-conditions are met, at least one post-condition is not met and the operation is not currently submitted or running
+- operation is considered completed when all its post conditions are met, and it is up to the user to define those post conditions
 - the `volume_computed()` function is a condition function. It's also decorated as a label-function, which means it's going to show up in the status summary, but not every condition function has to be a label function
 - your condition functions can be arbitrary python functions that take the job argument as first argument, you don't have to try to cramp everything into the decorator
 
