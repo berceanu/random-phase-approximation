@@ -36,15 +36,6 @@ def compute_volume(job):
 
 The `volume_computed()` function is a condition function. It's also decorated as a label-function, which means it's going to show up in the status summary, but not every condition function has to be a label function.
 
-OTHER:
-- you can use the `-d` or `--detailed` option to show it on a per-job level
-- you need to add the `--progress` option for that
-- since your operations are bash commands, you can just pipe your output into a specific file like you would normally; so you would do something like : `return "your command > {}".format(job.fn('outputfile.txt'))`
-- if you run locally a simple `--parallel` appended to the run command will invoke parallel execution
-
-- [`_read_last_line`](https://stackoverflow.com/questions/3346430/what-is-the-most-efficient-way-to-get-first-and-last-line-of-a-text-file/18603065#18603065) sounds like it would do the trick.
-
-
 ```python
 @Project.operation
 @Project.post(data_available)
@@ -64,6 +55,16 @@ def full_calculation(job):
     # code for full calculation
 ```
 
+## OTHER
+- you can use the `-d` or `--detailed` option to show it on a per-job level
+- you need to add the `--progress` option for that
+- since your operations are bash commands, you can just pipe your output into a specific file like you would normally; so you would do something like : `return "your command > {}".format(job.fn('outputfile.txt'))`
+- if you run locally a simple `--parallel` appended to the run command will invoke parallel execution
+
+- [`_read_last_line`](https://stackoverflow.com/questions/3346430/what-is-the-most-efficient-way-to-get-first-and-last-line-of-a-text-file/18603065#18603065) sounds like it would do the trick.
+
+
+## Usage
 ```console
 $ python src/init.py
 $ python src/project.py run
