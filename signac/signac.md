@@ -19,12 +19,9 @@ def run_this_second(job):
 - your condition functions can be arbitrary python functions that take the job argument as first argument, you don't have to try to cramp everything into the decorator.
 
 ```python
-# project.py
-
 @Project.label
 def volume_computed(job):
     return os.path.isfile("volume.txt")
-
 
 @Project.operation
 @Project.post(volume_computed)
