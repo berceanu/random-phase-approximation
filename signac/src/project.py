@@ -15,6 +15,7 @@ class Project(FlowProject):
     pass
 
 # import module run_codes.py
+# generate inputs
 # define the 4 operations basic operations corresponding to the 4 codes
 
 
