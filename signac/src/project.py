@@ -82,7 +82,11 @@ def run_zero_temp_excited_state(job):
 
 # define all pre and post-conditions
 # tackle --load-matrix case
-
+@Project.operation
+@Project.post.isfile('result.txt')
+@Project.post(lambda job: 'Iteration converged' in list(open(job.fn('file.txt'))[-2])
+def calculation(job):
+    pass
 
 
 if __name__ == '__main__':
