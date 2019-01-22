@@ -1,6 +1,4 @@
-- write a function `generate_inputs` that can take the parameters as inputs, and will generate `dis.dat` and `start.dat`
 - `generate_inputs` creates `dis.dat` with `a=4` and `start.dat` with `b=5` say and they are copied to `run_a4_b5`
-
 
 ```python
 @Project.operation
