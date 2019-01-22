@@ -9,19 +9,68 @@ line with
 See also: $ python src/project.py --help
 """
 from flow import FlowProject, cmd, with_job
+from util import CODE_NAME, generate_inputs
+import os
+
 
 
 class Project(FlowProject):
     pass
 
-# import module run_codes.py
+
+def input_files_exist(job):
+    """Check if input files are present in the workspace"""
+    is_file = []
+    for temp in ('zero', 'finite'):
+        for state, suffix in zip(('ground', 'excited'), ("_dis.dat", "_start.dat")):
+            fpath = job.fn(CODE_NAME[temp][state] + suffix)
+            is_file.append(os.path.isfile(fpath))
+    return all(is_file)
+
 # generate inputs
+@Project.operation
+@Project.post(input_files_exist)
+def geninputs(job):
+    """Generate all 4 input files."""
+    generate_inputs(out_path=job.ws, **job.sp)
+
+
 # define the 4 operations basic operations corresponding to the 4 codes
+@Project.operation
+@cmd
+@Project.pre.isfile('dish_dis.dat')
+@Project.post.isfile('dish_qrpa.wel')
+def run_zero_temp_ground_state(job):
+    """Run dish FORTRAN code"""
+    program = 'bin/dish.sh'
+    path = job.ws 
+    stdout_file = job.fn("dish_stdout.txt")
+    stderr_file = job.fn("dish_stderr.txt")
+
+    return f"{program} {path} > {stdout_file} 2> {stderr_file}"
+
+@Project.operation
+@cmd
+@Project.pre.after(run_zero_temp_ground_state)
+@Project.pre.isfile('ztes_start.dat')
+@Project.post.isfile('ztes_lorvec.out')
+def run_zero_temp_excited_state(job):
+    """Run ztes C++ code"""
+    program = 'bin/ztes.sh'
+    path = job.ws 
+    stdout_file = job.fn("ztes_stdout.txt")
+    stderr_file = job.fn("ztes_stderr.txt")
+
+    return f"{program} {path} > {stdout_file} 2> {stderr_file}"
+
+
+# @Project.operation
+# @Project.operation
+# @Project.operation
+
+
 # define all pre and post-conditions; see .sh scripts
 # tackle --load-matrix case
-
-
-
 
 
 

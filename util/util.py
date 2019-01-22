@@ -15,7 +15,7 @@ CODE_NAME = { # mapping from executable names to what they represent
 }
 
 
-def generate_inputs(nuleus="NI62", angular_momentum=1, parity="-", temperature=2.0, transition_energy=9.78,
+def generate_inputs(nucleus="NI62", angular_momentum=1, parity="-", temperature=2.0, transition_energy=9.78,
                     out_path=os.getcwd(), load_matrix=False):
     """Generates input files dish_dis.dat, skys_dis.dat and (z|f)tes_start.dat.
 
@@ -23,7 +23,7 @@ def generate_inputs(nuleus="NI62", angular_momentum=1, parity="-", temperature=2
     the matrix elements by passing load_matrix=True
 
     Args:
-        nuleus: nucleus under consideration, eg. NI56, NI60, NI62, NI68, ZR90, SN132, PB208
+        nucleus: nucleus under consideration, eg. NI56, NI60, NI62, NI68, ZR90, SN132, PB208
         angular_momentum: 0 or 1
         parity: + or -
         temperature: eg. 2.0 (in MeV)
@@ -34,9 +34,6 @@ def generate_inputs(nuleus="NI62", angular_momentum=1, parity="-", temperature=2
     
     Returns:
         Writes files to out_path (current folder by default).
-    Usage:
-        generate_inputs(out_path=args.workspace, load_matrix=args.load_matrix,
-                    nuleus="NI62", angular_momentum=1, parity="-", temperature=2.0, transition_energy=9.78)
     """
 
     actual_parity = {"-" : 0, "+": 1} # map to the parity as it is defined in the input file
@@ -50,7 +47,7 @@ def generate_inputs(nuleus="NI62", angular_momentum=1, parity="-", temperature=2
         'j':angular_momentum,
         'parity':actual_parity[parity],
         'temp':temperature,
-        'XA':nuleus
+        'XA':nucleus
     }
 
     block = defaultdict(dict)

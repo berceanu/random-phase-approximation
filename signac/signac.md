@@ -1,18 +1,4 @@
-```python
-@Project.operation
-@cmd
-@Project.post.isfile('rpa.wel')
-def run_this_first(job):
-    return f"fortran_executable {job.workspace()}"
-
-@Project.operation
-@cmd
-@Project.pre.after(run_this_first):
-def run_this_second(job):
-    return f"cpp_executable {job.sp.a} {job.sp.b} > {job.fn('output.txt')}"
-```
-
-- `post.after(run_this_first)` reuses all of `run_this_first()`'s post conditions as pre-conditions for the `run_this_second()` operation
+- `pre.after(run_this_first)` reuses all of `run_this_first()`'s post conditions as pre-conditions for the `run_this_second()` operation
 - `job.fn('output.txt')` equiv to `os.path.join(job.workspace(), 'output.txt')`
 
 ```python

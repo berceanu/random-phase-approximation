@@ -78,7 +78,7 @@ def plot_lorvec(workspace=os.getcwd()):
 def main_generate(args):
     # generate input files for FORTRAN and C++ 
     generate_inputs(out_path=args.workspace, load_matrix=args.load_matrix,
-                    nuleus="NI62", angular_momentum=1, parity="-", temperature=2.0, transition_energy=9.78)
+                    nucleus="NI62", angular_momentum=1, parity="-", temperature=2.0, transition_energy=9.78)
 
 def main_run(args):
     def get_all_codenames():
@@ -98,7 +98,7 @@ def main_run(args):
             sys.exit(f"Executable {fpath} not found, exiting.")
 
     # check if input files are present in the workspace
-    for temp in ('zero', 'finite'): # create input files
+    for temp in ('zero', 'finite'):
         for state, suffix in zip(('ground', 'excited'), ("_dis.dat", "_start.dat")):
             fpath = os.path.join(args.workspace, CODE_NAME[temp][state] + suffix)
             if not os.path.isfile(fpath):

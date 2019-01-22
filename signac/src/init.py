@@ -11,25 +11,29 @@ import numpy as np
 
 def main():
     project = signac.init_project('rpa')
-    for p in np.linspace(0.5, 5.0, 10):
+    for tr_en in np.linspace(480/50, 490/50, 11):
         statepoint = dict(
-                # system size
-                N=512,
+                # nucleus of interest
+                nucleus="NI62",
 
-                # Lennard-Jones potential parameters
-                sigma=1.0,
-                epsilon=1.0,
-                r_cut=2.5,
+                # nucleus angular momentum
+                angular_momentum=1,
 
-                # thermal energy
-                kT=1.0,
-                # presure
-                p=p,
-                # thermostat coupling constant
-                tau=1.0,
-                # barostat coupling constant
-                tauP=1.0)
+                # nucleus parity
+                parity="-",
+
+                # system temperature in MeV
+                temperature=2.0,
+
+                # transition energy in MeV
+                transition_energy=tr_en,
+
+                # do full calculation
+                load_matrix=False
+                )
         project.open_job(statepoint).init()
+
+
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
