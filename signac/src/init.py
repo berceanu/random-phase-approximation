@@ -11,7 +11,8 @@ import numpy as np
 
 def main():
     project = signac.init_project('rpa')
-    for tr_en in np.linspace(480/50, 490/50, 11):
+#   for tr_en in np.linspace(480/50, 490/50, 11):
+    for mat in (False, True):     
         statepoint = dict(
                 # nucleus of interest
                 nucleus="NI62",
@@ -25,11 +26,11 @@ def main():
                 # system temperature in MeV
                 temperature=2.0,
 
-                # transition energy in MeV
-                transition_energy=tr_en,
+                # transition energy in MeV tr_en
+                transition_energy=9.78,
 
-                # do full calculation
-                load_matrix=False
+                # do full calculation False
+                load_matrix=mat
                 )
         project.open_job(statepoint).init()
 

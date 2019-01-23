@@ -9,6 +9,7 @@ line with
 See also: $ python src/project.py --help
 """
 from flow import FlowProject, cmd, with_job
+from signac import get_project
 from util import CODE_NAME, generate_inputs
 import os
 
@@ -38,6 +39,7 @@ def geninputs(job):
 # define the 4 operations basic operations corresponding to the 4 codes
 @Project.operation
 @cmd
+@Project.pre(lambda job: not job.sp.load_matrix)
 @Project.pre.isfile('dish_dis.dat')
 @Project.post.isfile('dish_qrpa.wel')
 @Project.post.isfile('dish_stdout.txt')
@@ -53,15 +55,15 @@ def run_zero_temp_ground_state(job):
 
     return f"{program} {path} > {stdout_file} 2> {stderr_file}"
 
-# Note: don't need to run in case of --load-matrix
-
 
 @Project.operation
 @cmd
-@Project.pre.after(run_zero_temp_ground_state)
+@Project.pre.isfile('dish_qrpa.wel')
 @Project.pre.isfile('ztes_start.dat')
+# @Project.pre the 6 binary files should be present if load_matrix=True
+# @Project.pre(lambda job: binaries_present() if job.sp.load_matrix else True)
 @Project.post.isfile('ztes_lorvec.out')
-@Project.post.isfile('ztes_stderr.txt') # exists and is empty
+@Project.post.isfile('ztes_stderr.txt')
 @Project.post.isfile('ztes_stdout.txt')
 @Project.post(lambda job: os.stat(job.fn('ztes_stderr.txt')).st_size==0)
 @Project.post(lambda job: 'program terminated without errors' in list(open(job.fn('ztes_stdout.txt')))[-2])
@@ -74,14 +76,37 @@ def run_zero_temp_excited_state(job):
 
     return f"{program} {path} > {stdout_file} 2> {stderr_file}"
 
-# Note: need to run also in case of --load-matrix
+
+# 1. need to calculate job {load_matrix=True, transition_energy=x, temperature=y, nucleus="NI62", angular_momentum=1, parity="-"}
+# 2. find results of _full calculation_ job {load_matrix=False, transition_energy=x, temperature=y, nucleus="NI62", angular_momentum=1, parity="-"}
+# 3. copy the 6 binary files from job #2, as well as `dish_qrpa.wel`
+# 4. run ztes code
+
+@Project.operation
+# @Project.post(binaries_present)
+@Project.post(lambda job: 'need_full_calculation' in job.doc)
+def look_for_previous_results(job):
+    project = get_project()
+    previous_results = project.find_jobs(dict(job.sp, load_matrix=False))
+    if len(previous_results):
+        print(previous_results)
+        # copy the 6 binary files from other job, as well as `dish_qrpa.wel`
+        job.doc.need_full_calculation = False
+    else:
+        job.doc.need_full_calculation = True
+
+
+# Project.operation
+# Project.pre.true('need_full_calculation')
+# Project.post(data_available)
+# def full_calculation(job):
+    # code for full calculation
 
 
 
 # @Project.operation
 # @Project.operation
 
-# tackle --load-matrix case
 
 if __name__ == '__main__':
     Project().main()
