@@ -79,17 +79,15 @@ def run_zero_temp_excited_state(job):
 
 # 1. need to calculate job {load_matrix=True, transition_energy=x, temperature=y, nucleus="NI62", angular_momentum=1, parity="-"}
 # 2. find results of _full calculation_ job {load_matrix=False, transition_energy=x, temperature=y, nucleus="NI62", angular_momentum=1, parity="-"}
-# 3. copy the 6 binary files from job #2, as well as `dish_qrpa.wel`
-# 4. run ztes code
+# 4. copy the 6 binary files, as well as `dish_qrpa.wel`
 
 @Project.operation
 # @Project.post(binaries_present)
 @Project.post(lambda job: 'need_full_calculation' in job.doc)
 def look_for_previous_results(job):
     project = get_project()
-    previous_results = project.find_jobs(dict(job.sp, load_matrix=False))
+    previous_results = project.find_jobs(dict(job.sp, load_matrix=True))
     if len(previous_results):
-        print(previous_results)
         # copy the 6 binary files from other job, as well as `dish_qrpa.wel`
         job.doc.need_full_calculation = False
     else:

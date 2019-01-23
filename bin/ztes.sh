@@ -1,0 +1,1 @@
+../signac/bin/ztes.sh
