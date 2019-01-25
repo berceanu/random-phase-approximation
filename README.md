@@ -5,10 +5,6 @@ See the original [paper](http://dx.doi.org/10.1016/j.physletb.2009.10.046).
 
 TODO:
 - write table to output file
-- remove `filetest.py` and `transerg.in`
-- write `generate_inputs` function
-- implement `_read_last_line` condition function; add "DONE" line to output
-- implement `signac` workflow - see `signac.md`
 - Python + templates to generate latex and ultimately png output similar to Table 2
 
 PARAMETERS TO VARY:
