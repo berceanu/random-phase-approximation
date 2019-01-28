@@ -223,7 +223,4 @@ def main():
 if __name__ == '__main__':
     main()
 
-
-#TODO: convert into module and import into signac program
-#TODO: create install script such that I can do python setup.py install --user
-#TODO: use virtualenv, see https://click.palletsprojects.com/en/7.x/quickstart/
+#TODO: installation via pipenv
