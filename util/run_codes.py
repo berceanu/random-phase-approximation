@@ -210,13 +210,13 @@ def main():
 
 # Usage example:
 # == real run ==
-# mkdir ../tests/out/full_calc
-# mkdir ../tests/out/load_mat
+# mkdir -p ../tests/out/full_calc
+# mkdir -p ../tests/out/load_mat
 # ./run_codes.py -w ../tests/out/full_calc all // runtime: 23 minutes
 # ./run_codes.py -w ../tests/out/load_mat --load-matrix --from-dir ../tests/out/full_calc all  // runtime: 5 minutes
 # == mock run ==
-# mkdir ../tests/out/full_calc_mock
-# mkdir ../tests/out/load_mat_mock
+# mkdir -p ../tests/out/full_calc_mock
+# mkdir -p ../tests/out/load_mat_mock
 # ./run_codes.py -w ../tests/out/full_calc_mock all --mock
 # ./run_codes.py -w ../tests/out/load_mat_mock --load-matrix --from-dir ../tests/out/full_calc_mock all --mock
 
