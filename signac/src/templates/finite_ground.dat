@@ -1,0 +1,4 @@
+{% include 'ground.dat' %}
+Delta    =  {{ "%-21s"|format('0.000   0.000') }} ! Gapparameter for neutrons and  protons
+temp     =  {{ "%-21s"|format(param.temp)      }} ! temperature
+filename =  {{ "%-21s"|format('T0__')          }} 

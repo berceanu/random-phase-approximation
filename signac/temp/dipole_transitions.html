@@ -1,0 +1,16 @@
+{% extends 'base.html' %}	
+
+ {% block table %}	
+<table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">	
+    <tr class="is-selected">	
+        <th>Transition</th>	
+        <th>Amplitude</th>	
+    </tr>	
+    {% for row in table %}	
+    <tr>	
+        <td>{{row.transition}}</td>	
+        <td>{{row.amplitude}}</td>	
+    </tr>	
+    {% endfor %}	
+</table>	
+{% endblock %}
