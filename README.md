@@ -3,9 +3,9 @@
 RPA for zero and finite temperature, both FORTRAN (ground state) and C++ (excited states) codes.
 See the original [paper](http://dx.doi.org/10.1016/j.physletb.2009.10.046).
 
-TODO:
-- write table to output file
-- Python + templates to generate latex and ultimately png output similar to Table 2
+DEPENDENCIES:
+- `cmake`
+- `gfortran`
 
 PARAMETERS TO VARY:
 - nucleus under consideration: `NI56`, `NI60`, `NI62`, `NI68`, `ZR90`, `SN132`, `PB208`
