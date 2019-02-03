@@ -1,28 +1,39 @@
-#%%
+# ---
+# jupyter:
+#   jupytext:
+#     text_representation:
+#       extension: .py
+#       format_name: percent
+#       format_version: '1.2'
+#       jupytext_version: 0.8.6
+#   kernelspec:
+#     display_name: Python 3
+#     language: python
+#     name: python3
+# ---
+
+# %%
 import pandas as pd
 import numpy as np
 import signac as sg
-from src.modules import code_api
+from modules import code_api
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from IPython.display import Image
-from IPython.core.display import HTML
 import re
 
-
-#%%
+# %%
 code = code_api.NameMapping()
 
-
-
-#%%
+# %%
 def split_element_mass(job):
     pattern = re.compile(r"([A-Z]*)(\d*)")
     element, mass_number = pattern.sub(r'\1 \2', job.sp.nucleus).split()
     element = element.title() # capitalize first letter only
     return element, mass_number
 
-#%%
+
+# %%
 def plot_job(job, ax, code_mapping=code_api.NameMapping()):
     STYLE = {'0.0': dict(color='dodgerblue', linestyle='-'),
              '1.0': dict(color='lawngreen', linestyle='--'),
@@ -50,15 +61,14 @@ def plot_job(job, ax, code_mapping=code_api.NameMapping()):
     )
 
     ax.legend()
-    # ax.grid()
+    ax.grid()
 
-
-
-#%%
+# %%
 project = sg.get_project()
 filter = dict(nucleus="NI62", angular_momentum=1, parity="-", transition_energy=9.78)
 selection = project.find_jobs(filter)
 
+# %%
 fig = Figure(figsize=(10, 6)) 
 canvas = FigureCanvas(fig)    
 ax = fig.add_subplot(111)  
@@ -76,7 +86,3 @@ fn = f"{element}{mass}.png"
 canvas.print_png(fn)
 fig.clear()
 Image(filename = fn)
-
-
-# for kT, group in project.groupby('kT'):
-#     print(kT, np.mean([job.sp.pressure] for job in group])
