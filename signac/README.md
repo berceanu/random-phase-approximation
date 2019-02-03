@@ -7,6 +7,7 @@ Test project using the [signac](https://signac.io) data management framework.
 ## Usage
 
 ```console
+$ ./init.sh # clears workspace!
 $ python3 src/init.py
 $ python3 src/project.py run --parallel
 $ python3 src/project.py status --pretty --full --stack
