@@ -15,7 +15,8 @@ c----------------------------------------------------------------------c
 
       integer iargc
       integer argc
-      character*100 argv(1)
+      character*200 argv(1)
+      CHARACTER(len=255) :: cwd
 
 c --- takes working dir from command line
       argc=iargc()
@@ -23,6 +24,9 @@ c --- takes working dir from command line
             call getarg(1,argv(1))
             call chdir(trim(adjustl(argv(1))))
       end if
+
+      CALL getcwd(cwd)
+      WRITE(*,*) "Working in folder ", TRIM(cwd)
 c
 c---- reads in data     
       call reader
