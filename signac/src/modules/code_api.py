@@ -42,13 +42,12 @@ class NameMapping:
         return self._prefix[temp][state] + '.sh'
 
     def input_file(self, temp, state):
-        return self._prefix[temp][state] + self._input_suffix[state]
+        return self.input_files(temp, state)[0]
 
     def input_files(self, temp=None, state=None):
         files = []
         if temp and state:
-            logger.warn('Use `input_file()` instead.')
-            return self.input_file(temp, state)
+            files.append(self._prefix[temp][state] + self._input_suffix[state])
         elif temp and not state:
             # loop of state
             for s in ('ground', 'excited'):

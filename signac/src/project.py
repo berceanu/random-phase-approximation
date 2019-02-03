@@ -292,8 +292,6 @@ def dipole_trans_finite(job):
     _extract_transitions(job, temp='finite', code_mapping=code)
 
 
-#TODO reproduce plots in Yf paper
-
 if __name__ == '__main__':
     logging.basicConfig(
         filename='project.log',
