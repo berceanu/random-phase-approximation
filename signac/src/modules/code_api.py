@@ -78,6 +78,9 @@ class NameMapping:
     def isovec_file(self, temp):
         return self._prefix[temp]['excited'] + '_lorvec.out'
 
+    def excvec_file(self, temp):
+        return self._prefix[temp]['excited'] + '_excvec.out'
+
     def stdout_file(self, temp, state):
         return self._prefix[temp][state] + '_stdout.txt'
 

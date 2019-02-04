@@ -6,6 +6,7 @@ See the original [paper](http://dx.doi.org/10.1016/j.physletb.2009.10.046).
 DEPENDENCIES:
 - `cmake`
 - `gfortran`
+- `$ conda install -c conda-forge signac signac-flow signac-dashboard`
 
 PARAMETERS TO VARY:
 - nucleus under consideration: `NI56`, `NI60`, `NI62`, `NI68`, `ZR90`, `SN132`, `PB208`
