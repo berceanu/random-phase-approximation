@@ -210,6 +210,9 @@ def run_finite_temp_excited_state(job):
 # PLOTTING #
 ############
 
+# TODO plot isovector and isoscalar as well
+# TODO plot vertical bars for excitations
+
 def _plot_isovector(job, temp, code_mapping=code_api.NameMapping()):
     def split_element_mass(job):
         pattern = re.compile(r"([A-Z]*)(\d*)")

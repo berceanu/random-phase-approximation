@@ -76,10 +76,10 @@ class NameMapping:
         return tuple(files)
 
     def isovec_file(self, temp):
-        return self._prefix[temp]['excited'] + '_lorvec.out'
+        return self._prefix[temp]['excited'] + '_lorvec.out' # _lorskal.out
 
     def excvec_file(self, temp):
-        return self._prefix[temp]['excited'] + '_excvec.out'
+        return self._prefix[temp]['excited'] + '_excvec.out' # _excskal.out
 
     def stdout_file(self, temp, state):
         return self._prefix[temp][state] + '_stdout.txt'

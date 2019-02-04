@@ -18,10 +18,10 @@ def main():
                 nucleus="SN132", #
 
                 # nucleus angular momentum
-                angular_momentum=0, #
+                angular_momentum=1, #
 
                 # nucleus parity
-                parity="+", #
+                parity="-", #
 
                 # system temperature in MeV
                 temperature=T,
@@ -36,7 +36,6 @@ def main():
     #     job.doc.setdefault('run_zero_temp_ground_state', True)
     #     job.doc.setdefault('run_finite_temp_ground_state', True)
 
-# TODO reproduce Fig. 1 Sn132
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
