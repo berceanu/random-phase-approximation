@@ -108,6 +108,7 @@ Image(filename = fn)
 # %%
 one_job = project.find_jobs(dict(nucleus="NI62", angular_momentum=1, parity="-", transition_energy=9.78, temperature=2.0))
 assert len(one_job) == 1
+job = next(one_job)
 
 # %%
 def transition_energies(df):
@@ -119,21 +120,25 @@ def transition_energies(df):
 fig = Figure(figsize=(10, 6)) 
 canvas = FigureCanvas(fig)    
 ax = fig.add_subplot(111)  
-df = plot_excvec(one_job, ax, code_mapping=code)
+df = plot_excvec(job, ax, code_mapping=code)
 ax.set(
     ylabel=r"$R \; (e^2fm^2/MeV)$",
     xlabel="E (MeV)")
 
-element, mass = split_element_mass(one_job)
-ax.set_title(fr"${{}}^{{{mass}}} {element} \; {one_job.sp.angular_momentum}^{{{one_job.sp.parity}}}$ at T = {one_job.sp.temperature} MeV")
+element, mass = split_element_mass(job)
+ax.set_title(fr"${{}}^{{{mass}}} {element} \; {job.sp.angular_momentum}^{{{job.sp.parity}}}$ at T = {job.sp.temperature} MeV")
 fig.suptitle("Isovector dipole transition strength distribution")
 
-fn = f"excvec_T_{one_job.sp.temperature}_{element}{mass}.png"
+fn = f"excvec_T_{job.sp.temperature}_{element}{mass}.png"
 canvas.print_png(fn)
 fig.clear()
 Image(filename = fn)
 
-#%%
+# %%
 tr_en = transition_energies(df)
+
+# %%
 next(tr_en)
+
+# %%
 next(tr_en)

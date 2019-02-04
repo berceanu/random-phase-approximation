@@ -187,3 +187,5 @@ out/
 .idea/
 signac.rc
 workspace/
+*.ipynb
+*.png

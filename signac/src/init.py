@@ -11,24 +11,23 @@ import numpy as np
 
 def main():
     project = signac.init_project('rpa')
-    # for energy in np.linspace(480/50, 490/50, 11): #9.81 #9.78
-    #for T in (0.0, 1.0, 2.0):
-    for tr_en in (9.78, 10.03):
+    for T in (0.0, 1.0, 2.0):
+    # for tr_en in (9.78, 10.03):
         statepoint = dict(
                 # nucleus of interest
-                nucleus="NI62", #
+                nucleus="SN132", #
 
                 # nucleus angular momentum
-                angular_momentum=1, #
+                angular_momentum=0, #
 
                 # nucleus parity
-                parity="-", #
+                parity="+", #
 
                 # system temperature in MeV
-                temperature=2.0,
+                temperature=T,
 
                 # transition energy in MeV
-                transition_energy=tr_en
+                transition_energy=0.0
                 )
         project.open_job(statepoint).init()
     
