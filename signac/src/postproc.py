@@ -136,7 +136,7 @@ df.applymap('{:,.2f}'.format)[(df.energy > 3.) & (df.energy < 8.) & (df.transiti
 df[np.isclose(df.energy, 7.77, atol=0.01)]
 
 # %%
-# TODO T = 0 Mev, E = 7.75 MeV
+# T = 0 Mev, E = 7.75 MeV
 
 
 # %%
