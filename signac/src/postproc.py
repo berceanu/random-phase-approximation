@@ -16,14 +16,35 @@
 # %autosave 0
 
 # %%
+# Enabling the `widget` backend.
+# This requires jupyter-matplotlib a.k.a. ipympl.
+# ipympl can be install via pip or conda.
+##conda install -c conda-forge ipympl
+# If using the Notebook
+##conda install -c conda-forge widgetsnbextension
+# https://github.com/matplotlib/jupyter-matplotlib
+# %matplotlib widget
+
+# %%
 import pandas as pd
 import numpy as np
 import signac as sg
 from modules import code_api
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-from IPython.display import Image
+#from matplotlib.figure import Figure
+#from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+import matplotlib.pyplot as plt
+from matplotlib.gridspec import GridSpec
+#from IPython.display import Image
 import re
+
+# %%
+code = code_api.NameMapping()
+
+# %%
+project = sg.get_project()
+
+# %%
+is_finite = lambda job: 'finite' if job.sp.temperature > 0 else 'zero'
 
 # %%
 def split_element_mass(job):
@@ -32,266 +53,89 @@ def split_element_mass(job):
     element = element.title() # capitalize first letter only
     return element, mass_number
 
-
 # %%
-def plot_iso(job, ax, suffix='_lorvec.out'):
-    STYLE = {'0.0': dict(color='dodgerblue', linestyle='-'),
-             '1.0': dict(color='lawngreen', linestyle='--'),
-             '2.0': dict(color='firebrick', linestyle='-.')}
+def out_file_plot(job, temp, skalvec, lorexc, ax=None, code_mapping=code_api.NameMapping()):
+    STYLE = {'0.0': dict(color='dodgerblue', linestyle='solid'),
+             '1.0': dict(color='lawngreen', linestyle='dashed'),
+             '2.0': dict(color='firebrick', linestyle='dashdot')}
 
-    if job.sp.temperature > 0:
-        prefix = 'ftes'
-    else:
-        prefix = 'ztes'
-    fn = job.fn(prefix + suffix)
-    #
-    df = pd.read_csv(fn, delim_whitespace=True, comment='#', skip_blank_lines=True,
-                     header=None, names=['energy', 'transition_strength'])
-    df = df[(df.energy < 30)] # MeV
-
-    ax.plot(df.energy, df.transition_strength, label=f"T = {job.sp.temperature} MeV",
-                            color=STYLE[str(job.sp.temperature)]['color'],
-                            linestyle=STYLE[str(job.sp.temperature)]['linestyle'])
-    
-    return df
-
-# %%
-def plot_exc(job, ax, suffix='_excvec.out'):
-    if job.sp.temperature > 0:
-        prefix = 'ftes'
-    else:
-        prefix = 'ztes'
-    fn = job.fn(prefix + suffix)
-    #
-    df = pd.read_csv(fn, delim_whitespace=True, comment='#', skip_blank_lines=True,
-                     header=None, names=['energy', 'transition_strength'])
-    df = df[(df.energy < 30) & (df.transition_strength > 0.1)]
-    
-    ax.vlines(df.energy, 0., df.transition_strength, colors='red')
-
-    return df
-
-# %%
-def transition_energies(df):
-    for idx in df.index:
-        en = df.loc[idx, 'energy']
-        yield float("{0:.2f}".format(en))
-
-# %%
-project = sg.get_project()
-
-# %% [markdown]
-# # ${}^{62}$Ni 1${}^{-}$
-
-# %% [markdown]
-# Plotting the isovector dipole transition strength Lorentzian distribution.
-
-# %%
-filter = dict(nucleus="NI62", angular_momentum=1, parity="-", transition_energy=9.78)
-selection = project.find_jobs(filter)
-
-fig = Figure(figsize=(10, 6)) 
-canvas = FigureCanvas(fig)    
-ax = fig.add_subplot(111)  
-
-for T, group in selection.groupby('temperature'):
-    print(f"T = {T} MeV")
-    for job in group:
-        print(f"job id: {job._id}")
-        _ = plot_iso(job, ax, suffix='_lorvec.out')
-
-ax.set(
-    xlim=[0, 30],
-    ylim=[0, 4.5],
-    ylabel=r"$R \; (e^2fm^2/MeV)$",
-    xlabel="E (MeV)")
-
-ax.legend()
-ax.grid()
-
-element, mass = split_element_mass(job)
-ax.set_title(fr"${{}}^{{{mass}}} {element} \; {job.sp.angular_momentum}^{{{job.sp.parity}}}$")
-fig.suptitle("Isovector dipole transition strength Lorentzian distribution")
-
-fn = f"lorvec_T_all_{element}{mass}.png"
-canvas.print_png(fn)
-fig.clear()
-Image(filename = fn)
-
-# %% [markdown]
-# Plotting the isovector dipole transition strength distribution.
-
-# %%
-one_job = project.find_jobs(dict(nucleus="NI62", angular_momentum=1, parity="-", transition_energy=9.78, temperature=2.0))
-assert len(one_job) == 1
-job = next(one_job)
-
-fig = Figure(figsize=(10, 6)) 
-canvas = FigureCanvas(fig)    
-ax = fig.add_subplot(111)  
-df = plot_exc(job, ax, suffix='_excvec.out')
-ax.set(
-    ylabel=r"$R \; (e^2fm^2/MeV)$",
-    xlabel="E (MeV)")
-
-element, mass = split_element_mass(job)
-ax.set_title(fr"${{}}^{{{mass}}} {element} \; {job.sp.angular_momentum}^{{{job.sp.parity}}}$ at T = {job.sp.temperature} MeV")
-fig.suptitle("Isovector dipole transition strength distribution")
-
-fn = f"excvec_T_{job.sp.temperature}_{element}{mass}.png"
-canvas.print_png(fn)
-fig.clear()
-Image(filename = fn)
-
-# %%
-tr_en = transition_energies(df)
-print(f"E = {next(tr_en)} MeV")
-print(f"E = {next(tr_en)} MeV")
-
-# %% [markdown]
-# # ${}^{132}$Sn 0${}^{+}$
-
-# %%
-one_job = project.find_jobs(dict(nucleus="SN132", angular_momentum=0, parity="+", transition_energy=0.0, temperature=2.0))
-assert len(one_job) == 1
-job = next(one_job)
-
-fig = Figure(figsize=(10, 6)) 
-canvas = FigureCanvas(fig)    
-ax = fig.add_subplot(111)  
-df = plot_exc(job, ax, suffix='_excskal.out')
-ax.set(
-    ylabel=r"$R \; (e^2fm^2/MeV)$",
-    xlabel="E (MeV)")
-
-element, mass = split_element_mass(job)
-ax.set_title(fr"${{}}^{{{mass}}} {element} \; {job.sp.angular_momentum}^{{{job.sp.parity}}}$ at T = {job.sp.temperature} MeV")
-fig.suptitle("Isoscalar monopole transition strength distribution")
-
-fn = f"excvec_T_{job.sp.temperature}_{element}{mass}.png"
-canvas.print_png(fn)
-fig.clear()
-Image(filename = fn)
-
-# %%
-tr_en = transition_energies(df)
-print(f"E = {next(tr_en)} MeV")
-print(f"E = {next(tr_en)} MeV")
-
-# %%
-filter = dict(nucleus="SN132", angular_momentum=0, parity="+", transition_energy=0.0)
-selection = project.find_jobs(filter)
-
-fig = Figure(figsize=(10, 6)) 
-canvas = FigureCanvas(fig)    
-ax = fig.add_subplot(111)  
-
-for T, group in selection.groupby('temperature'):
-    print(f"T = {T} MeV")
-    for job in group:
-        print(f"job id: {job._id}")
-        _ = plot_iso(job, ax, suffix='_lorskal.out')
-
-ax.set(
-    xlim=[0, 30],
-    #ylim=[0, 4.5],
-    ylabel=r"$R \; (e^2fm^2/MeV)$",
-    xlabel="E (MeV)")
-
-ax.legend()
-ax.grid()
-
-element, mass = split_element_mass(job)
-ax.set_title(fr"${{}}^{{{mass}}} {element} \; {job.sp.angular_momentum}^{{{job.sp.parity}}}$")
-fig.suptitle("Isoscalar monopole transition strength Lorentzian distribution")
-
-fn = f"lorvec_T_all_{element}{mass}.png"
-canvas.print_png(fn)
-fig.clear()
-Image(filename = fn)
-
-# %%
-
-
-
-
-# %%
-from matplotlib.gridspec import GridSpec
-
-# %%
-code = code_api.NameMapping()
-
-
-# %%
-one_job = project.find_jobs(dict(nucleus="NI62", angular_momentum=1, parity="-", transition_energy=9.78, temperature=2.0))
-assert len(one_job) == 1
-job = next(one_job)
-
-# %%
-def out_file_data(job, skalvec, lorexc, code_mapping=code_api.NameMapping()):
-    if job.sp.temperature > 0:
-        temp = 'finite'
-    else:
-        temp = 'zero'
-    
     fn = job.fn(code_mapping.out_file(temp, skalvec, lorexc))
-    
-    df = pd.read_csv(fn, delim_whitespace=True, comment='#', skip_blank_lines=True,
-                 header=None, names=['energy', 'transition_strength'])
-    return df
 
-# %%
-def out_file_plot(df, ax, lorexc):
+    df = pd.read_csv(fn, delim_whitespace=True, comment='#', skip_blank_lines=True,
+                header=None, names=['energy', 'transition_strength'])
+
     df = df[df.energy < 30] # MeV
 
-    if lorexc == 'excitation':
-        ax.vlines(df.energy, 0., df.transition_strength, colors='black')
-    elif lorexc == 'lorentzian':
-        ax.plot(df.energy, df.transition_strength, color='black')
-    else:
-        raise ValueError
+    if ax:
+        if lorexc == 'excitation':
+            ax.vlines(df.energy, 0., df.transition_strength, label='_nolegend_',
+                      colors=STYLE[str(job.sp.temperature)]['color'],
+                     linestyles=STYLE[str(job.sp.temperature)]['linestyle'])
+        elif lorexc == 'lorentzian':
+            ax.plot(df.energy, df.transition_strength, label=f"T = {job.sp.temperature} MeV",
+                    color=STYLE[str(job.sp.temperature)]['color'],
+                   linestyle=STYLE[str(job.sp.temperature)]['linestyle'])
+        else:
+            raise ValueError
+        
+    return df
 
 # %%
-df = out_file_data(job, 'isovector', 'excitation', code)
+filter = dict(nucleus="SN132", angular_momentum=1, parity="-", transition_energy=0.0)
 
-# %%
-df[(df.energy > 9.7) & (df.energy < 9.8)]
+selection = project.find_jobs(filter)
 
-# %%
-df[np.isclose(df.energy, job.sp.transition_energy, atol=0.01)]
+fig = plt.figure(figsize=(10, 6))
+#fig = Figure(figsize=(12, 6)) 
+#canvas = FigureCanvas(fig)
 
-# %%
-fig = Figure(figsize=(12, 6)) 
-canvas = FigureCanvas(fig)
+
 gs = GridSpec(2, 1)
 ax = {'isoscalar': fig.add_subplot(gs[0,0]),
       'isovector': fig.add_subplot(gs[1,0])}
 
-for skalvec in 'isoscalar', 'isovector':
-    for sp in ("top", "bottom", "right"):
-        ax[skalvec].spines[sp].set_visible(False)
-    ax[skalvec].set(ylabel=r"$R \; (e^2fm^2/MeV)$")
-    ax[skalvec].set_title(skalvec)
-    ax[skalvec].grid()
-    for lorexc in 'excitation', 'lorentzian':
-        df = out_file_data(job, skalvec, lorexc, code)
-        out_file_plot(df, ax[skalvec], lorexc)
-        if lorexc == 'excitation' and job.sp.transition_energy != 0:
-            df = df[np.isclose(df.energy, job.sp.transition_energy, atol=0.01)]
-            ax[skalvec].vlines(df.energy, 0., df.transition_strength, colors='red')
-
-
-#ax['isoscalar'].text(0.02, 0.95, "", transform=ax.transAxes, color="firebrick")
-#ax['isoscalar'].xaxis.set_visible(False)
-ax['isovector'].set(xlabel="E (MeV)")
+for job in selection:
     
-fig.subplots_adjust(hspace=0.3)
-fig.suptitle(fr"Transition strength distribution of ${{}}^{{{mass}}} {element} \; {job.sp.angular_momentum}^{{{job.sp.parity}}}$ at T = {job.sp.temperature} MeV")
+    if job.sp.temperature > 0:
+        temp = 'finite'
+    else:
+        temp = 'zero'
+        
+    for skalvec in 'isoscalar', 'isovector':
+        for sp in ("top", "bottom", "right"):
+            ax[skalvec].spines[sp].set_visible(False)
+        ax[skalvec].set(ylabel=r"$R \; (e^2fm^2/MeV)$")
+        ax[skalvec].set_title(skalvec)
+        for lorexc in 'excitation', 'lorentzian':
+            df = out_file_plot(job=job, ax=ax[skalvec], temp=is_finite(job), skalvec=skalvec, lorexc=lorexc, code_mapping=code)
+        
+    ax['isoscalar'].legend()
+    ax['isovector'].set(xlabel="E (MeV)")
+    fig.subplots_adjust(hspace=0.3)
 
-fn = "full.png"
-canvas.print_png(fn)
-fig.clear()
-Image(filename = fn)
+    element, mass = split_element_mass(job)
+    fig.suptitle(fr"Transition strength distribution of ${{}}^{{{mass}}} {element} \; {job.sp.angular_momentum}^{{{job.sp.parity}}}$")
+
+#plt.show()
+#fn = "iso_all.png"
+#canvas.print_png(fn)
+#Image(filename = fn)
 
 # %%
+filter.update(temperature=2.0)
+one_job = project.find_jobs(filter)
+assert len(one_job) == 1
+job = next(one_job)
+
+df = out_file_plot(job=job, temp=is_finite(job), skalvec='isovector', lorexc='excitation', code_mapping=code)
+
+# %%
+df[(df.energy > 3.) & (df.energy < 8.) & (df.transition_strength > .1)]
+
+# %%
+df[np.isclose(df.energy, 7.77, atol=0.01)]
+
+# %%
+
+
 
