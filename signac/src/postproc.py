@@ -138,3 +138,17 @@ df[np.isclose(df.energy, 7.77, atol=0.01)]
 # %%
 # TODO T = 0 Mev, E = 7.75 MeV
 
+
+# %%
+filter.update(temperature=0.0)
+one_job = project.find_jobs(filter)
+assert len(one_job) == 1
+job = next(one_job)
+
+df = out_file_plot(job=job, temp=is_finite(job), skalvec='isovector', lorexc='excitation', code_mapping=code)
+
+# %%
+df[np.isclose(df.energy, 7.75, atol=0.01)].applymap('{:,.2f}'.format)
+
+# %%
+
