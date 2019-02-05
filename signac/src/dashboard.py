@@ -16,13 +16,13 @@ class MyDashboard(Dashboard):
     def job_sorter(self, job):
         return job.sp.get('temperature', -1)
     def job_title(self, job):
-        return f"Transition energy = {job.sp['temperature']} MeV"
+        return f"Temperature = {job.sp['temperature']} MeV"
 
 
 if __name__ == '__main__':
     config = {'DASHBOARD_PATHS': ['src/']}
     dashboard = MyDashboard(modules=[
-        ImageViewer(name='Lorentzian isovector lineshapes', img_globs=['*.png']),
+        ImageViewer(name='Transition strength distribution', img_globs=['*.png']),
         StatepointList(enabled=True),
         DocumentList(max_chars=140),
         FileList(enabled=False),
