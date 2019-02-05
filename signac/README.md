@@ -13,3 +13,7 @@ $ python3 src/project.py run --parallel
 $ python3 src/project.py status --pretty --full --stack
 $ python3 src/dashboard.py run --port 9999
 ```
+
+```console
+$ rsync -r -a -v -e ssh --delete P6000:~/Development/random-phase-approximation/signac/workspace/ workspace/
+```

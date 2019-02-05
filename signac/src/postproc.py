@@ -213,3 +213,85 @@ Image(filename = fn)
 # %%
 
 
+
+
+# %%
+from matplotlib.gridspec import GridSpec
+
+# %%
+code = code_api.NameMapping()
+
+
+# %%
+one_job = project.find_jobs(dict(nucleus="NI62", angular_momentum=1, parity="-", transition_energy=9.78, temperature=2.0))
+assert len(one_job) == 1
+job = next(one_job)
+
+# %%
+def out_file_data(job, skalvec, lorexc, code_mapping=code_api.NameMapping()):
+    if job.sp.temperature > 0:
+        temp = 'finite'
+    else:
+        temp = 'zero'
+    
+    fn = job.fn(code_mapping.out_file(temp, skalvec, lorexc))
+    
+    df = pd.read_csv(fn, delim_whitespace=True, comment='#', skip_blank_lines=True,
+                 header=None, names=['energy', 'transition_strength'])
+    return df
+
+# %%
+def out_file_plot(df, ax, lorexc):
+    df = df[df.energy < 30] # MeV
+
+    if lorexc == 'excitation':
+        ax.vlines(df.energy, 0., df.transition_strength, colors='black')
+    elif lorexc == 'lorentzian':
+        ax.plot(df.energy, df.transition_strength, color='black')
+    else:
+        raise ValueError
+
+# %%
+df = out_file_data(job, 'isovector', 'excitation', code)
+
+# %%
+df[(df.energy > 9.7) & (df.energy < 9.8)]
+
+# %%
+df[np.isclose(df.energy, job.sp.transition_energy, atol=0.01)]
+
+# %%
+fig = Figure(figsize=(12, 6)) 
+canvas = FigureCanvas(fig)
+gs = GridSpec(2, 1)
+ax = {'isoscalar': fig.add_subplot(gs[0,0]),
+      'isovector': fig.add_subplot(gs[1,0])}
+
+for skalvec in 'isoscalar', 'isovector':
+    for sp in ("top", "bottom", "right"):
+        ax[skalvec].spines[sp].set_visible(False)
+    ax[skalvec].set(ylabel=r"$R \; (e^2fm^2/MeV)$")
+    ax[skalvec].set_title(skalvec)
+    ax[skalvec].grid()
+    for lorexc in 'excitation', 'lorentzian':
+        df = out_file_data(job, skalvec, lorexc, code)
+        out_file_plot(df, ax[skalvec], lorexc)
+        if lorexc == 'excitation' and job.sp.transition_energy != 0:
+            df = df[np.isclose(df.energy, job.sp.transition_energy, atol=0.01)]
+            ax[skalvec].vlines(df.energy, 0., df.transition_strength, colors='red')
+
+
+#ax['isoscalar'].text(0.02, 0.95, "", transform=ax.transAxes, color="firebrick")
+#ax['isoscalar'].xaxis.set_visible(False)
+ax['isovector'].set(xlabel="E (MeV)")
+    
+fig.subplots_adjust(hspace=0.3)
+fig.suptitle(fr"Transition strength distribution of ${{}}^{{{mass}}} {element} \; {job.sp.angular_momentum}^{{{job.sp.parity}}}$ at T = {job.sp.temperature} MeV")
+
+fn = "full.png"
+canvas.print_png(fn)
+fig.clear()
+Image(filename = fn)
+
+# %%
+

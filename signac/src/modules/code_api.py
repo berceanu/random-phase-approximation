@@ -27,13 +27,16 @@ class NameMapping:
                        wel_suffix={'zero': "_qrpa.wel",
                                    'finite': "_rpa.wel"},
                        bins_suffix=('_arpa.bin', '_brpa.bin', '_xrpa.bin',
-                                     '_yrpa.bin' ,'_erpa.bin' ,'_c_erpa.bin')
+                                     '_yrpa.bin' ,'_erpa.bin' ,'_c_erpa.bin'),
+                       out_suffix={'isoscalar' : {'excitation': '_excskal.out', 'lorentzian': '_lorskal.out'},
+                                   'isovector' : {'excitation': '_excvec.out', 'lorentzian': '_lorvec.out'}}
                        ):
 
         self._prefix = prefix
         self._input_suffix = input_suffix
         self._wel_suffix = wel_suffix
         self._bins_suffix = bins_suffix
+        self._out_suffix = out_suffix
 
     def exec_file(self, temp, state):
         return self._prefix[temp][state]
@@ -75,11 +78,17 @@ class NameMapping:
                     files.append(self._prefix[t]['excited'] + suffix)
         return tuple(files)
 
-    def isovec_file(self, temp):
-        return self._prefix[temp]['excited'] + '_lorvec.out' # _lorskal.out
+    def out_file(self, temp, skalvec, lorexc):
+        return self._prefix[temp]['excited'] + self._out_suffix[skalvec][lorexc]
 
-    def excvec_file(self, temp):
-        return self._prefix[temp]['excited'] + '_excvec.out' # _excskal.out
+    def out_files(self, temp):
+        files = []
+        for skalvec in 'isoscalar', 'isovector':
+            for lorexc in 'excitation', 'lorentzian':
+                files.append(self.out_file(temp, skalvec, lorexc))
+        return tuple(files)
+
+
 
     def stdout_file(self, temp, state):
         return self._prefix[temp][state] + '_stdout.txt'

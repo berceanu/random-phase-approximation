@@ -15,8 +15,10 @@ import os
 import shutil
 import random
 import numpy as np
+import pandas as pd
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.gridspec import GridSpec
 import logging
 logger = logging.getLogger(__name__)
 from modules import code_api
@@ -26,6 +28,8 @@ from modules import code_api
 #####################
 # UTILITY FUNCTIONS #
 #####################
+
+PNG_FILE = 'iso_all.png'
 
 # https://stackoverflow.com/questions/3346430/what-is-the-most-efficient-way-to-get-first-and-last-line-of-a-text-file/18603065#18603065
 def read_last_line(filename):
@@ -41,12 +45,12 @@ def isemptyfile(filename):
     return lambda job: job.isfile(filename) and os.stat(job.fn(filename)).st_size == 0
 
 def file_contains(filename, text):
-    """Returns a function that checks if `filename` contains `text`."""
+    """Checks if `filename` contains `text`."""
     return lambda job: job.isfile(filename) and text in open(job.fn(filename), 'r').read()
 
-def arefiles(job, filenames):
+def arefiles(filenames):
     """Check if all `filenames` are in `job` folder."""
-    return all(job.isfile(fn) for fn in filenames)
+    return lambda job: all(job.isfile(fn) for fn in filenames)
 
 ###########################
 
@@ -60,10 +64,8 @@ class Project(FlowProject):
 ####################
 
 @Project.label
-def isovector_plotted(job):
-    if job.isfile('lorvec.png'):
-        return "isovec_plotted"
-    return "isovec_not_plotted"
+def plotted(job):
+    return job.isfile(PNG_FILE)
 
 def _progress(job, temp, code_mapping=code_api.NameMapping()):
     fn = code_mapping.stdout_file(temp, state='excited')
@@ -93,7 +95,7 @@ def progress_finite(job):
 
 def bin_files_exist(job, temp):
     """Check if job folder has the required .bin files for loading."""
-    return arefiles(job, code.bin_files(temp))
+    return arefiles(code.bin_files(temp))(job)
 
 def _prepare_run(job, temp, code_mapping=code_api.NameMapping()):
     filter = {param:job.sp[param] 
@@ -170,7 +172,7 @@ def run_zero_temp_ground_state(job):
 @cmd
 @Project.pre.isfile(code.input_file(temp='zero', state='excited')) 
 @Project.pre.isfile(code.wel_file(temp='zero'))
-@Project.post.isfile(code.isovec_file(temp='zero'))
+@Project.post(arefiles(code.out_files(temp='zero')))
 @Project.post(file_contains(code.stdout_file(temp='zero', state='excited'),
                              'program terminated without errors'))
 @Project.post(isemptyfile(code.stderr_file(temp='zero', state='excited')))
@@ -197,7 +199,7 @@ def run_finite_temp_ground_state(job):
 @cmd
 @Project.pre.isfile(code.input_file(temp='finite', state='excited')) 
 @Project.pre.isfile(code.wel_file(temp='finite'))
-@Project.post.isfile(code.isovec_file(temp='finite'))
+@Project.post(arefiles(code.out_files(temp='finite')))
 @Project.post(file_contains(code.stdout_file(temp='finite', state='excited'),
                              'program terminated without errors'))
 @Project.post(isemptyfile(code.stderr_file(temp='finite', state='excited')))
@@ -210,54 +212,71 @@ def run_finite_temp_excited_state(job):
 # PLOTTING #
 ############
 
-# TODO plot isovector and isoscalar as well
-# TODO plot vertical bars for excitations
+def _plot_iso(job, temp, code_mapping=code_api.NameMapping()):
 
-def _plot_isovector(job, temp, code_mapping=code_api.NameMapping()):
-    def split_element_mass(job):
+    def _out_file_plot(job, ax, temp, skalvec, lorexc, code_mapping=code_api.NameMapping()):
+    
+        fn = job.fn(code_mapping.out_file(temp, skalvec, lorexc))
+        
+        df = pd.read_csv(fn, delim_whitespace=True, comment='#', skip_blank_lines=True,
+                    header=None, names=['energy', 'transition_strength'])
+
+        df = df[df.energy < 30] # MeV
+
+        if lorexc == 'excitation':
+            ax.vlines(df.energy, 0., df.transition_strength, colors='black')
+        elif lorexc == 'lorentzian':
+            ax.plot(df.energy, df.transition_strength, color='black')
+        else:
+            raise ValueError
+        
+        return df
+
+    def _split_element_mass(job):
         pattern = re.compile(r"([A-Z]*)(\d*)")
         element, mass_number = pattern.sub(r'\1 \2', job.sp.nucleus).split()
         element = element.title() # capitalize first letter only
         return element, mass_number
 
-    arr = np.loadtxt(job.fn(code_mapping.isovec_file(temp)))
-    h_axis = arr[:,0]
-    arr1d = arr[:,1]
 
-    fig = Figure(figsize=(10, 6))
+    fig = Figure(figsize=(12, 6)) 
     canvas = FigureCanvas(fig)
 
-    ax = fig.add_subplot(111)
-    ax.plot(h_axis, arr1d, label=f"T = {job.sp.temperature} MeV",
-                           color='black',
-                           linestyle='-')
+    gs = GridSpec(2, 1)
+    ax = {'isoscalar': fig.add_subplot(gs[0,0]),
+        'isovector': fig.add_subplot(gs[1,0])}
 
-    ax.grid()
-    ax.set(
-        xlim=[0, 30],
-        ylim=[0, 4.5],
-        ylabel=r"$R \; (e^2fm^2/MeV)$",
-        xlabel="E (MeV)",
-    )
-    # ax.text(0.02, 0.95, "", transform=ax.transAxes, color="firebrick")
-    ax.legend()
+    for skalvec in 'isoscalar', 'isovector':
+        for sp in ("top", "bottom", "right"):
+            ax[skalvec].spines[sp].set_visible(False)
+        ax[skalvec].set(ylabel=r"$R \; (e^2fm^2/MeV)$")
+        ax[skalvec].set_title(skalvec)
+        for lorexc in 'excitation', 'lorentzian':
+            df = _out_file_plot(job=job, ax=ax[skalvec], temp=temp, skalvec=skalvec, lorexc=lorexc, code_mapping=code_mapping)
+            if lorexc == 'excitation' and job.sp.transition_energy != 0:
+                df = df[np.isclose(df.energy, job.sp.transition_energy, atol=0.01)]
+                ax[skalvec].vlines(df.energy, 0., df.transition_strength, colors='red')
 
-    element, mass = split_element_mass(job)
-    ax.set_title(fr"${{}}^{{{mass}}} {element} \; {job.sp.angular_momentum}^{{{job.sp.parity}}}$")
+    ax['isovector'].set(xlabel="E (MeV)")
+    fig.subplots_adjust(hspace=0.3)
 
-    canvas.print_figure(job.fn('lorvec.png'))
+    element, mass = _split_element_mass(job)
+    fig.suptitle(fr"Transition strength distribution of ${{}}^{{{mass}}} {element} \; {job.sp.angular_momentum}^{{{job.sp.parity}}}$ at T = {job.sp.temperature} MeV")
+
+    canvas.print_png(job.fn(PNG_FILE))
+
 
 @Project.operation
-@Project.pre.isfile(code.isovec_file(temp='zero'))
-@Project.post.isfile('lorvec.png')
+@Project.pre(arefiles(code.out_files(temp='zero')))
+@Project.post.isfile(PNG_FILE)
 def plot_zero(job):
-    _plot_isovector(job, temp='zero', code_mapping=code)
+    _plot_iso(job, temp='zero', code_mapping=code)
 
 @Project.operation
-@Project.pre.isfile(code.isovec_file(temp='finite'))
-@Project.post.isfile('lorvec.png')
+@Project.pre(arefiles(code.out_files(temp='finite')))
+@Project.post.isfile(PNG_FILE)
 def plot_finite(job):
-    _plot_isovector(job, temp='finite', code_mapping=code)
+    _plot_iso(job, temp='finite', code_mapping=code)
 
 ####################################
 # EXTRACT DIPOLE TRANSITIONS TABLE #
