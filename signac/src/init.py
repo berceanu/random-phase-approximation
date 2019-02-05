@@ -11,9 +11,9 @@ import numpy as np
 
 def main():
     project = signac.init_project('rpa')
-    for T in (0.0, 1.0, 2.0):
-    # for tr_en in (9.78, 10.03):
-        statepoint = dict(
+    for T in 0.0,:
+        for tr_en in 7.75,:
+            statepoint = dict(
                 # nucleus of interest
                 nucleus="SN132", #
 
@@ -27,9 +27,9 @@ def main():
                 temperature=T,
 
                 # transition energy in MeV
-                transition_energy=0.0
+                transition_energy=tr_en
                 )
-        project.open_job(statepoint).init()
+            project.open_job(statepoint).init()
     
     # project.write_statepoints()
     # for job in project:
