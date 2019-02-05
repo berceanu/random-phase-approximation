@@ -27,9 +27,13 @@ def extract_transitions(stdoutfn):
     logger.info('Wrote %s' % outfn)
 
 def get_table(txtfn):
-    dip_conf = pd.read_csv('dipole_transitions.txt', sep=r'\s+', header=None, usecols=[0, 1, 3, 4, 6, 7], 
+    dip_conf = pd.read_csv('dipole_transitions.txt', sep=r'\s+', header=None,
+         usecols=[0, 1, 3, 4, 6, 7], 
                                 names=['n_or_p', 'hole_energy', 'particle_energy', 'from_state', 'to_state', 'transition_amplitude'])
 
+    with pd.option_context('mode.use_inf_as_null', True):
+        dip_conf = dip_conf.dropna()
+    
     # filtered_conf = dip_conf[dip_conf.transition_amplitude > 1]
 
     sorted_conf = dip_conf.sort_values(by=['n_or_p', 'transition_amplitude'], ascending=[False, False])
@@ -70,7 +74,7 @@ def get_table(txtfn):
 def main():
     logging.basicConfig(level=logging.INFO)
 
-    extract_transitions('ftes_stdout.txt')
+    extract_transitions('ztes_stdout.txt') # 'ftes_stdout.txt'
     table = get_table('dipole_transitions.txt')
     
     output = env.get_template("dipole_transitions.html").render(title='Dipole transition amplitudes', table=table)

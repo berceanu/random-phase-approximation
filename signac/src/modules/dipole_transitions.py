@@ -45,11 +45,13 @@ class DipoleTransitions(Module):
         if not job.isfile(dip_conf_fn):
             return None
         else:
-            df = pd.read_csv(job.fn(dip_conf_fn), sep=r'\s+')
-
-            dip_conf = pd.read_csv(job.fn(dip_conf_fn), sep='\s+', header=None,
+            dip_conf = pd.read_csv(job.fn(dip_conf_fn), sep=r'\s+', header=None,
                 usecols=[0, 1, 3, 4, 6, 7], 
-                names=['n_or_p', 'hole_energy', 'particle_energy', 'from_state', 'to_state', 'transition_amplitude'])
+                names=['n_or_p', 'hole_energy', 'particle_energy',
+                 'from_state', 'to_state', 'transition_amplitude'])
+            with pd.option_context('mode.use_inf_as_null', True):
+                dip_conf = dip_conf.dropna() # drop inf values
+
             filtered_conf = dip_conf[dip_conf.transition_amplitude > 1]
             df = filtered_conf.sort_values(by=['n_or_p', 'transition_amplitude'], ascending=[False, False])
 
