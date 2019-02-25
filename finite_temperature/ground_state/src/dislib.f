@@ -346,31 +346,29 @@ C=======================================================================
 C=======================================================================
 C
 C     is = 1 determines the symbol for a given proton number npro
-c          2 determines the proton number for a given symbol te
+c          2 determines the proton number for a given symbol TE
 c
 C-----------------------------------------------------------------------
 C
-      PARAMETER (MAXZ=139)
+      PARAMETER (MAXZ=118)
 C
       CHARACTER TE*2,T*(2*MAXZ+2)
 C
       T(  1: 40) = '   HHELIBE B C N O FNENAMGALSI P SCLAR K'
-      T( 41: 80) = 'CASCTI VCRMNFECONICUZNGAGEASSEBRCRRBSR Y'
-      T( 81:120) = 'ZRNBMOTCRORHPDAGCDINSNSBTE OXECSBA;ACEPR'
-      T(121:160) = 'NDPMSMEUGDTBDYHOERTMYBLUHFTA WREODIRPTAU'
+      T( 41: 80) = 'CASCTI VCRMNFECONICUZNGAGEASSEBRKRRBSR Y'
+      T( 81:120) = 'ZRNBMOTCRURHPDAGCDINSNSBTE IXECSBALACEPR'
+      T(121:160) = 'NDPMSMEUGDTBDYHOERTMYBLUHFTA WREOSIRPTAU'
       T(161:200) = 'HGTLPBBIPOATRNFRRAACTHPA UNPPUAMCMBKCFES'
-      T(201:240) = 'FMMDNOLRG4G5G6G7G8G9GGX1X2X3X4X5X6X7X8X9'
-      T(241:260) = 'SSS1S2S3S4S5S6S7S8S9TTT1T2T3T4T5T6T7T8T9'
+      T(201:238) = 'FMMDNOLRRFDBSGBHHSMTDSRGCNNHFLMCLVTSOG'
 C
       if (is.eq.1) then
-         if (npro.lt.0.or.npro.gt.maxz) stop 'in NUCLEUS: npro wrong' 
-         te = t(2*npro+1:2*npro+2)
+         if (npro.lt.0.or.npro.gt.MAXZ) stop 'in NUCLEUS: npro wrong' 
+         TE = T(2*npro+1:2*npro+2)
          return
       else
-         do np = 0,maxz
-            if (te.eq.t(2*np+1:2*np+2)) then
+         do np = 0,MAXZ
+            if (TE.eq.T(2*np+1:2*np+2)) then
                npro = np
-	       if (npro.eq.139) npro = 140
                return
             endif
          enddo
@@ -382,7 +380,7 @@ c
 C-END-NUCLEUS
       END
 c=======================================================================
-  
+
       subroutine ordi(n,e,mu)
   
 c=======================================================================
