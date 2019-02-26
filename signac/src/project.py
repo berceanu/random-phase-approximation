@@ -98,8 +98,8 @@ def bin_files_exist(job, temp):
     return arefiles(code.bin_files(temp))(job)
 
 def _prepare_run(job, temp, code_mapping=code_api.NameMapping()):
-    filter = {param:job.sp[param] 
-                for param in ('nucleus', 'angular_momentum', 'parity', 'temperature')}
+    filter = {param:job.sp[param]
+                for param in ('proton_number', 'neutron_number', 'angular_momentum', 'parity', 'temperature')}
 
     project = get_project()
     jobs_for_restart = [job for job in project.find_jobs(filter)
@@ -109,13 +109,17 @@ def _prepare_run(job, temp, code_mapping=code_api.NameMapping()):
         job_for_restart = random.choice(jobs_for_restart)
     except IndexError: # prepare full calculation
         logger.info('Full calculation required.')
-        code_input = code_api.GenerateInputs(out_path=job.ws, **job.sp, mapping=code_mapping)
+        code_input = code_api.GenerateInputs(**job.sp,
+                                                out_path=job.ws,
+                                                mapping=code_mapping)
         code_input.write_param_files(temp)
         # job.doc[f'run_{temp}_temp_ground_state'] = True
     else:  # prepare restart
         logger.info('Restart possible.')
-        code_input = code_api.GenerateInputs(out_path=job.ws, **job.sp,
-                                    load_matrix=True, mapping=code_mapping)
+        code_input = code_api.GenerateInputs(**job.sp, 
+                                                out_path=job.ws,                                                
+                                                mapping=code_mapping,
+                                                load_matrix=True)
         code_input.write_param_files(temp, state='excited')
         dotwelfn = code_mapping.wel_file(temp)
         shutil.copy(job_for_restart.fn(dotwelfn), job.fn(dotwelfn))
@@ -234,7 +238,7 @@ def _plot_iso(job, temp, code_mapping=code_api.NameMapping()):
 
     def _split_element_mass(job):
         pattern = re.compile(r"([A-Z]*)(\d*)")
-        element, mass_number = pattern.sub(r'\1 \2', job.sp.nucleus).split()
+        element, mass_number = pattern.sub(r'\1 \2', job.doc.nucleus).split()
         element = element.title() # capitalize first letter only
         return element, mass_number
 

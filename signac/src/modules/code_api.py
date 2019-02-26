@@ -144,16 +144,27 @@ class NameMapping:
 class GenerateInputs:
     """Generates input files dish_dis.dat, skys_dis.dat and (z|f)tes_start.dat."""
 
-    def __init__(self, nucleus="NI62", angular_momentum=1, parity="-", temperature=2.0, transition_energy=9.78,
-                    out_path=os.getcwd(), load_matrix=False, mapping=NameMapping()):
+    def __init__(self, out_path=os.getcwd(),
+                       mapping=NameMapping(),
+                       load_matrix=False,
+                proton_number=28,
+                neutron_number=34,
+                angular_momentum=1,
+                parity="-",
+                temperature=2.0,
+                transition_energy=9.78)
         """Args:
-            nucleus: nucleus under consideration, eg. NI56, NI60, NI62, NI68, ZR90, SN132, PB208
+            proton_number: atomic number Z
+            neutron_number: neutron number N
             angular_momentum: 0 or 1
             parity: + or -
             temperature: eg. 2.0 (in MeV)
             transition_energy: eg. 9.78 (in MeV)
             load_matrix: flag that controls the matrix elements calculation, default is to perform the calculation
             out_path: path of folder to write files to"""
+
+        # nucleus under consideration, eg. NI56, NI60, *NI62*, NI68, ZR90, SN132, PB208
+        nucleus = get_nucleus(proton_number, neutron_number)
 
         PARITY = {"-" : 0, "+": 1} # map to the parity as it is defined in the input files
 
@@ -198,7 +209,13 @@ def main():
     print(code.input_files(state='ground'))
     print(code.isovec_file(temp='zero'))
 
-    my_inputs = GenerateInputs(nucleus="NI62", angular_momentum=1, parity="-", temperature=2.0, transition_energy=9.78, mapping=code)
+    my_inputs = GenerateInputs(proton_number=28,
+                               neutron_number=34,
+                               angular_momentum=1,
+                               parity="-",
+                               temperature=2.0,
+                               transition_energy=9.78,
+                               mapping=code)
     my_inputs.write_param_files()
 
 

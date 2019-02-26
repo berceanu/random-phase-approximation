@@ -9,7 +9,6 @@ import signac ##
 import numpy as np
 from modules import code_api
 
-# nucleus=get_nucleus(proton_number=50, neutron_number=82)
 
 def main():
     project = signac.init_project('rpa')
@@ -37,11 +36,19 @@ def main():
                 transition_energy=tr_en
                 )
             project.open_job(statepoint).init()
-    
-    project.write_statepoints()
+
     for job in project:
-        job.doc.setdefault('run_zero_temp_ground_state', True)
-        job.doc.setdefault('run_finite_temp_ground_state', True)
+        nprot = job.sp.proton_number
+        nneutr = job.sp.neutron_number
+        nucleus = code_api.get_nucleus(proton_number=nprot, neutron_number=nneutr)
+        job.doc.setdefault('nucleus', nucleus)
+
+
+
+    # project.write_statepoints()
+    # for job in project:
+    #     job.doc.setdefault('run_zero_temp_ground_state', True)
+    #     job.doc.setdefault('run_finite_temp_ground_state', True)
 
 
 if __name__ == '__main__':

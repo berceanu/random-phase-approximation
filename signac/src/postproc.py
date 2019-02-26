@@ -49,7 +49,7 @@ is_finite = lambda job: 'finite' if job.sp.temperature > 0 else 'zero'
 # %%
 def split_element_mass(job):
     pattern = re.compile(r"([A-Z]*)(\d*)")
-    element, mass_number = pattern.sub(r'\1 \2', job.sp.nucleus).split()
+    element, mass_number = pattern.sub(r'\1 \2', job.doc.nucleus).split()
     element = element.title() # capitalize first letter only
     return element, mass_number
 
@@ -81,7 +81,8 @@ def out_file_plot(job, temp, skalvec, lorexc, ax=None, code_mapping=code_api.Nam
     return df
 
 # %%
-filter = dict(nucleus="SN132", angular_momentum=1, parity="-", transition_energy=0.0)
+filter = dict(proton_number=50, neutron_number=82,
+                 angular_momentum=1, parity="-", transition_energy=0.0)
 
 selection = project.find_jobs(filter)
 
@@ -151,4 +152,5 @@ df = out_file_plot(job=job, temp=is_finite(job), skalvec='isovector', lorexc='ex
 df[np.isclose(df.energy, 7.75, atol=0.01)].applymap('{:,.2f}'.format)
 
 # %%
+
 
