@@ -12,6 +12,7 @@ from modules import code_api
 
 def main():
     project = signac.init_project('rpa')
+
     for N in range(76, 96 + 2, 2):
         for T in (0.0, 1.0, 2.0):
             statepoint = dict(
@@ -34,6 +35,31 @@ def main():
                 transition_energy=0.42 # 0.42 is random
                 )
             project.open_job(statepoint).init()
+
+
+    for Z in range(44, 48 + 2, 2):
+        for T in (0.0, 1.0, 2.0):
+            statepoint = dict(
+                # atomic number Z
+                proton_number=Z, 
+
+                # neutron number N
+                neutron_number=82, # fixed
+
+                # nucleus angular momentum
+                angular_momentum=1, #
+
+                # nucleus parity
+                parity="-", #
+
+                # system temperature in MeV
+                temperature=T,
+
+                # transition energy in MeV
+                transition_energy=0.42 # 0.42 is random
+                )
+            project.open_job(statepoint).init()
+
 
     for job in project:
         nprot = job.sp.proton_number
