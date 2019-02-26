@@ -31,7 +31,7 @@ def main():
                 temperature=T,
 
                 # transition energy in MeV
-                transition_energy=0.0
+                transition_energy=0.42 # 0.42 is random
                 )
             project.open_job(statepoint).init()
 
