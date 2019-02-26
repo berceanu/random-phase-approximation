@@ -15,13 +15,11 @@ def main():
     for T in 0.0,:
         for tr_en in 7.75,:
             statepoint = dict(
-                # nucleus="SN132",
-
                 # atomic number Z
-                proton_number=50
+                proton_number=50,
 
                 # neutron number N
-                neutron_number=82
+                neutron_number=82,
 
                 # nucleus angular momentum
                 angular_momentum=1, #
