@@ -14,9 +14,9 @@ from modules import dipole_transitions as dt
 
 class MyDashboard(Dashboard):
     def job_sorter(self, job):
-        return job.sp.get('temperature', -1)
+        return job.sp.get('proton_number', -1)
     def job_title(self, job):
-        return f"Temperature = {job.sp['temperature']} MeV"
+        return f"Proton number = {job.sp['proton_number']}"
 
 
 if __name__ == '__main__':
