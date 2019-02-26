@@ -12,14 +12,14 @@ from modules import code_api
 
 def main():
     project = signac.init_project('rpa')
-    for T in 0.0,:
-        for tr_en in 7.75,:
+    for N in np.arange(76, 96 + 2, 2, dtype=np.uint8):
+        for T in [0.0, 1.0, 2.0]:
             statepoint = dict(
                 # atomic number Z
-                proton_number=50,
+                proton_number=50, # fixed atomic number
 
                 # neutron number N
-                neutron_number=82,
+                neutron_number=N,
 
                 # nucleus angular momentum
                 angular_momentum=1, #
@@ -31,7 +31,7 @@ def main():
                 temperature=T,
 
                 # transition energy in MeV
-                transition_energy=tr_en
+                transition_energy=0.0
                 )
             project.open_job(statepoint).init()
 
