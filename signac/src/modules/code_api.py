@@ -152,7 +152,7 @@ class GenerateInputs:
                 angular_momentum=1,
                 parity="-",
                 temperature=2.0,
-                transition_energy=9.78)
+                transition_energy=9.78):
         """Args:
             proton_number: atomic number Z
             neutron_number: neutron number N
