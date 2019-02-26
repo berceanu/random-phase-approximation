@@ -163,6 +163,7 @@ class GenerateInputs:
             load_matrix: flag that controls the matrix elements calculation, default is to perform the calculation
             out_path: path of folder to write files to"""
 
+        assert (proton_number % 2 == 0) and (neutron_number % 2 == 0), "Nucleus must be even-even!"
         # nucleus under consideration, eg. NI56, NI60, *NI62*, NI68, ZR90, SN132, PB208
         nucleus = get_nucleus(proton_number, neutron_number)
 
