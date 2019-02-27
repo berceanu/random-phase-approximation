@@ -7,8 +7,8 @@ import logging
 
 import signac ##
 import numpy as np
-from modules import code_api
 import mypackage.code_api as code_api
+import mypackage.util as util
 
 def main():
     project = signac.init_project('rpa')
@@ -64,7 +64,7 @@ def main():
     for job in project:
         nprot = job.sp.proton_number
         nneutr = job.sp.neutron_number
-        nucleus = code_api.get_nucleus(proton_number=nprot, neutron_number=nneutr)
+        nucleus = util.get_nucleus(proton_number=nprot, neutron_number=nneutr)
         job.doc.setdefault('nucleus', nucleus)
 
 

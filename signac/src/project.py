@@ -10,7 +10,6 @@ See also: $ python src/project.py --help
 """
 from flow import FlowProject, cmd, with_job
 from signac import get_project
-import re
 import os
 import shutil
 import random
@@ -22,6 +21,7 @@ from matplotlib.gridspec import GridSpec
 import logging
 logger = logging.getLogger(__name__)
 import mypackage.code_api as code_api
+import mypackage.util as util
 
 # @with_job
 
@@ -236,12 +236,6 @@ def _plot_iso(job, temp, code_mapping=code_api.NameMapping()):
         
         return df
 
-    def _split_element_mass(job):
-        pattern = re.compile(r"([A-Z]*)(\d*)")
-        element, mass_number = pattern.sub(r'\1 \2', job.doc.nucleus).split()
-        element = element.title() # capitalize first letter only
-        return element, mass_number
-
 
     fig = Figure(figsize=(12, 6)) 
     canvas = FigureCanvas(fig)
@@ -264,7 +258,7 @@ def _plot_iso(job, temp, code_mapping=code_api.NameMapping()):
     ax['isovector'].set(xlabel="E (MeV)")
     fig.subplots_adjust(hspace=0.3)
 
-    element, mass = _split_element_mass(job)
+    element, mass = util.split_element_mass(job)
     fig.suptitle(fr"Transition strength distribution of ${{}}^{{{mass}}} {element} \; {job.sp.angular_momentum}^{{{job.sp.parity}}}$ at T = {job.sp.temperature} MeV")
 
     canvas.print_png(job.fn(PNG_FILE))

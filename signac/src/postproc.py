@@ -30,28 +30,19 @@ import pandas as pd
 import numpy as np
 import signac as sg
 import mypackage.code_api as code_api
-#from matplotlib.figure import Figure
-#from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
-#from IPython.display import Image
-import re
+import mypackage.util as util
 
 # %%
 code = code_api.NameMapping()
 
 # %%
 project = sg.get_project()
+project
 
 # %%
 is_finite = lambda job: 'finite' if job.sp.temperature > 0 else 'zero'
-
-# %%
-def split_element_mass(job):
-    pattern = re.compile(r"([A-Z]*)(\d*)")
-    element, mass_number = pattern.sub(r'\1 \2', job.doc.nucleus).split()
-    element = element.title() # capitalize first letter only
-    return element, mass_number
 
 # %%
 def out_file_plot(job, temp, skalvec, lorexc, ax=None, code_mapping=code_api.NameMapping()):
@@ -81,27 +72,21 @@ def out_file_plot(job, temp, skalvec, lorexc, ax=None, code_mapping=code_api.Nam
     return df
 
 # %%
+# everything but the temperature
 filter = dict(proton_number=50, neutron_number=82,
-                 angular_momentum=1, parity="-", transition_energy=0.0)
+                 angular_momentum=1, parity="-", transition_energy=0.42)
 
 selection = project.find_jobs(filter)
 
-fig = plt.figure(figsize=(10, 6))
-#fig = Figure(figsize=(12, 6)) 
-#canvas = FigureCanvas(fig)
+assert len(selection)
 
+fig = plt.figure(figsize=(10, 6))
 
 gs = GridSpec(2, 1)
 ax = {'isoscalar': fig.add_subplot(gs[0,0]),
       'isovector': fig.add_subplot(gs[1,0])}
 
-for job in selection:
-    
-    if job.sp.temperature > 0:
-        temp = 'finite'
-    else:
-        temp = 'zero'
-        
+for job in selection:    
     for skalvec in 'isoscalar', 'isovector':
         for sp in ("top", "bottom", "right"):
             ax[skalvec].spines[sp].set_visible(False)
@@ -110,23 +95,47 @@ for job in selection:
         for lorexc in 'excitation', 'lorentzian':
             df = out_file_plot(job=job, ax=ax[skalvec], temp=is_finite(job), skalvec=skalvec, lorexc=lorexc, code_mapping=code)
         
+ax['isoscalar'].legend()
+ax['isovector'].set(xlabel="E (MeV)")
+fig.subplots_adjust(hspace=0.3)
+
+element, mass = util.split_element_mass(job)
+fig.suptitle(fr"Transition strength distribution of ${{}}^{{{mass}}} {element} \; {job.sp.angular_momentum}^{{{job.sp.parity}}}$")
+
+# %%
+for key, group in project.groupby(('proton_number', 'neutron_number')):
+    fig = plt.figure(figsize=(10, 6))
+
+    gs = GridSpec(2, 1)
+    ax = {'isoscalar': fig.add_subplot(gs[0,0]),
+          'isovector': fig.add_subplot(gs[1,0])}
+    for job in group:
+        for skalvec in 'isoscalar', 'isovector':
+            for sp in ("top", "bottom", "right"):
+                ax[skalvec].spines[sp].set_visible(False)
+            ax[skalvec].set(ylabel=r"$R \; (e^2fm^2/MeV)$")
+            ax[skalvec].set_title(skalvec)
+            for lorexc in 'excitation', 'lorentzian':
+                df = out_file_plot(job=job, ax=ax[skalvec], temp=is_finite(job), skalvec=skalvec, lorexc=lorexc, code_mapping=code)
+
     ax['isoscalar'].legend()
     ax['isovector'].set(xlabel="E (MeV)")
     fig.subplots_adjust(hspace=0.3)
 
-    element, mass = split_element_mass(job)
+    element, mass = util.split_element_mass(job)
     fig.suptitle(fr"Transition strength distribution of ${{}}^{{{mass}}} {element} \; {job.sp.angular_momentum}^{{{job.sp.parity}}}$")
 
-#plt.show()
-#fn = "iso_all.png"
-#canvas.print_png(fn)
-#Image(filename = fn)
+# %%
+
+
+# %%
+
 
 # %%
 filter.update(temperature=2.0)
 one_job = project.find_jobs(filter)
 assert len(one_job) == 1
-job = next(one_job)
+job = next(iter(one_job))
 
 df = out_file_plot(job=job, temp=is_finite(job), skalvec='isovector', lorexc='excitation', code_mapping=code)
 
@@ -144,7 +153,7 @@ df[np.isclose(df.energy, 7.77, atol=0.01)]
 filter.update(temperature=0.0)
 one_job = project.find_jobs(filter)
 assert len(one_job) == 1
-job = next(one_job)
+job = next(iter(one_job))
 
 df = out_file_plot(job=job, temp=is_finite(job), skalvec='isovector', lorexc='excitation', code_mapping=code)
 
@@ -152,5 +161,4 @@ df = out_file_plot(job=job, temp=is_finite(job), skalvec='isovector', lorexc='ex
 df[np.isclose(df.energy, 7.75, atol=0.01)].applymap('{:,.2f}'.format)
 
 # %%
-
 
