@@ -8,7 +8,7 @@ import logging
 import signac ##
 import numpy as np
 from modules import code_api
-
+import mypackage.code_api as code_api
 
 def main():
     project = signac.init_project('rpa')

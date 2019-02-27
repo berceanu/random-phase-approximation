@@ -8,7 +8,7 @@ from signac_dashboard.modules.image_viewer import ImageViewer
 from signac_dashboard.modules.document_list import DocumentList
 from signac_dashboard.modules.file_list import FileList
 from signac_dashboard.modules.notes import Notes
-from modules import dipole_transitions as dt
+import mypackage.dipole_transitions as dt
 
 
 

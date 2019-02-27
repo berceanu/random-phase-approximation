@@ -21,7 +21,7 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.gridspec import GridSpec
 import logging
 logger = logging.getLogger(__name__)
-from modules import code_api
+import mypackage.code_api as code_api
 
 # @with_job
 

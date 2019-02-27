@@ -29,7 +29,7 @@
 import pandas as pd
 import numpy as np
 import signac as sg
-from modules import code_api
+import mypackage.code_api as code_api
 #from matplotlib.figure import Figure
 #from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 import matplotlib.pyplot as plt

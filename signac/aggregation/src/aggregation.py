@@ -5,7 +5,7 @@ import pandas as pd
 import random
 import re
 import signac as sg
-from modules import code_api
+import mypackage.code_api as code_api
 
 
 rpa = sg.get_project(root='../')
