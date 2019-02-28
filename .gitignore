@@ -138,7 +138,6 @@ venv.bak/
 .mypy_cache/
 
 # added by me
-signac.rc
 workspace/
 *.code-workspace
 .vscode/
