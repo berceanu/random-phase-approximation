@@ -31,6 +31,8 @@ import numpy as np
 import signac as sg
 import mypackage.code_api as code_api
 import matplotlib.pyplot as plt
+from cycler import cycler
+from collections import defaultdict
 from matplotlib.gridspec import GridSpec
 import mypackage.util as util
 
@@ -45,11 +47,20 @@ project
 is_finite = lambda job: 'finite' if job.sp.temperature > 0 else 'zero'
 
 # %%
-def out_file_plot(job, temp, skalvec, lorexc, ax=None, code_mapping=code_api.NameMapping()):
-    STYLE = {'0.0': dict(color='dodgerblue', linestyle='solid'),
-             '1.0': dict(color='lawngreen', linestyle='dashed'),
-             '2.0': dict(color='firebrick', linestyle='dashdot')}
+line_colors = ['C0', 'C1', 'C2', 'C3']
+line_styles = ['-', '--', ':', '-.']
 
+cyl = cycler(c=line_colors) + cycler(ls=line_styles)
+vert_cyl = cycler(colors=line_colors) + cycler(linestyles=line_styles)
+
+loop_cy_iter = cyl()
+vert_loop_cy_iter = vert_cyl()
+
+STYLE = defaultdict(lambda : next(loop_cy_iter))
+vert_STYLE = defaultdict(lambda : next(vert_loop_cy_iter))
+
+# %%
+def out_file_plot(job, temp, skalvec, lorexc, ax=None, code_mapping=code_api.NameMapping()):
     fn = job.fn(code_mapping.out_file(temp, skalvec, lorexc))
 
     df = pd.read_csv(fn, delim_whitespace=True, comment='#', skip_blank_lines=True,
@@ -60,12 +71,10 @@ def out_file_plot(job, temp, skalvec, lorexc, ax=None, code_mapping=code_api.Nam
     if ax:
         if lorexc == 'excitation':
             ax.vlines(df.energy, 0., df.transition_strength, label='_nolegend_',
-                      colors=STYLE[str(job.sp.temperature)]['color'],
-                     linestyles=STYLE[str(job.sp.temperature)]['linestyle'])
+                          **vert_STYLE[str(job.sp.temperature)])
         elif lorexc == 'lorentzian':
             ax.plot(df.energy, df.transition_strength, label=f"T = {job.sp.temperature} MeV",
-                    color=STYLE[str(job.sp.temperature)]['color'],
-                   linestyle=STYLE[str(job.sp.temperature)]['linestyle'])
+                        **STYLE[str(job.sp.temperature)])
         else:
             raise ValueError
         
@@ -86,7 +95,7 @@ gs = GridSpec(2, 1)
 ax = {'isoscalar': fig.add_subplot(gs[0,0]),
       'isovector': fig.add_subplot(gs[1,0])}
 
-for job in selection:    
+for job in sorted(selection, key=lambda job: job.sp.temperature):    
     for skalvec in 'isoscalar', 'isovector':
         for sp in ("top", "bottom", "right"):
             ax[skalvec].spines[sp].set_visible(False)
@@ -109,7 +118,7 @@ for key, group in project.groupby(('proton_number', 'neutron_number')):
     gs = GridSpec(2, 1)
     ax = {'isoscalar': fig.add_subplot(gs[0,0]),
           'isovector': fig.add_subplot(gs[1,0])}
-    for job in group:
+    for job in sorted(group, key=lambda job: job.sp.temperature):
         for skalvec in 'isoscalar', 'isovector':
             for sp in ("top", "bottom", "right"):
                 ax[skalvec].spines[sp].set_visible(False)
@@ -128,7 +137,9 @@ for key, group in project.groupby(('proton_number', 'neutron_number')):
 # %%
 
 
+
 # %%
+
 
 
 # %%
@@ -161,4 +172,5 @@ df = out_file_plot(job=job, temp=is_finite(job), skalvec='isovector', lorexc='ex
 df[np.isclose(df.energy, 7.75, atol=0.01)].applymap('{:,.2f}'.format)
 
 # %%
+
 

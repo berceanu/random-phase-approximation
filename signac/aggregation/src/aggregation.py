@@ -1,6 +1,8 @@
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.gridspec import GridSpec
+from cycler import cycler
+from collections import defaultdict
 import pandas as pd
 import random
 import copy
@@ -14,11 +16,20 @@ aggregation = sg.get_project(root='./')
 
 code = code_api.NameMapping()
 
+line_colors = ['C0', 'C1', 'C2', 'C3']
+line_styles = ['-', '--', ':', '-.']
+
+cyl = cycler(c=line_colors) + cycler(ls=line_styles)
+vert_cyl = cycler(colors=line_colors) + cycler(linestyles=line_styles)
+
+loop_cy_iter = cyl()
+vert_loop_cy_iter = vert_cyl()
+ 
+STYLE = defaultdict(lambda : next(loop_cy_iter))
+vert_STYLE = defaultdict(lambda : next(vert_loop_cy_iter))
+
 
 def out_file_plot(job, temp, skalvec, lorexc, ax=None, code_mapping=code_api.NameMapping()):
-    STYLE = {'0.0': dict(color='dodgerblue', linestyle='solid'),
-             '1.0': dict(color='lawngreen', linestyle='dashed'),
-             '2.0': dict(color='firebrick', linestyle='dashdot')}
 
     fn = job.fn(code_mapping.out_file(temp, skalvec, lorexc))
 
@@ -29,13 +40,13 @@ def out_file_plot(job, temp, skalvec, lorexc, ax=None, code_mapping=code_api.Nam
 
     if ax:
         if lorexc == 'excitation':
-            ax.vlines(df.energy, 0., df.transition_strength, label='_nolegend_',
-                      colors=STYLE[str(job.sp.temperature)]['color'],
-                     linestyles=STYLE[str(job.sp.temperature)]['linestyle'])
+            ax.vlines(df.energy, 0., df.transition_strength,
+                        label='_nolegend_',
+                        **vert_STYLE[str(job.sp.temperature)])
         elif lorexc == 'lorentzian':
-            ax.plot(df.energy, df.transition_strength, label=f"T = {job.sp.temperature} MeV",
-                    color=STYLE[str(job.sp.temperature)]['color'],
-                   linestyle=STYLE[str(job.sp.temperature)]['linestyle'])
+            ax.plot(df.energy, df.transition_strength, 
+                        label=f"T = {job.sp.temperature} MeV",
+                        **STYLE[str(job.sp.temperature)])
         else:
             raise ValueError
         
@@ -54,7 +65,7 @@ def store_aggregated_results(rpa_jobs):
           'isovector': fig.add_subplot(gs[1,0])}
 
     origin = list()
-    for job in rpa_jobs:
+    for job in sorted(rpa_jobs, key=lambda job: job.sp.temperature):
         origin.append(str(job))
         for skalvec in 'isoscalar', 'isovector':
             for sp in "top", "bottom", "right":
