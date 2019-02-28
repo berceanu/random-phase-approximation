@@ -10,7 +10,7 @@ import mypackage.util as util
 
 
 rpa = sg.get_project(root='../')
-aggregation = sg.get_project()
+aggregation = sg.get_project(root='./')
 
 code = code_api.NameMapping()
 
@@ -82,9 +82,5 @@ def store_aggregated_results(rpa_jobs):
         canvas.print_png(agg_job.fn('iso_all_temp_all.png'))
 
 
-#rpa_schema = rpa.detect_schema()
 for key, group in rpa.groupby(('proton_number', 'neutron_number')):
-    #group_schema = rpa_schema(group)
-    #print(group_schema)
-
     store_aggregated_results(group)
