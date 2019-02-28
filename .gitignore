@@ -138,6 +138,7 @@ venv.bak/
 .mypy_cache/
 
 # added by me
+*.py.swp
 workspace/
 *.code-workspace
 .vscode/
