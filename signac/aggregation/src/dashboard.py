@@ -9,8 +9,9 @@ from signac_dashboard.modules.notes import Notes
 class MyDashboard(Dashboard):
     def job_sorter(self, job):
         return job.sp.get('proton_number', -1)
+
     def job_title(self, job):
-        return f"Proton number = {job.sp['proton_number']}"
+        return f"(Z, N) = ({job.sp['proton_number']}, {job.sp['neutron_number']})"
 
 
 if __name__ == '__main__':
