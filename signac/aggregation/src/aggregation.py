@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+"""This module plots the dipole strengths for a single nucleus at various temperatures."""
+
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.gridspec import GridSpec
@@ -9,27 +12,22 @@ import copy
 import signac as sg
 import mypackage.code_api as code_api
 import mypackage.util as util
-
-
-rpa = sg.get_project(root='../')
-aggregation = sg.get_project(root='./')
-
-code = code_api.NameMapping()
-
-line_colors = ['C0', 'C1', 'C2', 'C3']
-line_styles = ['-', '--', ':', '-.']
-
-cyl = cycler(c=line_colors) + cycler(ls=line_styles)
-vert_cyl = cycler(colors=line_colors) + cycler(linestyles=line_styles)
-
-loop_cy_iter = cyl()
-vert_loop_cy_iter = vert_cyl()
- 
-STYLE = defaultdict(lambda : next(loop_cy_iter))
-vert_STYLE = defaultdict(lambda : next(vert_loop_cy_iter))
+import logging
+logger = logging.getLogger(__name__)
 
 
 def out_file_plot(job, temp, skalvec, lorexc, ax=None, code_mapping=code_api.NameMapping()):
+    line_colors = ['C0', 'C1', 'C2', 'C3']
+    line_styles = ['-', '--', ':', '-.']
+
+    cyl = cycler(c=line_colors) + cycler(ls=line_styles)
+    vert_cyl = cycler(colors=line_colors) + cycler(linestyles=line_styles)
+
+    loop_cy_iter = cyl()
+    vert_loop_cy_iter = vert_cyl()
+    
+    STYLE = defaultdict(lambda : next(loop_cy_iter))
+    vert_STYLE = defaultdict(lambda : next(vert_loop_cy_iter))
 
     fn = job.fn(code_mapping.out_file(temp, skalvec, lorexc))
 
@@ -53,8 +51,9 @@ def out_file_plot(job, temp, skalvec, lorexc, ax=None, code_mapping=code_api.Nam
     return df
 
 
-def store_aggregated_results(rpa_jobs):
+def store_aggregated_results(rpa_jobs, to_project):
     is_finite = lambda job: 'finite' if job.sp.temperature > 0 else 'zero'
+    code = code_api.NameMapping()
 
     fig = Figure(figsize=(10, 6)) 
     canvas = FigureCanvas(fig)
@@ -66,6 +65,7 @@ def store_aggregated_results(rpa_jobs):
 
     origin = list()
     for job in sorted(rpa_jobs, key=lambda job: job.sp.temperature):
+        logger.info("plotting %s with T = %s MeV" % (str(job), job.sp.temperature))
         origin.append(str(job))
         for skalvec in 'isoscalar', 'isovector':
             for sp in "top", "bottom", "right":
@@ -87,11 +87,30 @@ def store_aggregated_results(rpa_jobs):
     statepoint = copy.deepcopy(job.sp())
     del statepoint['temperature']
 
-    with aggregation.open_job(statepoint) as agg_job: # .init() implicitly called here
+    with to_project.open_job(statepoint) as agg_job: # .init() implicitly called here
         agg_job.doc['origin'] = origin
         # save figure to disk in agg_job's folder
         canvas.print_png(agg_job.fn('iso_all_temp_all.png'))
+        logger.info("wrote %s" % agg_job.fn('iso_all_temp_all.png'))
 
 
-for key, group in rpa.groupby(('proton_number', 'neutron_number')):
-    store_aggregated_results(group)
+def main():
+    rpa = sg.get_project(root='../')
+    aggregation = sg.get_project(root='./')
+    logger.info("rpa project: %s" % str(rpa))
+    logger.info("aggregation project: %s" % str(aggregation))
+
+    for key, group in rpa.groupby(('proton_number', 'neutron_number')):
+        logger.info("(Z, N) =  %s" % key)
+        store_aggregated_results(group, aggregation)
+
+
+if __name__ == '__main__':
+    logging.basicConfig(
+        filename='aggregation.log',
+        format='%(asctime)s - %(name)s - %(levelname)-8s - %(message)s',
+        level=logging.INFO,
+        datefmt='%Y-%m-%d %H:%M:%S')
+    logger.info('==RUN STARTED==')
+    main()
+    logger.info('==RUN FINISHED==')
