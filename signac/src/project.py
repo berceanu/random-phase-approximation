@@ -314,7 +314,7 @@ def dipole_trans_finite(job):
 
 if __name__ == '__main__':
     logging.basicConfig(
-        filename='project.log',
+        filename='rpa-project.log',
         format='%(asctime)s - %(name)s - %(levelname)-8s - %(message)s',
         level=logging.INFO,
         datefmt='%Y-%m-%d %H:%M:%S')
