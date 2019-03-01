@@ -66,19 +66,26 @@ def store_aggregated_results(Z, N, rpa_jobs, to_project,
     is_finite = lambda job: 'finite' if job.sp.temperature > 0 else 'zero'
     code = code_api.NameMapping()
 
-    fig = Figure(figsize=(10, 6)) 
-    canvas = FigureCanvas(fig)
+    if args.isoscalar:
+        fig = Figure(figsize=(12, 6)) # width, height in inches
+        canvas = FigureCanvas(fig)
+        gs = GridSpec(2, 1)
+        ax = {'isoscalar': fig.add_subplot(gs[0,0]),
+              'isovector': fig.add_subplot(gs[1,0])}
+        panels = ['isoscalar', 'isovector']
+    else: # no isoscalar panel
+        fig = Figure(figsize=(12, 5)) 
+        canvas = FigureCanvas(fig)
+        gs = GridSpec(1, 1)
+        ax = {'isovector': fig.add_subplot(gs[0,0])}
+        panels = ['isovector']
 
-
-    gs = GridSpec(2, 1)
-    ax = {'isoscalar': fig.add_subplot(gs[0,0]),
-          'isovector': fig.add_subplot(gs[1,0])}
 
     origin = dict()
     for job in sorted(rpa_jobs, key=lambda job: job.sp.temperature):
         logger.info("plotting %s with T = %s MeV" % (str(job), job.sp.temperature))
         origin[f"T = {job.sp.temperature} MeV"] = str(job)
-        for skalvec in 'isoscalar', 'isovector':
+        for skalvec in panels:
             for sp in "top", "bottom", "right":
                 ax[skalvec].spines[sp].set_visible(False)
             ax[skalvec].set(ylabel=r"$R \; (e^2fm^2/MeV)$")
@@ -89,9 +96,10 @@ def store_aggregated_results(Z, N, rpa_jobs, to_project,
                                         args=args,
                                     )
 
-    ax['isoscalar'].legend()
+    ax['isovector'].legend()
     ax['isovector'].set(xlabel="E (MeV)")
-    fig.subplots_adjust(hspace=0.3)
+    if args.isoscalar:
+        fig.subplots_adjust(hspace=0.3)
 
     # here job is the last one in rpa_jobs
     element, mass = util.split_element_mass(job)
@@ -117,6 +125,10 @@ def main():
         '--vlines',
         action='store_true',
         help="Add vertical lines at transition energies to plots.")
+    parser.add_argument(
+        '--isoscalar',
+        action='store_true',
+        help="Plot isoscalar component as well.")
     parser.add_argument(
         '--minEnergy',
         type=float,
