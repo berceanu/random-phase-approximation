@@ -84,7 +84,7 @@ def store_aggregated_results(Z, N, rpa_jobs, to_project,
     origin = dict()
     for job in sorted(rpa_jobs, key=lambda job: job.sp.temperature):
         logger.info("plotting %s with T = %s MeV" % (str(job), job.sp.temperature))
-        origin[f"T = {job.sp.temperature} MeV"] = str(job)
+        origin[f"T = {job.sp.temperature} MeV".replace('.', '_')] = str(job)
         for skalvec in panels:
             for sp in "top", "bottom", "right":
                 ax[skalvec].spines[sp].set_visible(False)

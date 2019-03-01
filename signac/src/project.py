@@ -152,7 +152,7 @@ def _run_code(job, temp, state, codepath='../bin', code_mapping=code_api.NameMap
     stderr_file = job.fn(code_mapping.stderr_file(temp, state))
 
     command = f"{code} {job.ws} > {stdout_file} 2> {stderr_file}"
-    logger.info(command)
+    # logger.info(command) # no side-effects allowed, see 
 
     return command
 
@@ -175,7 +175,9 @@ def run_zero_temp_ground_state(job):
 @Project.operation
 @cmd
 @Project.pre.isfile(code.input_file(temp='zero', state='excited')) 
-@Project.pre.isfile(code.wel_file(temp='zero'))
+# @Project.pre.isfile(code.wel_file(temp='zero'))
+# use all of run_zero_temp_ground_state's post-conditions as pre-conditions
+@Project.pre.after(run_zero_temp_ground_state) 
 @Project.post(arefiles(code.out_files(temp='zero')))
 @Project.post(file_contains(code.stdout_file(temp='zero', state='excited'),
                              'program terminated without errors'))
@@ -202,7 +204,8 @@ def run_finite_temp_ground_state(job):
 @Project.operation
 @cmd
 @Project.pre.isfile(code.input_file(temp='finite', state='excited')) 
-@Project.pre.isfile(code.wel_file(temp='finite'))
+# @Project.pre.isfile(code.wel_file(temp='finite'))
+@Project.pre.after(run_finite_temp_ground_state)
 @Project.post(arefiles(code.out_files(temp='finite')))
 @Project.post(file_contains(code.stdout_file(temp='finite', state='excited'),
                              'program terminated without errors'))
