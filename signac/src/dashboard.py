@@ -10,8 +10,11 @@ import mypackage.dipole_transitions as dt
 
 
 class MyDashboard(Dashboard):
+
     def job_sorter(self, job):
-        return job.sp.get('proton_number', -1)
+        # shuld return key for
+        # sorted(jobs, key=lambda job: job_sorter(job))
+        return job.sp['proton_number'], job.sp['neutron_number']
 
     def job_title(self, job):
         return f"(Z, N) = ({job.sp['proton_number']}, {job.sp['neutron_number']})"
