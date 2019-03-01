@@ -101,7 +101,7 @@ def main():
     logger.info("aggregation project: %s" % str(aggregation))
 
     for key, group in rpa.groupby(('proton_number', 'neutron_number')):
-        logger.info("(Z, N) =  %s" % key)
+        logger.info("(Z, N) =  (%s, %s)" % key)
         store_aggregated_results(group, aggregation)
 
 

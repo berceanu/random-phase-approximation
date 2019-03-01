@@ -12,7 +12,7 @@ setup(
    description='An awesome package that does something',
    long_description=open('README.txt').read(),
    install_requires=[
-       "signac >= 0.9.5",
+       "signac >= 0.9.4",
        "signac-flow >= 0.6.4",
        "signac-dashboard >= 0.1.6",
    ],
