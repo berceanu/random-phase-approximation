@@ -14,21 +14,23 @@ import mypackage.code_api as code_api
 import mypackage.util as util
 import logging
 logger = logging.getLogger(__name__)
+import argparse
+
+
+line_colors = ['C0', 'C1', 'C2', 'C3']
+line_styles = ['-', '--', ':', '-.']
+
+cyl = cycler(c=line_colors) + cycler(ls=line_styles)
+vert_cyl = cycler(colors=line_colors) + cycler(linestyles=line_styles)
+
+loop_cy_iter = cyl()
+vert_loop_cy_iter = vert_cyl()
+
+STYLE = defaultdict(lambda : next(loop_cy_iter))
+vert_STYLE = defaultdict(lambda : next(vert_loop_cy_iter))
 
 
 def out_file_plot(job, temp, skalvec, lorexc, ax=None, code_mapping=code_api.NameMapping()):
-    line_colors = ['C0', 'C1', 'C2', 'C3']
-    line_styles = ['-', '--', ':', '-.']
-
-    cyl = cycler(c=line_colors) + cycler(ls=line_styles)
-    vert_cyl = cycler(colors=line_colors) + cycler(linestyles=line_styles)
-
-    loop_cy_iter = cyl()
-    vert_loop_cy_iter = vert_cyl()
-    
-    STYLE = defaultdict(lambda : next(loop_cy_iter))
-    vert_STYLE = defaultdict(lambda : next(vert_loop_cy_iter))
-
     fn = job.fn(code_mapping.out_file(temp, skalvec, lorexc))
 
     df = pd.read_csv(fn, delim_whitespace=True, comment='#', skip_blank_lines=True,
@@ -51,7 +53,8 @@ def out_file_plot(job, temp, skalvec, lorexc, ax=None, code_mapping=code_api.Nam
     return df
 
 
-def store_aggregated_results(rpa_jobs, to_project):
+def store_aggregated_results(rpa_jobs, to_project,
+                                     plot_type=['excitation', 'lorentzian']):
     is_finite = lambda job: 'finite' if job.sp.temperature > 0 else 'zero'
     code = code_api.NameMapping()
 
@@ -72,7 +75,7 @@ def store_aggregated_results(rpa_jobs, to_project):
                 ax[skalvec].spines[sp].set_visible(False)
             ax[skalvec].set(ylabel=r"$R \; (e^2fm^2/MeV)$")
             ax[skalvec].set_title(skalvec)
-            for lorexc in 'excitation', 'lorentzian':
+            for lorexc in plot_type:
                 _ = out_file_plot(job=job, ax=ax[skalvec], temp=is_finite(job), 
                                     skalvec=skalvec, lorexc=lorexc, code_mapping=code)
 
@@ -95,6 +98,20 @@ def store_aggregated_results(rpa_jobs, to_project):
 
 
 def main():
+    parser = argparse.ArgumentParser(
+        description="this script plots the aggregated transition strengths "
+                    "for each nucleus over all temperatures.")
+    parser.add_argument(
+        '--vlines',
+        action='store_true',
+        help="Add vertical lines at transition energies to plots.")
+
+    args = parser.parse_args() # load command line args
+
+    plot_type = ['lorentzian']
+    if args.vlines:
+        plot_type.append('excitation')
+
     rpa = sg.get_project(root='../')
     aggregation = sg.get_project(root='./')
     logger.info("rpa project: %s" % str(rpa))
@@ -102,7 +119,7 @@ def main():
 
     for key, group in rpa.groupby(('proton_number', 'neutron_number')):
         logger.info("(Z, N) =  (%s, %s)" % key)
-        store_aggregated_results(group, aggregation)
+        store_aggregated_results(group, aggregation, plot_type=plot_type)
 
 
 if __name__ == '__main__':
