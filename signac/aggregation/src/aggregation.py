@@ -152,8 +152,7 @@ def main_groupby(args):
                 )
 
             # save figure to disk in agg_job's folder
-            fig.canvas.print_png(agg_job.fn('iso_all_temp_all.png'))
-            logger.info("wrote %s" % agg_job.fn('iso_all_temp_all.png'))
+            fig.canvas.print_png('iso_all_temp_all.png')
 
 
 
