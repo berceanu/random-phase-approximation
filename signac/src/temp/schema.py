@@ -1,5 +1,8 @@
+"""Get the common statepoint keys in a group of jobs."""
+
 import signac
 import itertools as it
+import copy
 
 pr = signac.init_project('schema_test')
 
@@ -13,7 +16,7 @@ for key, group in pr.groupby(keys):
     gr1, gr2 = it.tee(group)
     statepoints = []
     for job in gr1:
-        sp = job.sp()
+        sp = copy.deepcopy(job.sp())
         for k in keys:
             sp.pop(k, None)
         statepoints.append(sp)
