@@ -24,6 +24,7 @@ import mypackage.code_api as code_api
 import mypackage.util as util
 
 # @with_job
+logfname = 'rpa-project.log'
 
 #####################
 # UTILITY FUNCTIONS #
@@ -151,8 +152,8 @@ def _run_code(job, temp, state, codepath='../bin', code_mapping=code_api.NameMap
     stdout_file = job.fn(code_mapping.stdout_file(temp, state))
     stderr_file = job.fn(code_mapping.stderr_file(temp, state))
 
-    command = f"{code} {job.ws} > {stdout_file} 2> {stderr_file}"
-    # logger.info(command) # no side-effects allowed, see 
+    run_command = f"{code} {job.ws} > {stdout_file} 2> {stderr_file}"
+    command = f"echo {run_command} >> {logfname} ; {run_command}"
 
     return command
 
@@ -317,7 +318,7 @@ def dipole_trans_finite(job):
 
 if __name__ == '__main__':
     logging.basicConfig(
-        filename='rpa-project.log',
+        filename=logfname,
         format='%(asctime)s - %(name)s - %(levelname)-8s - %(message)s',
         level=logging.INFO,
         datefmt='%Y-%m-%d %H:%M:%S')
