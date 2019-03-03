@@ -20,12 +20,13 @@ def sh(*cmd, **kwargs):
 
 # http://hamelot.io/visualization/using-ffmpeg-to-convert-a-set-of-images-into-a-video/
 def ffmpeg_command(
-    framerate=15, # fps
+    framerate=4., # fps
     resolution='1920x1080', # width x height
     input_files='pic%04d.png', # pic0001.png, pic0002.png, ...
     output_file='test.mp4',
     ):
-    return rf"ffmpeg -r {framerate} -f image2 -s {resolution} -i {input_files} -vcodec libx264 -crf 25  -pix_fmt yuv420p {output_file}"
+    return (rf"ffmpeg -r {framerate} -f image2 -s {resolution} -i {input_files} "
+                   rf"-vcodec libx264 -crf 25  -pix_fmt yuv420p -y {output_file}")
 
 
 def main_animate(args):
@@ -47,7 +48,7 @@ def main_animate(args):
                              output_file=pngstem + ".mp4"
                              )
 
-
+    # @TODO add job origin to anim_job job document
     with animation.open_job({}) as anim_job: # .init() implicitly called
 
         for counter, agg_job in enumerate(sorted(aggregation.find_jobs(
@@ -74,8 +75,8 @@ def main():
         description="this script aggregates many figures into a movie.")
     parser.add_argument(
         '--framerate',
-        type=int,
-        default=15,
+        type=float,
+        default=4.,
         help="Desired video framerate, in fps.")
     parser.add_argument(
         '--resolution',
