@@ -4,8 +4,8 @@ RPA for zero and finite temperature, both FORTRAN (ground state) and C++ (excite
 See the original [paper](http://dx.doi.org/10.1016/j.physletb.2009.10.046).
 
 DEPENDENCIES:
-- `cmake`
-- `gfortran`
+- `cmake` >= 3.10.2
+- `gfortran` >= 7.3.0
 - `ffmpeg` >= 3.4.4 (for animations)
 - `$ conda install -c conda-forge signac signac-flow signac-dashboard`
 
