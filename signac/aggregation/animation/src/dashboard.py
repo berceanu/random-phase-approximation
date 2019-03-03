@@ -8,17 +8,15 @@ from signac_dashboard.modules.notes import Notes
 
 
 class MyDashboard(Dashboard):
-    pass
-    # def job_sorter(self, job):
-    #     # shuld return key for
-    #     # sorted(jobs, key=lambda job: job_sorter(job))
-    #     return job.sp['proton_number'], job.sp['neutron_number']
+    def job_sorter(self, job):
+        # shuld return key for
+        #  sorted(jobs, key=lambda job: job_sorter(job))
+        return job.sp['proton_number']
 
-    # def job_title(self, job):
-    #     return f"(Z, N) = ({job.sp['proton_number']}, {job.sp['neutron_number']})"
+    def job_title(self, job):
+        return f"Z = {job.sp['proton_number']}"
 
 
-# @TODO update dashboard for animation project
 if __name__ == '__main__':
     config = {'DASHBOARD_PATHS': ['src/']}
     dashboard = MyDashboard(modules=[

@@ -4,6 +4,7 @@
 from flow import FlowProject, cmd
 import signac
 import subprocess
+import itertools as it
 import argparse
 import shutil
 import logging
@@ -13,8 +14,9 @@ logfile = 'animation.log'
 
 def sh(*cmd, **kwargs):
     logger.info(cmd[0])
-    stdout = subprocess.Popen(cmd, stdout=subprocess.PIPE,
+    stdout = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                             **kwargs).communicate()[0].decode('utf-8')
+    logger.info(stdout)
     return stdout
 
 
@@ -26,15 +28,19 @@ def ffmpeg_command(
     output_file='test.mp4',
     ):
     return (rf"ffmpeg -r {framerate} -f image2 -s {resolution} -i {input_files} "
-                   rf"-vcodec libx264 -crf 25  -pix_fmt yuv420p -y {output_file} &>> {logfile}")
+                   rf"-vcodec libx264 -crf 25  -pix_fmt yuv420p -y {output_file}")
 
 
 def main_animate(args):
     rpa = signac.get_project(root='../../')
-    aggregation = signac.get_project(root='../')
-    animation = signac.get_project(root='./')
     logger.info("rpa project: %s" % rpa.root_directory())
+    rpa_schema = rpa.detect_schema()
+    logger.info(rpa_schema)
+
+    aggregation = signac.get_project(root='../')
     logger.info("aggregation project: %s" % aggregation.root_directory())
+
+    animation = signac.get_project(root='./')
     logger.info("animation project: %s" % animation.root_directory())
 
     pngfname = 'iso_all_temp_all.png'
@@ -48,37 +54,36 @@ def main_animate(args):
                              output_file=pngstem + ".mp4"
                              )
 
-    # rpa_schema = rpa.detect_schema()
-    # print(rpa_schema)
-
-    with animation.open_job({}) as anim_job: # .init() implicitly called
-
-        neutrons = []
-        origin={}
-        for counter, agg_job in enumerate(sorted(aggregation.find_jobs(
+    agg_job_selection = sorted(aggregation.find_jobs(
             {'proton_number': args.protonNumber, 'neutron_number': {'$gte': args.minNeutronNumber}}),
-                key=lambda job: job.sp['neutron_number']),
-                    1): # start counting from 1
+                key=lambda job: job.sp['neutron_number'])
+    selection1, selection2 = it.tee(agg_job_selection)
+
+
+    origin={}
+    statepoint = {'proton_number': args.protonNumber, 'neutron_number': []}
+    for agg_job in selection1:
+        statepoint['neutron_number'].append(agg_job.sp['neutron_number'])
+        origin[f"N = {agg_job.sp['neutron_number']}"] = agg_job._id
+
+
+    with animation.open_job(statepoint) as anim_job: # .init() implicitly called
+
+        # update job document with original hashes
+        anim_job.doc.update(origin)
+
+        # copy all the `.png` files from `aggregation` project
+        for counter, agg_job in enumerate(selection2, 1): # start counting from 1
             logger.info('(Z, N) = ({}, {}); id = {}; file = iso_all_temp_all_{:04d}.png'.format(
-                agg_job.sp['proton_number'], agg_job.sp['neutron_number'],
-                agg_job._id, counter)
-                )
+              agg_job.sp['proton_number'], agg_job.sp['neutron_number'], agg_job._id, counter))
 
-            neutrons.append(agg_job.sp['neutron_number'])
-            origin[f"N = {agg_job.sp['neutron_number']}"] = str(agg_job)
-
+            # append sorted numerics index
             png_counted = input_files % counter
 
-            # copy all the .png files from `aggregation` project,
-            #  appending sorted numerics index
             shutil.copy(agg_job.fn(pngfname), anim_job.fn(png_counted))
 
         # call ffmpeg in job folder
         sh(command, shell=True)
-
-        anim_job.sp['proton_number'] = args.protonNumber
-        anim_job.sp['neutron_number'] = neutrons
-        anim_job.doc.update(origin)
 
 
 

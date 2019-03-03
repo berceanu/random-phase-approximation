@@ -6,6 +6,7 @@ See the original [paper](http://dx.doi.org/10.1016/j.physletb.2009.10.046).
 DEPENDENCIES:
 - `cmake`
 - `gfortran`
+- `ffmpeg` >= 3.4.4 (for animations)
 - `$ conda install -c conda-forge signac signac-flow signac-dashboard`
 
 PARAMETERS TO VARY:
