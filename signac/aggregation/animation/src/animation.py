@@ -49,7 +49,7 @@ def main_animate(args):
                              )
 
     # @TODO add job origin to anim_job job document
-    with animation.open_job({}) as anim_job: # .init() implicitly called
+    with animation.open_job({'a': 1}) as anim_job: # .init() implicitly called
 
         for counter, agg_job in enumerate(sorted(aggregation.find_jobs(
             {'proton_number': 50, 'neutron_number': {'$gte': 76}}), # Tin (Sn)
