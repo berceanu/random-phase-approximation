@@ -42,7 +42,7 @@ def main_animate(args):
     input_files = pngstem + '_%04d.png'
 
     command = ffmpeg_command(framerate=args.framerate,
-                             resolution=args.resolution
+                             resolution=args.resolution,
                              input_files=input_files,
                              output_file=pngstem + ".mp4"
                              )
@@ -54,7 +54,7 @@ def main_animate(args):
             {'proton_number': 50, 'neutron_number': {'$gte': 76}}), # Tin (Sn)
                 key=lambda job: job.sp['neutron_number']),
                     1): # start counting from 1
-            print('(Z, N) = ({}, {}); id = {}; file = iso_all_temp_all_{:04d}.png'.format(
+            logger.info('(Z, N) = ({}, {}); id = {}; file = iso_all_temp_all_{:04d}.png'.format(
                 agg_job.sp['proton_number'], agg_job.sp['neutron_number'],
                 agg_job._id, counter)
                 )
@@ -62,7 +62,7 @@ def main_animate(args):
 
             # copy all the .png files from `aggregation` project,
             #  appending sorted numerics index
-            shutil.copy(agg_job.fn(png), anim_job.fn(png_counted))
+            shutil.copy(agg_job.fn(pngfname), anim_job.fn(png_counted))
 
         # call ffmpeg in job folder
         sh(command, shell=True)
