@@ -84,6 +84,7 @@ c---- Pairing matrix elements
 
 c---- vfac factor for vpair multiplication
       read(lin,102) vfac
+      write(l6,103) ' vpair multiplication       : ',vfac
 
 c---- Parametrization type   
 c     read(lin,100) ipara

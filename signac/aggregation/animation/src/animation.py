@@ -26,7 +26,7 @@ def ffmpeg_command(
     output_file='test.mp4',
     ):
     return (rf"ffmpeg -r {framerate} -f image2 -s {resolution} -i {input_files} "
-                   rf"-vcodec libx264 -crf 25  -pix_fmt yuv420p -y {output_file}")
+                   rf"-vcodec libx264 -crf 25  -pix_fmt yuv420p -y {output_file} &>> {logfile}")
 
 
 def main_animate(args):
@@ -48,17 +48,25 @@ def main_animate(args):
                              output_file=pngstem + ".mp4"
                              )
 
-    # @TODO add job origin to anim_job job document
-    with animation.open_job({'a': 1}) as anim_job: # .init() implicitly called
+    # rpa_schema = rpa.detect_schema()
+    # print(rpa_schema)
 
+    with animation.open_job({}) as anim_job: # .init() implicitly called
+
+        neutrons = []
+        origin={}
         for counter, agg_job in enumerate(sorted(aggregation.find_jobs(
-            {'proton_number': 50, 'neutron_number': {'$gte': 76}}), # Tin (Sn)
+            {'proton_number': args.protonNumber, 'neutron_number': {'$gte': args.minNeutronNumber}}),
                 key=lambda job: job.sp['neutron_number']),
                     1): # start counting from 1
             logger.info('(Z, N) = ({}, {}); id = {}; file = iso_all_temp_all_{:04d}.png'.format(
                 agg_job.sp['proton_number'], agg_job.sp['neutron_number'],
                 agg_job._id, counter)
                 )
+
+            neutrons.append(agg_job.sp['neutron_number'])
+            origin[f"N = {agg_job.sp['neutron_number']}"] = str(agg_job)
+
             png_counted = input_files % counter
 
             # copy all the .png files from `aggregation` project,
@@ -68,11 +76,25 @@ def main_animate(args):
         # call ffmpeg in job folder
         sh(command, shell=True)
 
+        anim_job.sp['proton_number'] = args.protonNumber
+        anim_job.sp['neutron_number'] = neutrons
+        anim_job.doc.update(origin)
+
 
 
 def main():
     parser = argparse.ArgumentParser(
         description="this script aggregates many figures into a movie.")
+    parser.add_argument(
+        '--protonNumber',
+        type=int,
+        default=50, # Tin (Sn)
+        help="Proton number Z.")
+    parser.add_argument(
+        '--minNeutronNumber',
+        type=int,
+        default=76,
+        help="Minimum neutron number N for isotopes.")        
     parser.add_argument(
         '--framerate',
         type=float,
