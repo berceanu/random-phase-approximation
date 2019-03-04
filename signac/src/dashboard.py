@@ -14,7 +14,7 @@ class MyDashboard(Dashboard):
     def job_sorter(self, job):
         # shuld return key for
         # sorted(jobs, key=lambda job: job_sorter(job))
-        return job.sp['proton_number'], job.sp['neutron_number']
+        return job.sp['proton_number'], job.sp['neutron_number'], job.sp['temperature']
 
     def job_title(self, job):
         return f"(Z, N) = ({job.sp['proton_number']}, {job.sp['neutron_number']}), T = {job.sp.temperature}"
