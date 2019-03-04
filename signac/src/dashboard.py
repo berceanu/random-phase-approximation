@@ -17,7 +17,7 @@ class MyDashboard(Dashboard):
         return job.sp['proton_number'], job.sp['neutron_number']
 
     def job_title(self, job):
-        return f"(Z, N) = ({job.sp['proton_number']}, {job.sp['neutron_number']})"
+        return f"(Z, N) = ({job.sp['proton_number']}, {job.sp['neutron_number']}), T = {job.sp.temperature}"
 
 
 if __name__ == '__main__':
