@@ -26,40 +26,36 @@ from collections import OrderedDict
 ! head ftes_lorvec.out
 
 # %%
-146 - 50
+146 - 50 # N
 
 # %%
 # 'energy', 'transition_strength'
 #  names=['col1', 'col2']
 df_lorvec = pd.read_csv('ftes_lorvec.out', delim_whitespace=True, comment='#', skip_blank_lines=True,
-            header=None, names=['col1', 'col2'])
+            header=None, names=['U', 'fE1'])
 
 # %%
-df_lorvec = df_lorvec[(df_lorvec.col1 >= 0.1) & (df_lorvec.col1 <= 30)] # MeV
+df_lorvec = df_lorvec[(df_lorvec.U >= 0.1) & (df_lorvec.U <= 30)] # MeV
 
 # %%
 df_lorvec.head()
 
 # %%
+df_lorvec.index
+
+# %%
 every_10 = df_lorvec.iloc[::10, :]
 every_10.reset_index(drop=True, inplace=True)
-df = every_10.iloc[:4, :].T
-print(df.to_string())
-print()
-print(df.index)
+every_10_T = every_10.T
 
 # %%
-# print(table.to_string())
-print()
-# print(table.index)
+df = every_10_T
+df2 = pd.concat([df], keys=['100'], names=['A'])
+df3 = pd.concat([df2], keys=['50'], names=['Z'])
+lorvec_df = df3
 
 # %%
-myidx = pd.MultiIndex(levels=[['50'], ['100'], ['col1', 'col2']],
-                      labels=[[0, 0], [0, 0], [0, 1]],
-                       names=['Z', 'A', None])
 
-# %%
-print(df.reindex(index=myidx).to_string())
 
 # %%
 
@@ -99,6 +95,7 @@ stocks.sort_index(inplace=True)
 
 
 # %%
+
 
 
 # %%
@@ -152,6 +149,22 @@ def fn_to_dict(fname):
     return mydict, minA, maxA
 
 # %%
+
+
+# %%
+# @TODO 
+# df_to_dict(df):
+    # get dictionary from dataframe
+# @TODO 
+# dict_to_fn(nested_dict, fname):
+    # write dict to file
+# @TODO same float formatting
+# @TODO same column names
+# @TODO multiply by constant to convert e^2fm^2 to barn
+# @TODO why missing some A values
+# @TODO Z and N as strings?
+
+# %%
 md, a, b = fn_to_dict('z050')
 print(f"Amin = {a}, Amax = {b}")
 
@@ -169,6 +182,9 @@ def dict_to_df(ordered_nested_dict):
 # %%
 df = dict_to_df(md)
 df.head()
+
+# %%
+lorvec_df
 
 # %%
 md_tst = {'50': {'100': {'col1': (0.100,
@@ -198,6 +214,7 @@ df_tst
 df_tst = df_tst.T
 pprint.pprint(df_tst.to_dict('list')) # dict is OK
 df_tst = df_tst.T
+print()
 print(df_tst.index) # index is OK
 
 # %%
@@ -206,6 +223,21 @@ table
 
 # %%
 table.T
+
+# %%
+s = df_tst.loc[('50', '100', 'col1'), :]
+s
+
+
+# %%
+md2={}
+for i in df.columns:
+    if i[0] not in md2.keys():
+        md2[i[0]]={}
+    if i[1] not in md2[i[0]].keys():
+        md2[i[0]][i[1]]={}
+md2[i[0]][i[1]][i[2]]=tuple(df[i[0]][i[1]][i[2]].values)
+
 
 # %%
 
@@ -226,6 +258,55 @@ stocks.loc[(slice(None), ['2016-10-03', '2016-10-04']), :]
 
 # %%
 
+
+
+# %%
+
+
+
+# %%
+md = {'50': {'100': {'col1': ('0.100',
+                              '0.200',
+                              '0.300',
+                              '0.400'),
+                     'col2': ('6.263E-03',
+                              '6.746E-03',
+                              '7.266E-03',
+                              '7.825E-03')},
+             '101': {'col1': ('0.100',
+                              '0.200',
+                              '0.300',
+                              '0.400'),
+                     'col2': ('6.510E-03',
+                              '7.011E-03',
+                              '7.533E-03',
+                              '8.134E-03')}
+            }
+     }
+
+# %%
+reform = {(firstKey, secondKey, thirdKey): values for firstKey, middleDict in md.items() for secondKey, innerdict in middleDict.items() for thirdKey, values in innerdict.items()}
+
+# %%
+df = pd.DataFrame(reform)
+
+# %%
+df
+
+# %%
+md2={}
+for i in df.columns:
+    if i[0] not in md2.keys():
+        md2[i[0]]={}
+    if i[1] not in md2[i[0]].keys():
+        md2[i[0]][i[1]]={}
+    md2[i[0]][i[1]][i[2]]=tuple(df[i[0]][i[1]][i[2]].values)
+
+# %%
+pprint.pprint(md2)
+
+# %%
+md2 == md
 
 # %%
 
