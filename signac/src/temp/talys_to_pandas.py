@@ -30,7 +30,6 @@ from collections import OrderedDict
 
 # %%
 # 'energy', 'transition_strength'
-#  names=['col1', 'col2']
 df_lorvec = pd.read_csv('ftes_lorvec.out', delim_whitespace=True, comment='#', skip_blank_lines=True,
             header=None, names=['U', 'fE1'])
 
@@ -41,17 +40,14 @@ df_lorvec = df_lorvec[(df_lorvec.U >= 0.1) & (df_lorvec.U <= 30)] # MeV
 df_lorvec.head()
 
 # %%
-df_lorvec.index
-
-# %%
 every_10 = df_lorvec.iloc[::10, :]
 every_10.reset_index(drop=True, inplace=True)
 every_10_T = every_10.T
 
 # %%
 df = every_10_T
-df2 = pd.concat([df], keys=['100'], names=['A'])
-df3 = pd.concat([df2], keys=['50'], names=['Z'])
+df2 = pd.concat([df], keys=[146], names=['A'])
+df3 = pd.concat([df2], keys=[50], names=['Z'])
 lorvec_df = df3
 
 # %%
@@ -154,15 +150,13 @@ def fn_to_dict(fname):
 # %%
 # @TODO 
 # df_to_dict(df):
-    # get dictionary from dataframe
+    # get dictionary from dataframe X
 # @TODO 
 # dict_to_fn(nested_dict, fname):
-    # write dict to file
+    # write dict to file 
 # @TODO same float formatting
-# @TODO same column names
 # @TODO multiply by constant to convert e^2fm^2 to barn
 # @TODO why missing some A values
-# @TODO Z and N as strings?
 
 # %%
 md, a, b = fn_to_dict('z050')
@@ -184,7 +178,16 @@ df = dict_to_df(md)
 df.head()
 
 # %%
-lorvec_df
+df.loc[(50, 146, ['U', 'fE1']), :]
+
+# %%
+lorvec_df.loc[(50, 146, ['U', 'fE1']), :]
+
+# %%
+df.loc[(50, 146, ['U', 'fE1']), :] = lorvec_df.loc[(50, 146, ['U', 'fE1']), :]
+
+# %%
+df.loc[(50, 146, ['U', 'fE1']), :]
 
 # %%
 md_tst = {'50': {'100': {'col1': (0.100,
