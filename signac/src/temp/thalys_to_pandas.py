@@ -17,93 +17,55 @@
 
 # %%
 import pandas as pd
-
-# %%
-df = pd.read_csv('ftes_lorvec.out', delim_whitespace=True, comment='#', skip_blank_lines=True,
-            header=None, names=['energy', 'transition_strength'])
-
-# %%
-df = df[(df.energy >= 0.1) & (df.energy <= 30)] # MeV
-
-# %%
-df
-
-# %%
-df.iloc[::10, :]
-
-# %%
-
-
-# %%
-user_dict = {12: {'Category 1': {'att_1': 1, 'att_2': 'whatever'},
-                  'Category 2': {'att_1': 23, 'att_2': 'another'}},
-             15: {'Category 1': {'att_1': 10, 'att_2': 'foo'},
-                  'Category 2': {'att_1': 30, 'att_2': 'bar'}}}
-
-# %%
-
-
-# %%
-
-
-# %%
-user_dict = {12: {'Category 1': {'att_1': 1, 'att_2': 'whatever'},
-                  'Category 2': {'att_1': 23, 'att_2': 'another'}},
-             15: {'Category 1': {'att_1': 10, 'att_2': 'foo'},
-                  'Category 2': {'att_1': 30, 'att_2': 'bar'}}}
-
-# %%
-df = pd.DataFrame.from_dict({(i,j): user_dict[i][j] 
-                           for i in user_dict.keys() 
-                           for j in user_dict[i].keys()},
-                       orient='index')
-
-# %%
-df.index
-
-# %%
-arrays = [['bar', 'bar', 'baz', 'baz', 'foo', 'foo', 'qux', 'qux'],
-         ['one', 'two', 'one', 'two', 'one', 'two', 'one', 'two']]
-
-# %%
-tuples = list(zip(*arrays))
-
-# %%
-tuples
-
-# %%
-index = pd.MultiIndex.from_tuples(tuples, names=['first', 'second'])
-
-# %%
-index
-
-# %%
-s = pd.Series(np.random.randn(8), index=index)
-
-
-# %%
 import numpy as np
+import re
+import pprint
+from collections import OrderedDict
 
 # %%
-s
+! head ftes_lorvec.out
 
 # %%
-s.index
+146 - 50
 
 # %%
-s.loc['baz']
+# 'energy', 'transition_strength'
+#  names=['col1', 'col2']
+df_lorvec = pd.read_csv('ftes_lorvec.out', delim_whitespace=True, comment='#', skip_blank_lines=True,
+            header=None, names=['col1', 'col2'])
 
 # %%
-import pandas as pd
+df_lorvec = df_lorvec[(df_lorvec.col1 >= 0.1) & (df_lorvec.col1 <= 30)] # MeV
+
+# %%
+df_lorvec.head()
+
+# %%
+every_10 = df_lorvec.iloc[::10, :]
+every_10.reset_index(drop=True, inplace=True)
+df = every_10.iloc[:4, :].T
+print(df.to_string())
+print()
+print(df.index)
+
+# %%
+# print(table.to_string())
+print()
+# print(table.index)
+
+# %%
+myidx = pd.MultiIndex(levels=[['50'], ['100'], ['col1', 'col2']],
+                      labels=[[0, 0], [0, 0], [0, 1]],
+                       names=['Z', 'A', None])
+
+# %%
+print(df.reindex(index=myidx).to_string())
+
+# %%
+
 
 # %%
 stocks = pd.read_csv('http://bit.ly/smallstocks')
-
-# %%
-stocks
-
-# %%
-stocks.index
 
 # %%
 stocks.groupby('Symbol').Close.mean()
@@ -119,31 +81,12 @@ ser.unstack()
 
 # %%
 df = stocks.pivot_table(values='Close', index='Symbol', columns='Date')
-df
-
-# %%
-ser
-
-# %%
-ser.loc['AAPL']
-
-# %%
-ser.loc['AAPL', '2016-10-03']
-
-# %%
-ser.loc[:, '2016-10-03']
-
-# %%
-df.loc['AAPL']
-
-# %%
-df.loc[:, '2016-10-03']
 
 # %%
 stocks.set_index(['Symbol', 'Date'], inplace=True)
 
 # %%
-stocks
+ser.loc[:, '2016-10-03']
 
 # %%
 stocks.index
@@ -152,117 +95,19 @@ stocks.index
 stocks.sort_index(inplace=True)
 
 # %%
-stocks
 
-# %%
-stocks.loc['AAPL']
 
-# %%
-stocks.loc[('AAPL', '2016-10-03'), :] # rows, columns
-
-# %%
-stocks.loc[('AAPL', '2016-10-03'), 'Close']
-
-# %%
-stocks.loc[(['AAPL', 'MSFT'], '2016-10-03'), :]
-
-# %%
-stocks.loc[(['AAPL', 'MSFT'], '2016-10-03'), 'Close']
-
-# %%
-stocks.loc[('AAPL', ['2016-10-03', '2016-10-04']), 'Close']
-
-# %%
-stocks.loc[(slice(None), ['2016-10-03', '2016-10-04']), :]
-
-# %%
-both = pd.merge
 
 # %%
 
 
 # %%
- Z=  50 A=  90
-  U[MeV]  fE1[mb/MeV]
-    0.100   6.291E-03
-    0.200   6.776E-03
-    0.300   7.300E-03
-
-  Z=  50 A=  91
-  U[MeV]  fE1[mb/MeV]
-    0.100   6.350E-03
-    0.200   6.840E-03
-    0.300   7.369E-03
-    0.400   7.937E-03
-
-# %%
-{50: {90: {}, 91: {}}}
-
-# %%
-mydict = {50: {90: {'U': [0.100, 0.200, 29.900, 30.000], 'fE1': [6.291E-03, 6.776E-03, 8.220E-01, 8.110E-01]},
-               91: {'U': [0.100, 0.200, 29.900, 30.000], 'fE1': [6.291E-03, 6.776E-03, 8.220E-01, 8.110E-01]}},
-          51: {90: {'U': [0.100, 0.200, 29.900, 30.000], 'fE1': [6.291E-03, 6.776E-03, 8.220E-01, 8.110E-01]},
-               91: {'U': [0.100, 0.200, 29.900, 30.000], 'fE1': [6.291E-03, 6.776E-03, 8.220E-01, 8.110E-01]}}}
-
-# %%
-{(i,j): user_dict[i][j] 
-                           for i in user_dict.keys() 
-                           for j in user_dict[i].keys()}
-
-# %%
-df = pd.DataFrame.from_dict({(i,j): user_dict[i][j] 
-                           for i in user_dict.keys() 
-                           for j in user_dict[i].keys()},
-                       orient='index')
-
-# %%
-df.index
-
-# %%
-df
-
-# %%
-df = pd.DataFrame.from_dict(user_dict)
-
-# %%
-df
-
-# %%
-pd.DataFrame.from_dict?
-
-# %%
-import re
-
-# %%
-new_line = re.compile('\n[\s\r]+?\n')
-
-# %%
-contents = open('z050').read()
-
-# %%
-blocks = new_line.split(contents)
-
-# %%
-len(blocks)
+def to_float(iterable):
+    return (float(val) for val in iterable)
 
 # %%
 class ConfigurationSyntaxError(Exception):
     pass
-
-# %%
-blocks[2].splitlines()
-
-# %%
-raise ConfigurationSyntaxError('blas')
-
-# %%
-tst = {'50': {}}
-
-# %%
-mydict = {50: {90: {'U': [0.100, 0.200, 29.900, 30.000], 'fE1': [6.291E-03, 6.776E-03, 8.220E-01, 8.110E-01]},
-               91: {'U': [0.100, 0.200, 29.900, 30.000], 'fE1': [6.291E-03, 6.776E-03, 8.220E-01, 8.110E-01]}},
-          51: {90: {'U': [0.100, 0.200, 29.900, 30.000], 'fE1': [6.291E-03, 6.776E-03, 8.220E-01, 8.110E-01]},
-               91: {'U': [0.100, 0.200, 29.900, 30.000], 'fE1': [6.291E-03, 6.776E-03, 8.220E-01, 8.110E-01]}}}
 
 # %%
 def fn_to_dict(fname):
@@ -272,17 +117,19 @@ def fn_to_dict(fname):
     new_line = re.compile('\n[\s\r]+?\n')
     blocks = new_line.split(contents)
     
-    assert len(blocks[:-1]) == 82, "Not right number of blocks!"
     assert blocks[-1].strip() == '', "Last line not empty!"
+    assert len(blocks[:-1]) == 82, "Not right number of blocks!"
     
-    mydict = {str(z_from_fname): {}}
+    mydict = OrderedDict()
+    mydict[z_from_fname] =  OrderedDict()
+    
     minA, maxA = 400, 0
     for blk in blocks[:-1]: # except last line
         block = blk.splitlines()
     
         nucleus_header = block[0].split()
-        Z, A = nucleus_header[1::2]
-        if (nucleus_header[0::2] != ['Z=', 'A=']) or (int(Z) != z_from_fname):
+        Z, A = (int(val) for val in nucleus_header[1::2])
+        if (nucleus_header[0::2] != ['Z=', 'A=']) or (Z != z_from_fname):
             raise ConfigurationSyntaxError('Wrong header inside %s!' % fname)
         if int(A) < minA:
             minA = int(A)
@@ -296,7 +143,9 @@ def fn_to_dict(fname):
         columns = (row.split() for row in block[2:])
         c1_vals, c2_vals = zip(*columns)
 
-        d = {A: {'U': c1_vals, 'fE1': c2_vals}}
+        d = OrderedDict()
+        d[A] = OrderedDict(U=list(to_float(c1_vals)),
+                         fE1=list(to_float(c2_vals)))
         mydict[Z].update(d)
         
     print(f"Amax - Amin = {maxA - minA}, {len(blocks[:-1])} blocks")
@@ -307,71 +156,76 @@ md, a, b = fn_to_dict('z050')
 print(f"Amin = {a}, Amax = {b}")
 
 # %%
-pprint.pprint(md)
+def dict_to_df(ordered_nested_dict):
+    reform = {(firstKey, secondKey, thirdKey): values for firstKey, middleDict in ordered_nested_dict.items() for secondKey, innerdict in middleDict.items() for thirdKey, values in innerdict.items()}
+    df = pd.DataFrame(reform)
+    df = df.T # transpose
+    df.index.names=['Z', 'A', None]
+    return df
 
 # %%
-b
+# pprint.pprint(md)
 
 # %%
-b - a
+df = dict_to_df(md)
+df.head()
 
 # %%
-df = pd.DataFrame.from_dict({(i,j): md[i][j][v] for i in md.keys() for j in md[i].keys() for v in md[i][j]}, orient='index')
+md_tst = {'50': {'100': {'col1': (0.100,
+                              0.200,
+                              0.300,
+                              0.400),
+                     'col2': (0.1359,
+                              0.14329,
+                              0.151455,
+                              0.160519)},
+             '101': {'col1': (0.100,
+                              0.200,
+                              0.300,
+                              0.400),
+                     'col2': (6.510E-03,
+                              7.011E-03,
+                              7.553E-03,
+                              8.134E-03)}
+            }
+     }
 
 # %%
-mydict = {(i,j): md[i][j][v] for i in md.keys() for j in md[i].keys() for v in md[i][j]}
+df_tst = dict_to_df(md_tst)
+df_tst
 
 # %%
-import pprint
+df_tst = df_tst.T
+pprint.pprint(df_tst.to_dict('list')) # dict is OK
+df_tst = df_tst.T
+print(df_tst.index) # index is OK
 
 # %%
-pprint.pprint(mydict)
+table = df_tst.loc[('50', '100', ['col1', 'col2']), :]
+table
 
 # %%
-Z, A = block[0].split()[1], block[0].split()[3]
-print(f"(Z, A) = ({Z}, {A})")
+table.T
 
 # %%
-col1, col2 = block[1].split()[0].split('[')[0], block[1].split()[1].split('[')[0]
-print(f"(col1, col2) = ({col1}, {col2})")
+
 
 # %%
-myd = {(i,j): md[i][j][v] for i in md.keys() for j in md[i].keys() for v in md[i][j]}
+
 
 # %%
-df = pd.DataFrame.from_dict({(i,j): myd[i][j] for i in myd.keys() for j in myd[i].keys()}, orient='index')
+stocks
 
 # %%
-df
+stocks.loc[('AAPL', '2016-10-03'), :] # rows, columns
+stocks.loc[('AAPL', '2016-10-03'), 'Close']
+stocks.loc[(['AAPL', 'MSFT'], '2016-10-03'), :]
+stocks.loc[(['AAPL', 'MSFT'], '2016-10-03'), 'Close']
+stocks.loc[('AAPL', ['2016-10-03', '2016-10-04']), 'Close']
+stocks.loc[(slice(None), ['2016-10-03', '2016-10-04']), :]
 
 # %%
-print(df.to_string())
 
-# %%
-df
-
-# %%
-md = {'50': {'100': {'col1': ('0.100',
-                      '0.200',
-                      '0.300',
-                      '0.400'),
-                'col2': ('6.263E-03',
-                        '6.746E-03',
-                        '7.266E-03',
-                        '7.825E-03')},
-        '101': {'col1': ('0.100',
-                      '0.200',
-                      '0.300',
-                      '0.400'),
-                'col2': ('6.510E-03',
-                        '7.011E-03',
-                        '7.553E-03',
-                        '8.134E-03')}
-             }
-}
-
-# %%
-md1 = {(i,j): md[i][j][v] for i in md.keys() for j in md[i].keys() for v in md[i][j]}
 
 # %%
 
