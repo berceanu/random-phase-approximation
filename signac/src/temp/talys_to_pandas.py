@@ -111,9 +111,7 @@ class ConfigurationSyntaxError(Exception):
 # @TODO 
 # dict_to_fn(ordered_nested_dict, fname):
     # write dict to file 
-# @TODO same float formatting
 # @TODO multiply by constant to convert e^2fm^2 to barn
-# @TODO why missing some A values
 
 # %%
 def fn_to_dict(fname):
@@ -126,6 +124,7 @@ def fn_to_dict(fname):
     
     assert blocks[-1].strip() == '', "Last line not empty!"
     assert len(blocks[:-1]) == 82, "Not right number of blocks!"
+    # gap from A = 170 to A = 178
     
     mydict = OrderedDict()
     mydict[z_from_fname] =  OrderedDict()
@@ -161,40 +160,55 @@ def fn_to_dict(fname):
 # %%
 def dict_to_fn(ordered_nested_dict, fname):
     ond = ordered_nested_dict
+
+    assert len(ond.keys()) == 1, "More than one element present in dict!"
+
     z_from_fname = int(''.join(filter(lambda c: not c.isalpha(), fname)))
-    print(z_from_fname)
-#     print(ond[z_from_fname])
-    nucleus_header = f' Z={z_from_fname:4d} A={90:4d}'
-    print(nucleus_header)
+    assert list(ond.keys())[0] == z_from_fname, "Elements from dict and file do not match!"
+
     col_header = f'  U[MeV]  fE1[mb/MeV]'
-    print(col_header)
-    data = '{:9.3f}   {:.3E}'.format(11.100, 6.510E-03)
-    print(data)
     
-    for Z in ond.keys():
-        for A in ond[Z].keys():
-            print(Z, A)
-            for U, fE1 in zip(ond[Z][A]['U'], ond[Z][A]['fE1']):
-                print(U, fE1)
-    
+    atomic_mass_numbers = []
     with open(fname, "w") as f:
-        f.write('This is not a test.\n')
-
-
-
-# %%
-t1 = (1,2,3)
-t2 = (4,5,6)
-
-for a, b in zip(t1, t2):
-    print(a, b)
+        for Z in ond.keys():
+            for A in ond[Z].keys():
+                atomic_mass_numbers.append(A)
+                nucleus_header = f' Z={Z:4d} A={A:4d}'
+                f.write(f'{nucleus_header}\n')
+                f.write(f'{col_header}\n')
+                for U, fE1 in zip(ond[Z][A]['U'], ond[Z][A]['fE1']):
+                    f.write('{:9.3f}   {:.3E}\n'.format(U, fE1))
+                f.write(' \n')
+    return atomic_mass_numbers
 
 # %%
 md, a, b = fn_to_dict('z050')
 print(f"Amin = {a}, Amax = {b}")
 
 # %%
-dict_to_fn(md, 'newz050')
+mnum = dict_to_fn(md, 'newz050')
+
+# %%
+df = dict_to_df(md)
+
+# %%
+def df_to_dict(df):
+    ond = OrderedDict() # ordered_nested_dict
+    for Z, A, data_col in df.columns:
+        if Z not in ond.keys():
+            ond[Z] = OrderedDict()
+        if A not in ond[Z].keys():
+            ond[Z][A] = OrderedDict()
+        ond[Z][A][data_col] = tuple(df[Z][A][data_col].values)
+    return ond
+
+# %%
+md2 = df_to_dict(df)
+
+# %%
+for i, A in enumerate(mnum[1:], 1):
+    if A - mnum[i-1] != 1:
+        print(A, A - mnum[i-1])
 
 # %%
 md_tst = {'50': {'100': {'col1': (0.100,
@@ -222,7 +236,7 @@ def dict_to_df(ordered_nested_dict):
     df = pd.DataFrame(reform)
     df = df.T # transpose
     df.index.names=['Z', 'A', None]
-    return df
+    return df.T
 
 # %%
 # pprint.pprint(md)
@@ -286,9 +300,7 @@ s
 # %%
 
 
-
 # %%
-
 
 
 # %%
@@ -301,59 +313,3 @@ stocks.loc[(['AAPL', 'MSFT'], '2016-10-03'), :]
 stocks.loc[(['AAPL', 'MSFT'], '2016-10-03'), 'Close']
 stocks.loc[('AAPL', ['2016-10-03', '2016-10-04']), 'Close']
 stocks.loc[(slice(None), ['2016-10-03', '2016-10-04']), :]
-
-# %%
-
-
-
-# %%
-
-
-
-# %%
-md = {'50': {'100': {'col1': ('0.100',
-                              '0.200',
-                              '0.300',
-                              '0.400'),
-                     'col2': ('6.263E-03',
-                              '6.746E-03',
-                              '7.266E-03',
-                              '7.825E-03')},
-             '101': {'col1': ('0.100',
-                              '0.200',
-                              '0.300',
-                              '0.400'),
-                     'col2': ('6.510E-03',
-                              '7.011E-03',
-                              '7.533E-03',
-                              '8.134E-03')}
-            }
-     }
-
-# %%
-reform = {(firstKey, secondKey, thirdKey): values for firstKey, middleDict in md.items() for secondKey, innerdict in middleDict.items() for thirdKey, values in innerdict.items()}
-
-# %%
-df = pd.DataFrame(reform)
-
-# %%
-df
-
-# %%
-md2={}
-for i in df.columns:
-    if i[0] not in md2.keys():
-        md2[i[0]]={}
-    if i[1] not in md2[i[0]].keys():
-        md2[i[0]][i[1]]={}
-    md2[i[0]][i[1]][i[2]]=tuple(df[i[0]][i[1]][i[2]].values)
-
-# %%
-pprint.pprint(md2)
-
-# %%
-md2 == md
-
-# %%
-
-
