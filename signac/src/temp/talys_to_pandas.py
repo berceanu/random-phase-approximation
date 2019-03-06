@@ -53,7 +53,9 @@ lorvec_df = df3
 # %%
 
 
+
 # %%
+
 
 
 # %%
@@ -103,9 +105,21 @@ class ConfigurationSyntaxError(Exception):
     pass
 
 # %%
+# @TODO 
+# df_to_dict(df):
+    # get dictionary from dataframe X
+# @TODO 
+# dict_to_fn(ordered_nested_dict, fname):
+    # write dict to file 
+# @TODO same float formatting
+# @TODO multiply by constant to convert e^2fm^2 to barn
+# @TODO why missing some A values
+
+# %%
 def fn_to_dict(fname):
     z_from_fname = int(''.join(filter(lambda c: not c.isalpha(), fname)))
-    contents = open(fname).read()
+    with open(fname) as f:
+        contents = f.read()
     
     new_line = re.compile('\n[\s\r]+?\n')
     blocks = new_line.split(contents)
@@ -137,30 +151,70 @@ def fn_to_dict(fname):
         c1_vals, c2_vals = zip(*columns)
 
         d = OrderedDict()
-        d[A] = OrderedDict(U=list(to_float(c1_vals)),
-                         fE1=list(to_float(c2_vals)))
+        d[A] = OrderedDict(U=tuple(to_float(c1_vals)),
+                         fE1=tuple(to_float(c2_vals)))
         mydict[Z].update(d)
         
     print(f"Amax - Amin = {maxA - minA}, {len(blocks[:-1])} blocks")
     return mydict, minA, maxA
 
 # %%
+def dict_to_fn(ordered_nested_dict, fname):
+    ond = ordered_nested_dict
+    z_from_fname = int(''.join(filter(lambda c: not c.isalpha(), fname)))
+    print(z_from_fname)
+#     print(ond[z_from_fname])
+    nucleus_header = f' Z={z_from_fname:4d} A={90:4d}'
+    print(nucleus_header)
+    col_header = f'  U[MeV]  fE1[mb/MeV]'
+    print(col_header)
+    data = '{:9.3f}   {:.3E}'.format(11.100, 6.510E-03)
+    print(data)
+    
+    for Z in ond.keys():
+        for A in ond[Z].keys():
+            print(Z, A)
+            for U, fE1 in zip(ond[Z][A]['U'], ond[Z][A]['fE1']):
+                print(U, fE1)
+    
+    with open(fname, "w") as f:
+        f.write('This is not a test.\n')
+
 
 
 # %%
-# @TODO 
-# df_to_dict(df):
-    # get dictionary from dataframe X
-# @TODO 
-# dict_to_fn(nested_dict, fname):
-    # write dict to file 
-# @TODO same float formatting
-# @TODO multiply by constant to convert e^2fm^2 to barn
-# @TODO why missing some A values
+t1 = (1,2,3)
+t2 = (4,5,6)
+
+for a, b in zip(t1, t2):
+    print(a, b)
 
 # %%
 md, a, b = fn_to_dict('z050')
 print(f"Amin = {a}, Amax = {b}")
+
+# %%
+dict_to_fn(md, 'newz050')
+
+# %%
+md_tst = {'50': {'100': {'col1': (0.100,
+                              0.200,
+                              0.300,
+                              0.400),
+                     'col2': (0.1359,
+                              0.14329,
+                              0.151455,
+                              0.160519)},
+             '101': {'col1': (0.100,
+                              0.200,
+                              0.300,
+                              0.400),
+                     'col2': (6.510E-03,
+                              7.011E-03,
+                              7.553E-03,
+                              8.134E-03)}
+            }
+     }
 
 # %%
 def dict_to_df(ordered_nested_dict):
@@ -225,27 +279,16 @@ table = df_tst.loc[('50', '100', ['col1', 'col2']), :]
 table
 
 # %%
-table.T
-
-# %%
 s = df_tst.loc[('50', '100', 'col1'), :]
 s
 
 
 # %%
-md2={}
-for i in df.columns:
-    if i[0] not in md2.keys():
-        md2[i[0]]={}
-    if i[1] not in md2[i[0]].keys():
-        md2[i[0]][i[1]]={}
-md2[i[0]][i[1]][i[2]]=tuple(df[i[0]][i[1]][i[2]].values)
+
 
 
 # %%
 
-
-# %%
 
 
 # %%
@@ -312,4 +355,5 @@ pprint.pprint(md2)
 md2 == md
 
 # %%
+
 
