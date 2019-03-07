@@ -1,28 +1,12 @@
-# ---
-# jupyter:
-#   jupytext:
-#     text_representation:
-#       extension: .py
-#       format_name: percent
-#       format_version: '1.2'
-#       jupytext_version: 0.8.6
-#   kernelspec:
-#     display_name: Python 3
-#     language: python
-#     name: python3
-# ---
+"""This module contains functions for generating TALYS input files."""
 
-# %%
-# %autosave 0
-
-# %%
 import pandas as pd
-import numpy as np
 import re
-import pprint
+import os
 from collections import OrderedDict
+import logging
+logger = logging.getLogger(__name__)
 
-# %%
 class ConfigurationSyntaxError(Exception):
     pass
 
@@ -32,7 +16,8 @@ def cast_to(to_type, iterable):
 
 
 def z_from_fname(fname):
-    Z = int(''.join(filter(lambda c: not c.isalpha(), fname)))
+    fn = os.path.basename(fname)
+    Z = int(''.join(filter(lambda c: not c.isalpha(), fn)))
     return Z
 
 
@@ -40,6 +25,7 @@ def lorvec_to_df(fname, Z, A):
     # @TODO multiply by constant to convert e^2fm^2 to barn
     df_lorvec = pd.read_csv(fname, delim_whitespace=True, comment='#', skip_blank_lines=True,
                 header=None, names=['U', 'fE1'])
+    logger.info('Read %s' % fname)
 
     df_lorvec = df_lorvec[(df_lorvec.U >= 0.1) & (df_lorvec.U <= 30)] # MeV
 
@@ -53,9 +39,9 @@ def lorvec_to_df(fname, Z, A):
 
 
 def fn_to_dict(fname):
-    z_fn = z_from_fname(fname)
     with open(fname) as f:
         contents = f.read()
+    logger.info('Read %s' % fname)
     
     new_line = re.compile(r'\n[\s\r]+?\n')
     blocks = new_line.split(contents)
@@ -63,7 +49,8 @@ def fn_to_dict(fname):
     assert blocks[-1].strip() == '', "Last line not empty!"
     assert len(blocks[:-1]) == 82, "Not right number of blocks!"
     # there is a gap from A = 170 to A = 178 for Z = 50
-    
+
+    z_fn = z_from_fname(fname)
     ond = OrderedDict() # ordered_nested_dict
     ond[z_fn] =  OrderedDict()
     
@@ -110,6 +97,9 @@ def dict_to_fn(ordered_nested_dict, fname):
                     f.write('{:9.3f}   {:.3E}\n'.format(U, fE1))
                 f.write(' \n')
 
+    logger.info('Wrote %s' % fname)
+    
+
 
 def df_to_dict(df):
     if isinstance(df.index, pd.MultiIndex):
@@ -136,7 +126,7 @@ def dict_to_df(ordered_nested_dict):
 
 
 def atomic_mass_numbers(talys):
-    if not isinstance(talys_df, pd.MultiIndex):
+    if not isinstance(talys, pd.MultiIndex):
         df = talys.T.copy()
     else:
         df = talys.copy()
@@ -155,21 +145,14 @@ def replace_table(Z, A, talys, lorvec):
     else:
         df2 = lorvec.copy()
     df1.loc[(Z, A, ['U', 'fE1']), :] = df2.loc[(Z, A, ['U', 'fE1']), :]
+    logger.info('Replaced loc[({}, {}, ["U", "fE1"]), :]'.format(Z, A))
+
     return df1.T if transpose else df1
 
-# %%
-lorvec_df = lorvec_to_df('ftes_lorvec.out', Z=50, A=146)
 
-talys_dict = fn_to_dict('z050')
-talys_df = dict_to_df(talys_dict)
+def main():
+    logging.basicConfig(level=logging.INFO)
 
-mass_numbers = atomic_mass_numbers(talys_df)
-print(f"min(A) = {mass_numbers.min()}, max(A) = {mass_numbers.max()}")
 
-talys_df_new = replace_table(Z=50, A=146, talys=talys_df, lorvec=lorvec_df)
-
-new_talys_dict = df_to_dict(talys_df_new)
-dict_to_fn(new_talys_dict, 'newz050')
-
-# %%
-! diff z050 newz050
+if __name__ == '__main__':
+    main()

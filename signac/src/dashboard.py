@@ -26,7 +26,7 @@ if __name__ == '__main__':
         ImageViewer(name='Transition strength distribution', img_globs=['*.png']),
         StatepointList(enabled=True),
         DocumentList(max_chars=140),
-        FileList(enabled=False),
+        FileList(enabled=True),
         Notes(enabled=False),
         dt.DipoleTransitions(name='Dipole Transitions', enabled=True),
         ],

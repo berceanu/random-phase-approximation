@@ -22,6 +22,7 @@ import logging
 logger = logging.getLogger(__name__)
 import mypackage.code_api as code_api
 import mypackage.util as util
+import mypackage.talys_api as talys
 
 # @with_job
 logfname = 'rpa-project.log'
@@ -314,6 +315,69 @@ def dipole_trans_zero(job):
 @Project.post.isfile('dipole_transitions.txt')
 def dipole_trans_finite(job):
     _extract_transitions(job, temp='finite', code_mapping=code)
+
+
+#################################
+# GENERATE INPUT FOR TALYS CODE #
+#################################
+
+def z_fn(job):
+    return 'z{:03d}'.format(job.sp.proton_number)
+
+def talys_template_file(job, top_level_dir='src/templates', fname=None):
+    if not fname:
+        fname = z_fn(job)
+    full_path = os.path.join(top_level_dir, fname)
+    return full_path
+
+
+def _generate_talys_input(job, temp, code_mapping=code_api.NameMapping()):
+    job_mass_number = job.sp.proton_number + job.sp.neutron_number
+    fn = job.fn(code_mapping.out_file(temp=temp, 
+                            skalvec='isovector', lorexc='lorentzian'))
+
+    # @TODO multiply by constant to convert e^2*fm^2 to barn
+    lorvec_df = talys.lorvec_to_df(fname=fn, 
+                        Z=job.sp.proton_number, A=job_mass_number)
+
+    talys_dict = talys.fn_to_dict(fname=talys_template_file(job))
+    talys_df = talys.dict_to_df(talys_dict)
+
+    mass_numbers = talys.atomic_mass_numbers(talys_df)
+    logger.info("{} contains atomic mass numbers from A={} to A={}.".format(
+        talys_template_file(job),
+        mass_numbers.min(), mass_numbers.max()))
+
+
+    if job_mass_number in mass_numbers:
+        talys_df_new = talys.replace_table(Z=job.sp.proton_number,
+                                           A=job_mass_number,
+                                talys=talys_df, lorvec=lorvec_df)
+        new_talys_dict = talys.df_to_dict(talys_df_new)
+        talys.dict_to_fn(new_talys_dict, fname=job.fn(z_fn(job)))
+        job.doc['talys_input'] = z_fn(job)
+    else:
+        logger.warning("(Z,A)=({},{}) not found in {}!".format(
+            job.sp.proton_number, job_mass_number,
+            talys_template_file(job)))
+
+
+@Project.operation
+@Project.pre(lambda job: os.path.isfile(talys_template_file(job)))
+@Project.pre.isfile(code.out_file(temp='zero', 
+                            skalvec='isovector', lorexc='lorentzian'))
+@Project.post(lambda job: job.isfile(z_fn(job)))
+def generate_talys_input_zero(job):
+    _generate_talys_input(job, temp='zero', code_mapping=code)
+
+@Project.operation
+@Project.pre(lambda job: os.path.isfile(talys_template_file(job)))
+@Project.pre.isfile(code.out_file(temp='finite', 
+                            skalvec='isovector', lorexc='lorentzian'))
+@Project.post(lambda job: job.isfile(z_fn(job)))
+def generate_talys_input_finite(job):
+    _generate_talys_input(job, temp='finite', code_mapping=code)
+
 
 
 if __name__ == '__main__':
