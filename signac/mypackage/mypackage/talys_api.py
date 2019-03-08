@@ -23,6 +23,7 @@ def z_from_fname(fname):
 
 α = 7.297352570e-03 # fine structure constant
 u_factor = 10 * 16 * math.pi**3 * α / 9 # 4.022 mb / (e^2 * fm^2)
+# see src/temp/sum_rule.ipynb
 
 def lorvec_to_df(fname, Z, A,
                  unit_factor=u_factor, # mb / (e^2 * fm^2)
