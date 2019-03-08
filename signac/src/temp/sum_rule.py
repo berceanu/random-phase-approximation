@@ -31,6 +31,9 @@ selection = rpa.find_jobs({'proton_number': 50, 'neutron_number': 82,
                            'temperature': 0.})
 
 # %%
+50 + 82
+
+# %%
 myjob = next(selection)
 
 # %%
@@ -109,7 +112,7 @@ print(f'Excitation isovector sum rule: {excvec_sum:.3f} mb.')
 print(f'Experimentally measured value is 2330 ± 590 mb.') 
 
 # %%
-lorvec_df.tail()
+lorvec_df.head(20)
 
 # %%
 excvec_df.tail()
