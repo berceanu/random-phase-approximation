@@ -3,6 +3,7 @@
 import pandas as pd
 import re
 import os
+import math
 from collections import OrderedDict
 import logging
 logger = logging.getLogger(__name__)
@@ -20,12 +21,18 @@ def z_from_fname(fname):
     Z = int(''.join(filter(lambda c: not c.isalpha(), fn)))
     return Z
 
+α = 7.297352570e-03 # fine structure constant
+u_factor = 10 * 16 * math.pi**3 * α / 9 # 4.022 mb / (e^2 * fm^2)
 
-def lorvec_to_df(fname, Z, A):
-    # @TODO multiply by constant to convert e^2fm^2 to barn
-    df_lorvec = pd.read_csv(fname, delim_whitespace=True, comment='#', skip_blank_lines=True,
-                header=None, names=['U', 'fE1'])
+def lorvec_to_df(fname, Z, A,
+                 unit_factor=u_factor, # mb / (e^2 * fm^2)
+                ):
+    df_lorvec = pd.read_csv(fname, delim_whitespace=True, comment='#',
+                    skip_blank_lines=True, header=None, names=['U', 'fE1'])
     logger.info('Read %s' % fname)
+
+    # multiply by constant to convert e^2*fm^2 to mb
+    df_lorvec['fE1'] = df_lorvec['fE1'].apply(lambda row: row * unit_factor) # mb/MeV
 
     df_lorvec = df_lorvec[(df_lorvec.U >= 0.1) & (df_lorvec.U <= 30)] # MeV
 

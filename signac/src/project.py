@@ -336,7 +336,6 @@ def _generate_talys_input(job, temp, code_mapping=code_api.NameMapping()):
     fn = job.fn(code_mapping.out_file(temp=temp, 
                             skalvec='isovector', lorexc='lorentzian'))
 
-    # @TODO multiply by constant to convert e^2*fm^2 to barn
     lorvec_df = talys.lorvec_to_df(fname=fn, 
                         Z=job.sp.proton_number, A=job_mass_number)
 
