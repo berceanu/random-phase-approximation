@@ -107,9 +107,9 @@ def sum_rule(fname,
 # %%
 lorvec_df, lorvec_sum = sum_rule(lorvec_fn)
 excvec_df, excvec_sum = sum_rule(excvec_fn)
-print(f'Lorentzian isovector sum rule: {lorvec_sum:.3f} mb.')
-print(f'Excitation isovector sum rule: {excvec_sum:.3f} mb.')
-print(f'Experimentally measured value is 2330 ± 590 mb.') 
+print(f'Lorentzian isovector sum rule: {lorvec_sum:.3f} mb⋅MeV.')
+print(f'Excitation isovector sum rule: {excvec_sum:.3f} mb⋅MeV.')
+print(f'Experimentally measured value is 2330 ± 590 mb⋅MeV.') 
 
 # %%
 lorvec_df.head(20)
