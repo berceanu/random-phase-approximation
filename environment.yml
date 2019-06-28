@@ -14,15 +14,9 @@ dependencies:
   - matplotlib=3.1*
   - ipympl  # interactive plotting in jupyterlab
   # jupyter tools and extensions
-  - jupyterhub
-  - jupyter_cms
   - jupyterlab
   - jupytext
   - line_profiler
-  - nbdime
-  - nbstripout
-  - nb_conda
-  - mistune
   # other
   - unyt=2.2*
   - signac=1.1*
