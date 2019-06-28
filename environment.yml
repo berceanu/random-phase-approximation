@@ -1,0 +1,37 @@
+# conda env create -f environment.yml
+name: random-phase-approximation
+
+channels:
+- conda-forge
+
+dependencies:
+  # general numerics (version controlled)
+  - python=3.7*
+  - numpy=1.16*
+  - scipy=1.2*
+  - cython=0.29*
+  # plotting and serialization
+  - matplotlib=3.1*
+  - ipympl  # interactive plotting in jupyterlab
+  # jupyter tools and extensions
+  - jupyterhub
+  - jupyter_cms
+  - jupyterlab
+  - jupytext
+  - line_profiler
+  - nbdime
+  - nbstripout
+  - nb_conda
+  - mistune
+  # other
+  - unyt=2.2*
+  - signac=1.1*
+  - signac-dashboard=0.2*
+  - signac-flow=0.7*
+  - jinja2=2.10*
+  - ffmpeg=4.1*
+  - git
+  - pandas
+  - pandoc
+  - pytest-flakes
+  - sympy
