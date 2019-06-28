@@ -11,7 +11,7 @@ import mypackage.code_api as code_api
 import mypackage.util as util
 
 def main():
-    project = signac.init_project('rpa')
+    project = signac.init_project('rpa', workspace='debug_workspace')
 
     statepoint = dict(
         # atomic number Z

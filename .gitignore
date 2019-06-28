@@ -185,5 +185,5 @@ skys
 dish
 out/
 .idea/
-workspace/
+debug_workspace/
 *.png
