@@ -142,6 +142,7 @@ venv.bak/
 workspace/
 *.code-workspace
 .vscode/
+signac.rc
 signac_statepoints.json
 signac_project_document.json
 .signac_sp_cache.json.gz
@@ -186,4 +187,5 @@ dish
 out/
 .idea/
 workspace/
+debug_workspace/
 *.png
