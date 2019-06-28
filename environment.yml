@@ -9,7 +9,6 @@ dependencies:
   - python=3.7*
   - numpy=1.16*
   - scipy=1.2*
-  - cython=0.29*
   # plotting and serialization
   - matplotlib=3.1*
   - ipympl  # interactive plotting in jupyterlab
@@ -24,8 +23,6 @@ dependencies:
   - signac-flow=0.7*
   - jinja2=2.10*
   - ffmpeg=4.1*
-  - git
   - pandas
-  - pandoc
   - pytest-flakes
   - sympy
