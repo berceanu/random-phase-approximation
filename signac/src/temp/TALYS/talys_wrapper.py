@@ -6,6 +6,11 @@ import logging
 import subprocess
 
 import numpy as np
+from jinja2 import Environment, FileSystemLoader
+
+# pass folder containing the templates
+file_loader = FileSystemLoader("src/templates")
+env = Environment(loader=file_loader)
 
 logger = logging.getLogger(__name__)
 logfile = "wrapper.log"
@@ -37,8 +42,10 @@ def ffmpeg_command(
 
 
 def main():
+    contents = env.get_template(f"{t}_{s}.dat").render(param=self._param)
+
     v = np.asarray([1, 2, 3])
-    print(v)
+    print(v, contents)
 
 
 if __name__ == "__main__":
