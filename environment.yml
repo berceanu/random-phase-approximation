@@ -35,3 +35,9 @@ dependencies:
   - pandoc
   - pytest-flakes
   - sympy
+  # dev tools
+  - black
+  - pip
+  - setuptools
+  - wheel
+
