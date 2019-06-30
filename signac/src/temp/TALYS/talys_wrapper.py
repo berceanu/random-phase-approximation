@@ -10,7 +10,10 @@ import subprocess
 from dataclasses import dataclass
 
 import numpy as np
+import pandas as pd
 from jinja2 import Environment, FileSystemLoader
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
 from numpy.testing import assert_allclose
 
 # pass folder containing the template
@@ -64,7 +67,7 @@ def talys_command(
 
 def main():
     # generate TALYS input file
-    sn = NuclearElement("sn", 145)
+    sn = NuclearElement("Sn", 145)
     input_contents = env.get_template("input.j2").render(element=sn, astro="n")
     input_fname = "input.txt"
 
@@ -100,6 +103,50 @@ def main():
     # run TALYS
     command = talys_command(input_file=input_fname, output_file="output.txt")
     sh(command, shell=True, cwd=p)
+
+    # plot result
+    cross_section = pd.read_csv(
+        p / "xs000000.tot",
+        sep=r"\s+",
+        header=None,
+        comment="#",
+        names=[
+            "energy",
+            "xs",
+            "gamma_xs",
+            "xs_over_res_prod_xs",
+            "direct",
+            "preequilibrium",
+            "compound",
+        ],
+    )
+
+    fig = Figure(figsize=(6.4, 6.4))
+    canvas = FigureCanvas(fig)
+    ax = fig.add_subplot(111)
+
+    ax.loglog(
+        cross_section["energy"],
+        cross_section["compound"],
+        color="black",
+        label="HFB+QRPA",
+    )
+
+    ax.set(
+        xlim=[1e-3, 10.0],
+        ylim=[1e-4, 10.0],
+        ylabel=r"Cross-Section [mb]",
+        xlabel=r"$E_n$ [MeV]",
+    )
+    ax.text(
+        0.7,
+        0.95,
+        r"${}^{%d}$%s(n,$\gamma$)${}^{%d}$%s" % (sn.mass, sn.name, sn.mass + 1, sn.name),
+        transform=ax.transAxes,
+        color="black",
+    )
+    ax.legend(loc="lower left")
+    canvas.print_png(p / "hfb_qrpa.png")
 
 
 if __name__ == "__main__":
