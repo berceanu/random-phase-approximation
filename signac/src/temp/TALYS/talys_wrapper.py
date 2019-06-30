@@ -48,15 +48,18 @@ def sh(*cmd, **kwargs):
 
 
 def talys_command(
-        input_file: str = "input", output_file: str = "output", wd=pathlib.Path.cwd()
+        talys_bin=pathlib.PosixPath("~/bin/talys").expanduser(),
+        input_file: str = "input",
+        output_file: str = "output",
 ) -> str:
     """Construct the TALYS command to be ran.
 
+    :param talys_bin: absolute path to the TALYS binary
     :param input_file: input file name
     :param output_file: output file name
     :return: TALYS command
     """
-    return rf"talys < {input_file} > {output_file}"
+    return rf"{talys_bin} < {input_file} > {output_file}"
 
 
 def main():
@@ -91,14 +94,12 @@ def main():
     logger.info("Wrote %s" % filepath)
 
     filepath = p / energy_fname
-    np.savetxt(filepath, my_v, fmt='%.3f', newline=os.linesep)
+    np.savetxt(filepath, my_v, fmt="%.3f", newline=os.linesep)
     logger.info("Wrote %s" % filepath)
 
     # run TALYS
-    command = talys_command(input_fname, "output.txt", wd=p)
-    # sh(command, shell=True, cwd=p)
-
-    # np.set_printoptions(suppress=True)
+    command = talys_command(input_file=input_fname, output_file="output.txt")
+    sh(command, shell=True, cwd=p)
 
 
 if __name__ == "__main__":
