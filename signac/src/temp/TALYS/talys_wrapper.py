@@ -4,11 +4,14 @@
 
 import hashlib
 import logging
+import os
+import pathlib
 import subprocess
 from dataclasses import dataclass
-import pathlib
 
+import numpy as np
 from jinja2 import Environment, FileSystemLoader
+from numpy.testing import assert_allclose
 
 # pass folder containing the template
 file_loader = FileSystemLoader(".")
@@ -22,7 +25,7 @@ def hash_string(string):
     """
     Return a SHA-256 hash of the given string
     """
-    return hashlib.sha256(string.encode('utf-8')).hexdigest()
+    return hashlib.sha256(string.encode("utf-8")).hexdigest()
 
 
 @dataclass
@@ -44,7 +47,9 @@ def sh(*cmd, **kwargs):
     return stdout
 
 
-def talys_command(input_file: str = "input", output_file: str = "output", wd=pathlib.Path.cwd()) -> str:
+def talys_command(
+        input_file: str = "input", output_file: str = "output", wd=pathlib.Path.cwd()
+) -> str:
     """Construct the TALYS command to be ran.
 
     :param input_file: input file name
@@ -60,20 +65,41 @@ def main():
     input_contents = env.get_template("input.j2").render(element=sn, astro="n")
     input_fname = "input.txt"
 
-    # write input file to job folder
+    # generate energy input file
+    v1 = np.linspace(0.001, 0.01, 10)
+    v2 = np.linspace(0.015, 0.03, 4)
+    v3 = np.linspace(0.04, 0.2, 17)
+    v4 = np.linspace(0.22, 0.3, 5)
+    v5 = np.linspace(0.35, 0.4, 2)
+    v6 = np.linspace(0.5, 30.0, 296)
+
+    my_v = np.empty(334, dtype=np.float64)
+    np.concatenate((v1, v2, v3, v4, v5, v6), out=my_v)
+
+    energy_fname = "energy.in"
+    v_ref = np.loadtxt(pathlib.Path.cwd() / energy_fname)
+    assert_allclose(my_v, v_ref)
+
+    # write files to job folder
     dir_name: str = hash_string(input_contents)
     p = pathlib.Path.cwd() / dir_name
-    p.mkdir()
+    p.mkdir(exist_ok=True)
+
     filepath = p / input_fname
     with filepath.open("w", encoding="utf-8") as f:
         f.write(input_contents)
-    logger.info("Wrote %s" % input_fname)
+    logger.info("Wrote %s" % filepath)
+
+    filepath = p / energy_fname
+    np.savetxt(filepath, my_v, fmt='%.3f', newline=os.linesep)
+    logger.info("Wrote %s" % filepath)
 
     # run TALYS
     command = talys_command(input_fname, "output.txt", wd=p)
     # sh(command, shell=True, cwd=p)
 
-# todo generate energy.in from np.linspace/logspace
+    # np.set_printoptions(suppress=True)
+
 
 if __name__ == "__main__":
     logging.basicConfig(
