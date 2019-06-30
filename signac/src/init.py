@@ -14,15 +14,15 @@ def main():
 
     statepoint = dict(
         # atomic number Z
-        proton_number=50,  # fixed atomic number
+        proton_number=50,
         # neutron number N
-        neutron_number=90,
+        neutron_number=96,
         # nucleus angular momentum
         angular_momentum=1,  #
         # nucleus parity
         parity="-",  #
         # system temperature in MeV
-        temperature=0.0,
+        temperature=2.0,
         # transition energy in MeV
         transition_energy=0.42,  # 0.42 is random
     )
@@ -38,3 +38,5 @@ def main():
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     main()
+
+#
