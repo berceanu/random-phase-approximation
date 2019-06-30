@@ -2,9 +2,11 @@
 # -*- coding: utf-8 -*-
 """Simple wrapper for calling TALYS code."""
 
+import hashlib
 import logging
 import subprocess
 from dataclasses import dataclass
+import pathlib
 
 from jinja2 import Environment, FileSystemLoader
 
@@ -14,6 +16,13 @@ env = Environment(loader=file_loader)
 
 logger = logging.getLogger(__name__)
 logfile = "wrapper.log"
+
+
+def hash_string(string):
+    """
+    Return a SHA-256 hash of the given string
+    """
+    return hashlib.sha256(string.encode('utf-8')).hexdigest()
 
 
 @dataclass
@@ -35,28 +44,36 @@ def sh(*cmd, **kwargs):
     return stdout
 
 
-def ffmpeg_command(
-        framerate=4.0,  # fps
-        resolution="1920x1080",  # width x height
-        input_files="pic%04d.png",  # pic0001.png, pic0002.png, ...
-        output_file="test.mp4",
-):
-    return (
-        rf"ffmpeg -r {framerate} -f image2 -s {resolution} -i {input_files} "
-        rf"-vcodec libx264 -crf 25  -pix_fmt yuv420p -y {output_file}"
-    )
+def talys_command(input_file: str = "input", output_file: str = "output", wd=pathlib.Path.cwd()) -> str:
+    """Construct the TALYS command to be ran.
+
+    :param input_file: input file name
+    :param output_file: output file name
+    :return: TALYS command
+    """
+    return rf"talys < {input_file} > {output_file}"
 
 
 def main():
+    # generate TALYS input file
     sn = NuclearElement("sn", 145)
-
     input_contents = env.get_template("input.j2").render(element=sn, astro="n")
+    input_fname = "input.txt"
 
-    with open('input', 'w') as f:
+    # write input file to job folder
+    dir_name: str = hash_string(input_contents)
+    p = pathlib.Path.cwd() / dir_name
+    p.mkdir()
+    filepath = p / input_fname
+    with filepath.open("w", encoding="utf-8") as f:
         f.write(input_contents)
+    logger.info("Wrote %s" % input_fname)
 
-    logger.info('Wrote %s' % 'input')
+    # run TALYS
+    command = talys_command(input_fname, "output.txt", wd=p)
+    # sh(command, shell=True, cwd=p)
 
+# todo generate energy.in from np.linspace/logspace
 
 if __name__ == "__main__":
     logging.basicConfig(
