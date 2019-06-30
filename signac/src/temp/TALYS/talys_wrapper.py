@@ -4,16 +4,22 @@
 
 import logging
 import subprocess
+from dataclasses import dataclass
 
-import numpy as np
 from jinja2 import Environment, FileSystemLoader
 
-# pass folder containing the templates
-file_loader = FileSystemLoader("src/templates")
+# pass folder containing the template
+file_loader = FileSystemLoader(".")
 env = Environment(loader=file_loader)
 
 logger = logging.getLogger(__name__)
 logfile = "wrapper.log"
+
+
+@dataclass
+class NuclearElement:
+    name: str
+    mass: int
 
 
 def sh(*cmd, **kwargs):
@@ -22,18 +28,18 @@ def sh(*cmd, **kwargs):
         subprocess.Popen(
             cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, **kwargs
         )
-        .communicate()[0]
-        .decode("utf-8")
+            .communicate()[0]
+            .decode("utf-8")
     )
     logger.info(stdout)
     return stdout
 
 
 def ffmpeg_command(
-    framerate=4.0,  # fps
-    resolution="1920x1080",  # width x height
-    input_files="pic%04d.png",  # pic0001.png, pic0002.png, ...
-    output_file="test.mp4",
+        framerate=4.0,  # fps
+        resolution="1920x1080",  # width x height
+        input_files="pic%04d.png",  # pic0001.png, pic0002.png, ...
+        output_file="test.mp4",
 ):
     return (
         rf"ffmpeg -r {framerate} -f image2 -s {resolution} -i {input_files} "
@@ -42,10 +48,14 @@ def ffmpeg_command(
 
 
 def main():
-    contents = env.get_template(f"{t}_{s}.dat").render(param=self._param)
+    sn = NuclearElement("sn", 145)
 
-    v = np.asarray([1, 2, 3])
-    print(v, contents)
+    input_contents = env.get_template("input.j2").render(element=sn, astro="n")
+
+    with open('input', 'w') as f:
+        f.write(input_contents)
+
+    logger.info('Wrote %s' % 'input')
 
 
 if __name__ == "__main__":
@@ -55,6 +65,5 @@ if __name__ == "__main__":
         level=logging.INFO,
         datefmt="%Y-%m-%d %H:%M:%S",
     )
-    logger.info("==RUN STARTED==")
 
     main()
