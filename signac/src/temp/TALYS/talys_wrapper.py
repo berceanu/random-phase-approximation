@@ -141,7 +141,8 @@ def main():
     ax.text(
         0.7,
         0.95,
-        r"${}^{%d}$%s(n,$\gamma$)${}^{%d}$%s" % (sn.mass, sn.name, sn.mass + 1, sn.name),
+        r"${}^{%d}$%s(n,$\gamma$)${}^{%d}$%s"
+        % (sn.mass, sn.name, sn.mass + 1, sn.name),
         transform=ax.transAxes,
         color="black",
     )

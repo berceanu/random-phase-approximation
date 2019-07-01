@@ -8,17 +8,18 @@ line with
 
 See also: $ python src/project.py --help
 """
-from flow import FlowProject, cmd, with_job
-from signac import get_project
+import logging
 import os
-import shutil
 import random
+import shutil
+
 import numpy as np
 import pandas as pd
-from matplotlib.figure import Figure
+from flow import FlowProject, cmd, with_job
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
 from matplotlib.gridspec import GridSpec
-import logging
+from signac import get_project
 
 logger = logging.getLogger(__name__)
 import mypackage.code_api as code_api
@@ -272,7 +273,7 @@ def run_finite_temp_excited_state(job):
 
 def _plot_iso(job, temp, code_mapping=code_api.NameMapping()):
     def _out_file_plot(
-        job, ax, temp, skalvec, lorexc, code_mapping=code_api.NameMapping()
+            job, ax, temp, skalvec, lorexc, code_mapping=code_api.NameMapping()
     ):
 
         fn = job.fn(code_mapping.out_file(temp, skalvec, lorexc))
@@ -400,6 +401,7 @@ def dipole_trans_finite(job):
 # GENERATE INPUT FOR TALYS CODE #
 #################################
 
+
 @dataclass
 class TalysData:
     input_fname: str = "talys_input.txt"
@@ -421,7 +423,9 @@ class TalysData:
         v5 = np.linspace(0.35, 0.4, 2)
         v6 = np.linspace(0.5, 30.0, 296)
 
-        my_v = np.empty(v1.size + v2.size + v3.size + v4.size + v5.size + v6.size, dtype=np.float64)
+        my_v = np.empty(
+            v1.size + v2.size + v3.size + v4.size + v5.size + v6.size, dtype=np.float64
+        )
         np.concatenate((v1, v2, v3, v4, v5, v6), out=my_v)
 
         return my_v
@@ -507,13 +511,14 @@ def talys_input_file(job):
     """Generate TALYS input file."""
     element, mass = util.split_element_mass(job)
     # we hit the element with N - 1 with 1 neutron
-    input_contents = env.get_template(talys_data.input_template).render(element=element, mass=mass - 1, energy_fname=talys_data.energy_fname, astro="n")
+    input_contents = env.get_template(talys_data.input_template).render(
+        element=element, mass=mass - 1, energy_fname=talys_data.energy_fname, astro="n"
+    )
 
-    filepath=pathlib.Path(job.fn(talys_data.input_fname))
+    filepath = pathlib.Path(job.fn(talys_data.input_fname))
     with filepath.open("w", encoding="utf-8") as f:
         f.write(input_contents)
     logger.info("Wrote %s" % filepath)
-
 
 
 @Project.operation
@@ -547,25 +552,16 @@ def run_talys(job):
 
     run_command = f"{talys_bin} < {input_fn} > {output_fn} 2> {stderr_fn}"
 
-    command = f"echo \"{run_command}\" >> {logfname} && {run_command}"
+    command = f'echo "{run_command}" >> {logfname} && {run_command}'
 
     return command
+
 
 # todo restore backuped file
 
 
 # todo plot result
 # todo lock file via https://pypi.org/project/filelock/
-
-
-
-
-
-
-
-
-
-
 
 
 if __name__ == "__main__":
