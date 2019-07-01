@@ -12,6 +12,7 @@ import logging
 import os
 import random
 import shutil
+import filecmp
 
 import numpy as np
 import pandas as pd
@@ -410,6 +411,8 @@ class TalysData:
     output_fname: str = "talys_output.txt"
     talys_bin = pathlib.PosixPath("~/bin/talys").expanduser()
     stderr_fname: str = "talys_stderr.txt"
+    cross_section_fname: str = "xs000000.tot"
+    cross_section_png: str = "hfb_qrpa.png"
 
     # todo create separate {job}/talys/ folder instead of prefixing all the filenames
 
@@ -432,6 +435,9 @@ class TalysData:
 
     def run_command(self) -> str:
         """Construct the TALYS command to be ran."""
+        assert self.talys_bin.is_file(), f"{self.talys_bin} not found!"
+
+        return f"{self.talys_bin} < {self.input_fname} > {self.output_fname} 2> {self.stderr_fname}"
 
 
 talys_data = TalysData()
@@ -525,43 +531,124 @@ def talys_input_file(job):
 @Project.post.isfile(talys_data.energy_fname)
 def talys_energy_file(job):
     """Generate TALYS energy input file."""
-    filepath = pathlib.Path(job.fn(talys_data.energy_fname))
+    file_path = pathlib.Path(job.fn(talys_data.energy_fname))
     energies = talys_data.energy_values()
-    np.savetxt(filepath, energies, fmt="%.3f", newline=os.linesep)
-    logger.info("Wrote %s" % filepath)
+    np.savetxt(file_path, energies, fmt="%.3f", newline=os.linesep)
+    logger.info("Wrote %s" % file_path)
+
+
+def get_element_path(job):
+    hfb_path = pathlib.PosixPath("~/src/talys/structure/gamma/hfb/").expanduser()
+
+    element, _ = util.split_element_mass(job)
+    element_path = hfb_path / f"{element}.psf"
+
+    assert element_path.is_file(), f"{element_path} not found!"
+
+    return element_path
+
+
+def get_backup_path(job):
+    p = get_element_path(job)
+    return p.parent / (p.stem + f"_{job}.bck")
+
+
+def copy_file(source, destination):
+    assert source.is_file(), f"{source} not found!"
+
+    with destination.open(mode='xb') as fid:
+        fid.write(source.read_bytes())
+
+
+@Project.operation
+@Project.pre.after(talys_input_file)
+@Project.pre.after(talys_energy_file)
+@Project.post(lambda job: job.isfile(get_backup_path(job)))
+def backup_element(job):
+    """run TALYS"""
+    copy_file(source=get_element_path(job), destination=get_backup_path(job))
+
+
+@Project.operation
+@Project.pre(lambda job: job.isfile(z_fn(job)))
+@Project.pre.after(backup_element)
+@Project.post(lambda job: filecmp.cmp(get_element_path(job), pathlib.Path(job.fn(z_fn(job)))))
+def replace_talys_file(job):
+    copy_file(source=pathlib.Path(job.fn(z_fn(job))), destination=get_element_path(job))
 
 
 @Project.operation
 @with_job
 @cmd
-@Project.pre.after(talys_input_file)
-@Project.pre.after(talys_energy_file)
-@Project.post.isfile(talys_data.output_fname)  # todo add to TalysData
+@Project.pre.after(replace_talys_file)
+@Project.post(arefiles((talys_data.output_fname, talys_data.cross_section_fname)))
 def run_talys(job):
     """run TALYS"""
-    # todo back up ~/src/talys/structure/gamma/hfb/Sn.psf
-    # pathlib.PosixPath("~/src/talys/structure/gamma/hfb/Sn.psf").expanduser().is_file()
-    # pathlib.PosixPath(f"~/src/talys/structure/gamma/hfb/Sn_{job}.bck").expanduser().is_file()
-    # todo cp z050 ~/src/talys/structure/gamma/hfb/Sn.psf
+    command: str = talys_data.run_command()
 
-    stderr_fn = talys_data.stderr_fname
-    input_fn = talys_data.input_fname
-    output_fn = talys_data.output_fname
-    talys_bin = talys_data.talys_bin
-    assert talys_bin.is_file(), f"{talys_bin} not found!"
-
-    run_command = f"{talys_bin} < {input_fn} > {output_fn} 2> {stderr_fn}"
-
-    command = f'echo "{run_command}" >> {logfname} && {run_command}'
-
-    return command
+    return f"echo {command} >> {logfname} && {command}"
 
 
 # todo restore backuped file
+@Project.operation
+@Project.pre.after(run_talys)
+@Project.post(??)
+def restore_backup(job):
+    copy_file(source=, destination=)
 
 
-# todo plot result
-# todo lock file via https://pypi.org/project/filelock/
+# todo lock file via https://pypi.org/project/filelock
+
+
+@Project.operation
+@Project.pre.after(run_talys)
+@Project.post.isfile(talys_data.cross_section_png)
+def plot_cross_section(job):
+    """Plot the TALYS output to get cross-section."""
+    cross_section = pd.read_csv(
+        job.fn(talys_data.cross_section_fname),
+        sep=r"\s+",
+        header=None,
+        comment="#",
+        names=[
+            "energy",
+            "xs",
+            "gamma_xs",
+            "xs_over_res_prod_xs",
+            "direct",
+            "preequilibrium",
+            "compound",
+        ],
+    )
+
+    fig = Figure(figsize=(6.4, 6.4))
+    canvas = FigureCanvas(fig)
+    ax = fig.add_subplot(111)
+
+    ax.loglog(
+        cross_section["energy"],
+        cross_section["compound"],
+        color="black",
+        label="HFB+QRPA",
+    )
+
+    ax.set(
+        xlim=[1e-3, 10.0],
+        ylim=[1e-4, 10.0],
+        ylabel=r"Cross-Section [mb]",
+        xlabel=r"$E_n$ [MeV]",
+    )
+    element, mass = util.split_element_mass(job)
+    ax.text(
+        0.7,
+        0.95,
+        r"${}^{%d}$%s(n,$\gamma$)${}^{%d}$%s"
+        % (mass, element, mass + 1, element),
+        transform=ax.transAxes,
+        color="black",
+    )
+    ax.legend(loc="lower left")
+    canvas.print_png(job.fn(talys_data.cross_section_png))
 
 
 if __name__ == "__main__":
