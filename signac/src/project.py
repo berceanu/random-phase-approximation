@@ -412,9 +412,9 @@ class TalysData:
     talys_bin = pathlib.PosixPath("~/bin/talys").expanduser()
     stderr_fname: str = "talys_stderr.txt"
     cross_section_fname: str = "xs000000.tot"
-    cross_section_png: str = "hfb_qrpa.png"
+    cross_section_png: str = "xsec.png"
 
-    # todo create separate {job}/talys/ folder instead of prefixing all the filenames
+    # todo create separate TALYS project, with its own init and copy each of the `z050`-type files there.
 
     @staticmethod
     def energy_values():
@@ -509,34 +509,6 @@ def generate_talys_input_finite(job):
 
 #############
 #############
-
-
-@Project.operation
-@Project.post.isfile(talys_data.input_fname)
-def talys_input_file(job):
-    """Generate TALYS input file."""
-    element, mass = util.split_element_mass(job)
-    # we hit the element with N - 1 with 1 neutron
-    input_contents = env.get_template(talys_data.input_template).render(
-        element=element, mass=mass - 1, energy_fname=talys_data.energy_fname, astro="n"
-    )
-
-    filepath = pathlib.Path(job.fn(talys_data.input_fname))
-    with filepath.open("w", encoding="utf-8") as f:
-        f.write(input_contents)
-    logger.info("Wrote %s" % filepath)
-
-
-@Project.operation
-@Project.post.isfile(talys_data.energy_fname)
-def talys_energy_file(job):
-    """Generate TALYS energy input file."""
-    file_path = pathlib.Path(job.fn(talys_data.energy_fname))
-    energies = talys_data.energy_values()
-    np.savetxt(file_path, energies, fmt="%.3f", newline=os.linesep)
-    logger.info("Wrote %s" % file_path)
-
-
 def get_element_path(job):
     hfb_path = pathlib.PosixPath("~/src/talys/structure/gamma/hfb/").expanduser()
 
@@ -553,17 +525,51 @@ def get_backup_path(job):
     return p.parent / (p.stem + f"_{job}.bck")
 
 
-def copy_file(source, destination):
+def copy_file(source, destination, exist_ok=False):
     assert source.is_file(), f"{source} not found!"
 
-    with destination.open(mode='xb') as fid:
+    mode = 'wb' if exist_ok else 'xb'
+    with destination.open(mode=mode) as fid:
         fid.write(source.read_bytes())
+
+    assert filecmp.cmp(source, destination), f"{source} and {destination} are not identical!"
+    logger.info("Copied %s to %s" % (source, destination))
+
+
+def write_contents_to(file_path, contents):
+    with file_path.open("w", encoding="utf-8") as f:
+        f.write(contents)
+    logger.info("Wrote %s" % file_path)
+
+
+@Project.operation
+@Project.post.isfile(talys_data.input_fname)
+def talys_input_file(job):
+    """Generate TALYS input file."""
+    element, mass = util.split_element_mass(job)
+    # we hit the element with N - 1 with 1 neutron
+    input_contents = env.get_template(talys_data.input_template).render(
+        element=element, mass=mass - 1, energy_fname=talys_data.energy_fname, astro="n"
+    )
+
+    filepath = pathlib.Path(job.fn(talys_data.input_fname))
+    write_contents_to(filepath, input_contents)
+
+
+@Project.operation
+@Project.post.isfile(talys_data.energy_fname)
+def talys_energy_file(job):
+    """Generate TALYS energy input file."""
+    file_path = pathlib.Path(job.fn(talys_data.energy_fname))
+    np.savetxt(file_path, talys_data.energy_values(), fmt="%.3f", newline=os.linesep)
+    logger.info("Wrote %s" % file_path)
 
 
 @Project.operation
 @Project.pre.after(talys_input_file)
 @Project.pre.after(talys_energy_file)
-@Project.post(lambda job: job.isfile(get_backup_path(job)))
+@Project.pre(lambda job: get_element_path(job).is_file())
+@Project.post(lambda job: get_backup_path(job).is_file())
 def backup_element(job):
     """run TALYS"""
     copy_file(source=get_element_path(job), destination=get_backup_path(job))
@@ -574,7 +580,7 @@ def backup_element(job):
 @Project.pre.after(backup_element)
 @Project.post(lambda job: filecmp.cmp(get_element_path(job), pathlib.Path(job.fn(z_fn(job)))))
 def replace_talys_file(job):
-    copy_file(source=pathlib.Path(job.fn(z_fn(job))), destination=get_element_path(job))
+    copy_file(source=pathlib.Path(job.fn(z_fn(job))), destination=get_element_path(job), exist_ok=True)
 
 
 @Project.operation
@@ -589,15 +595,12 @@ def run_talys(job):
     return f"echo {command} >> {logfname} && {command}"
 
 
-# todo restore backuped file
 @Project.operation
 @Project.pre.after(run_talys)
-@Project.post(??)
+@Project.post(lambda job: filecmp.cmp(get_element_path(job), get_backup_path(job)))
 def restore_backup(job):
-    copy_file(source=, destination=)
-
-
-# todo lock file via https://pypi.org/project/filelock
+    copy_file(source=get_backup_path(job), destination=get_element_path(job), exist_ok=True)
+    get_backup_path(job).unlink()  # delete backup file
 
 
 @Project.operation
@@ -629,12 +632,12 @@ def plot_cross_section(job):
         cross_section["energy"],
         cross_section["compound"],
         color="black",
-        label="HFB+QRPA",
+        label=f"T={job.sp.temperature}",
     )
 
     ax.set(
         xlim=[1e-3, 10.0],
-        ylim=[1e-4, 10.0],
+        ylim=[1e-4, 100.0],
         ylabel=r"Cross-Section [mb]",
         xlabel=r"$E_n$ [MeV]",
     )
@@ -643,12 +646,13 @@ def plot_cross_section(job):
         0.7,
         0.95,
         r"${}^{%d}$%s(n,$\gamma$)${}^{%d}$%s"
-        % (mass, element, mass + 1, element),
+        % (mass - 1, element, mass, element),
         transform=ax.transAxes,
         color="black",
     )
     ax.legend(loc="lower left")
     canvas.print_png(job.fn(talys_data.cross_section_png))
+    logger.info("Saved %s" % job.fn(talys_data.cross_section_png))
 
 
 if __name__ == "__main__":
