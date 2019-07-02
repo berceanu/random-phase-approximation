@@ -9,14 +9,15 @@ line with
 See also: $ python src/project.py --help
 """
 import logging
-import pathlib
-from dataclasses import dataclass
+import os
 
 import mypackage.util as util
 import pandas as pd
 from flow import FlowProject, cmd, with_job
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
+
+from .talys_utils import talys
 
 logger = logging.getLogger(__name__)
 logfname = "project.log"
@@ -32,64 +33,39 @@ def arefiles(file_names):
     return lambda job: all(job.isfile(fn) for fn in file_names)
 
 
+def areidentical(f1, f2):
+    """Return True if the two files are identical."""
+    from filecmp import cmp
+
+    return cmp(f1, f2)
+
+
 class Project(FlowProject):
     pass
 
 
-@dataclass
-class TalysData:
-    output_fname: str = "output.txt"
-    talys_bin = pathlib.PosixPath("~/bin/talys").expanduser()
-    stderr_fname: str = "stderr.txt"
-    cross_section_fname: str = "xs000000.tot"
-    cross_section_png: str = "xsec.png"
-
-    def run_command(self) -> str:
-        """Construct the TALYS command to be ran."""
-        assert self.talys_bin.is_file(), f"{self.talys_bin} not found!"
-
-        return f"{self.talys_bin} < {self.input_fname} > {self.output_fname} 2> {self.stderr_fname}"
-
-
-talys_data = TalysData()
-
-
-def get_element_path(job):
-    hfb_path = pathlib.PosixPath("~/src/talys/structure/gamma/hfb/").expanduser()
-
-    element, _ = util.split_element_mass(job)
-    element_path = hfb_path / f"{element}.psf"
-
-    assert element_path.is_file(), f"{element_path} not found!"
-
-    return element_path
-
-
-def get_backup_path(job):
-    p = get_element_path(job)
-    return p.parent / (p.stem + f"_{job}.bck")
-
-
 @Project.operation
-@Project.pre.after(talys_input_file)
-@Project.pre.after(talys_energy_file)
-@Project.pre(lambda job: get_element_path(job).is_file())
-@Project.post(lambda job: get_backup_path(job).is_file())
-def backup_element(job):
-    """backup TALYS database file"""
-    util.copy_file(source=get_element_path(job), destination=get_backup_path(job))
-
-
-@Project.operation
-@Project.pre(lambda job: job.isfile(z_fn(job)))
-@Project.pre.after(backup_element)
-@Project.post(
-    lambda job: filecmp.cmp(get_element_path(job), pathlib.Path(job.fn(z_fn(job))))
-)
-def replace_talys_file(job):
+@Project.pre(lambda job: os.path.isfile(job.doc["database_file"]))
+@Project.post(lambda job: os.path.isfile(job.doc["database_file_backup"]))
+def backup_database_file(job):
+    """Backup TALYS database file (eg Sn.psf to Sn_<job._id>.bck)"""
     util.copy_file(
-        source=pathlib.Path(job.fn(z_fn(job))),
-        destination=get_element_path(job),
+        source=job.doc["database_file"], destination=job.doc["database_file_backup"]
+    )
+
+
+@Project.operation
+@Project.pre(lambda job: job.isfile(job.doc["z_file"]))
+@Project.pre(lambda job: os.path.isfile(job.doc["database_file"]))
+@Project.pre.after(backup_database_file)
+@Project.post(
+    lambda job: areidentical(job.fn(job.doc["z_file"]), job.doc["database_file"])
+)
+def replace_database_file(job):
+    """Replace TALYS database file (eg Sn.psf) with the job's file (eg. z050)."""
+    util.copy_file(
+        source=job.fn(job.doc["z_file"]),
+        destination=job.doc["database_file"],
         exist_ok=True,
     )
 
@@ -97,32 +73,44 @@ def replace_talys_file(job):
 @Project.operation
 @with_job
 @cmd
-@Project.pre.after(replace_talys_file)
-@Project.post(arefiles((talys_data.output_fname, talys_data.cross_section_fname)))
+@Project.pre.after(replace_database_file)
+@Project.post(arefiles((talys.output_fn, talys.cross_section_fn)))
 def run_talys(job):
-    """run TALYS"""
-    command: str = talys_data.run_command()
+    """Run TALYS binary with the new database file."""
+    command: str = talys.run_command
 
     return f"echo {command} >> {logfname} && {command}"
 
 
 @Project.operation
 @Project.pre.after(run_talys)
-@Project.post(lambda job: filecmp.cmp(get_element_path(job), get_backup_path(job)))
-def restore_backup(job):
+@Project.post(
+    lambda job: areidentical(job.doc["database_file"], job.doc["database_file_backup"])
+)
+def restore_database_file(job):
+    """Restore original TALYS database file (eg Sn.psf)."""
     util.copy_file(
-        source=get_backup_path(job), destination=get_element_path(job), exist_ok=True
+        source=job.doc["database_file_backup"],
+        destination=job.doc["database_file"],
+        exist_ok=True,
     )
-    get_backup_path(job).unlink()  # delete backup file
 
 
 @Project.operation
-@Project.pre.after(run_talys)
-@Project.post.isfile(talys_data.cross_section_png)
+@Project.pre.after(restore_database_file)
+@Project.post(lambda job: not os.path.isfile(job.doc["database_file_backup"]))
+def remove_database_file_backup(job):
+    """Delete TALYS database file backup (eg. Sn_<job._id>.bck)."""
+    os.remove(job.doc["database_file_backup"])
+
+
+@Project.operation
+@Project.pre.after(remove_database_file_backup)
+@Project.post.isfile(talys.cross_section_png_fn)
 def plot_cross_section(job):
     """Plot the TALYS output to get cross-section."""
     cross_section = pd.read_csv(
-        job.fn(talys_data.cross_section_fname),
+        job.fn(talys.cross_section_fn),
         sep=r"\s+",
         header=None,
         comment="#",
@@ -163,8 +151,8 @@ def plot_cross_section(job):
         color="black",
     )
     ax.legend(loc="lower left")
-    canvas.print_png(job.fn(talys_data.cross_section_png))
-    logger.info("Saved %s" % job.fn(talys_data.cross_section_png))
+    canvas.print_png(job.fn(talys.cross_section_png_fn))
+    logger.info("Saved %s" % job.fn(talys.cross_section_png_fn))
 
 
 if __name__ == "__main__":

@@ -12,6 +12,9 @@ import mypackage.util as util
 import numpy as np
 import signac
 from jinja2 import Environment, FileSystemLoader
+from mypackage.talys_api import ConfigurationSyntaxError
+
+from .talys_utils import talys
 
 # pass folder containing the template
 file_loader = FileSystemLoader("src/templates")
@@ -22,33 +25,41 @@ logfname = "project.log"
 
 
 def energy_values():
-    """Generate energy input file contents."""
+    """Generate TALYS energy input file contents."""
     my_v, step = np.linspace(0.1, 30.0, 300, retstep=True)
     assert math.isclose(step, 0.1), f"step {step} is not 0.1!"
 
     return my_v.round(1)
 
 
-def talys_input_file(job):
+def input_file(job):
     """Generate TALYS input file."""
     element, mass = util.split_element_mass(job)
     # we hit the element with N - 1 with 1 neutron
-    input_contents = env.get_template("input.j2").render(
-        element=element, mass=mass - 1, energy_fname="energy.in", astro=job.sp.astro
+    input_contents = env.get_template(talys.input_template_fn).render(
+        element=element, mass=mass - 1, energy_fname=talys.energy_fn, astro=job.sp.astro
     )
-    file_path = pathlib.Path(job.fn("input.txt"))
-    util.write_contents_to(file_path, input_contents)
+    util.write_contents_to(job.fn(talys.input_fn), input_contents)
 
 
-def talys_energy_file(job):
+def energy_file(job):
     """Generate TALYS energy input file."""
-    file_path = pathlib.Path(job.fn("energy.in"))
+    file_path = pathlib.Path(job.fn(talys.energy_fn))
     np.savetxt(file_path, job.sp.projectile_energy, fmt="%.3f", newline=os.linesep)
     logger.info("Wrote %s" % file_path)
 
 
+def database_file_path(job):
+    """Return path to job's nucleus data file in TALYS database."""
+    element, _ = util.split_element_mass(job)
+    database_file = talys.hfb_path / f"{element}.psf"
+
+    assert database_file.is_file(), f"{database_file} not found!"
+    return database_file
+
+
 def main():
-    talys = signac.init_project("talys", workspace="workspace")
+    talys_proj = signac.init_project("talys", workspace="workspace")
 
     statepoint = dict(
         # atomic number Z
@@ -70,21 +81,34 @@ def main():
     )
     extra_keys = ("astro", "projectile_energy")
 
-    talys.open_job(statepoint).init()
-    rpa = signac.get_project(root="../")
-    logger.info("rpa project: %s" % rpa.root_directory())
-    logger.info("talys project: %s" % talys.root_directory())
+    talys_proj.open_job(statepoint).init()
+    rpa_proj = signac.get_project(root="../")
+    logger.info("rpa project: %s" % rpa_proj.root_directory())
+    logger.info("talys project: %s" % talys_proj.root_directory())
 
-    for talys_job in talys:
-        talys_energy_file(talys_job)
-        talys_input_file(talys_job)
+    for talys_job in talys_proj:
+        energy_file(talys_job)
+        input_file(talys_job)
 
-        rpa_job = rpa.open_job(
-            statepoint=util.remove_from_dict(talys_job.sp, extra_keys)
+        talys_job.doc.setdefault("database_file", database_file_path(talys_job))
+
+        p = pathlib.Path(talys_job.doc["database_file"])
+        talys_job.doc.setdefault(
+            "database_file_backup", p.parent / (p.stem + f"_{talys_job}.bck")
         )
 
-        fname = rpa_job.doc["talys_input"]
-        util.copy_file(source=rpa_job.fn(fname), destination=talys_job.fn(fname))
+        rpa_job = rpa_proj.open_job(
+            statepoint=util.remove_from_dict(dict(talys_job.sp), extra_keys)
+        )
+
+        if rpa_job in rpa_proj:
+            z_fn = rpa_job.doc["talys_input"]  # todo change this to "z_file"
+            util.copy_file(source=rpa_job.fn(z_fn), destination=talys_job.fn(z_fn))
+            talys_job.doc.setdefault("z_file", z_fn)
+        else:
+            msg = f"{rpa_job} not found in {rpa_proj.root_directory()}"
+            logger.error(msg)
+            raise ConfigurationSyntaxError(msg)
 
 
 if __name__ == "__main__":
