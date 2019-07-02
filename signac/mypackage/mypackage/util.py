@@ -29,7 +29,7 @@ def atomic_symbol_for_z(atomic_number):
     )
     assert len(periodic_table) == 2 * maxz + 2, "Error in periodic table!"
 
-    atomic_symbol = periodic_table[2 * atomic_number: 2 * atomic_number + 2]
+    atomic_symbol = periodic_table[2 * atomic_number : 2 * atomic_number + 2]
     assert len(atomic_symbol) == 2, "Error in atomic symbol selection!"
 
     return atomic_symbol
@@ -79,11 +79,13 @@ def copy_file(source, destination, exist_ok=False):
 
     assert source.is_file(), f"{source} not found!"
 
-    mode = 'wb' if exist_ok else 'xb'
+    mode = "wb" if exist_ok else "xb"
     with destination.open(mode=mode) as fid:
         fid.write(source.read_bytes())
 
-    assert filecmp.cmp(source, destination), f"{source} and {destination} are not identical!"
+    assert filecmp.cmp(
+        source, destination
+    ), f"{source} and {destination} are not identical!"
     logger.info("Copied %s to %s" % (source, destination))
 
 

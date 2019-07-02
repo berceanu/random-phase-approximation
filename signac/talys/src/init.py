@@ -34,7 +34,7 @@ def talys_input_file(job):
     element, mass = util.split_element_mass(job)
     # we hit the element with N - 1 with 1 neutron
     input_contents = env.get_template("input.j2").render(
-        element=element, mass=mass - 1, energy_fname="energy.in", astro=job.sp.astro,
+        element=element, mass=mass - 1, energy_fname="energy.in", astro=job.sp.astro
     )
     file_path = pathlib.Path(job.fn("input.txt"))
     util.write_contents_to(file_path, input_contents)
@@ -71,7 +71,7 @@ def main():
     extra_keys = ("astro", "projectile_energy")
 
     talys.open_job(statepoint).init()
-    rpa = signac.get_project(root='../')
+    rpa = signac.get_project(root="../")
     logger.info("rpa project: %s" % rpa.root_directory())
     logger.info("talys project: %s" % talys.root_directory())
 
@@ -79,12 +79,12 @@ def main():
         talys_energy_file(talys_job)
         talys_input_file(talys_job)
 
-        rpa_job = rpa.open_job(statepoint=util.remove_from_dict(talys_job.sp, extra_keys))
-        logger.info(rpa_job)
+        rpa_job = rpa.open_job(
+            statepoint=util.remove_from_dict(talys_job.sp, extra_keys)
+        )
 
         fname = rpa_job.doc["talys_input"]
-        util.copy_file(source=rpa_job.fn(fname),
-                       destination=talys_job.fn(fname))
+        util.copy_file(source=rpa_job.fn(fname), destination=talys_job.fn(fname))
 
 
 if __name__ == "__main__":
