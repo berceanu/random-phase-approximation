@@ -223,4 +223,3 @@ def main():
 if __name__ == '__main__':
     main()
 
-#TODO: installation via pipenv
