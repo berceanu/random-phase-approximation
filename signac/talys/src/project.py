@@ -17,7 +17,7 @@ from flow import FlowProject, cmd, with_job
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 
-from .talys_utils import talys
+from talys_utils import talys
 
 logger = logging.getLogger(__name__)
 logfname = "project.log"

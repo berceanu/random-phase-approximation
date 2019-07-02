@@ -14,7 +14,7 @@ import signac
 from jinja2 import Environment, FileSystemLoader
 from mypackage.talys_api import ConfigurationSyntaxError
 
-from .talys_utils import talys
+from talys_utils import talys
 
 # pass folder containing the template
 file_loader = FileSystemLoader("src/templates")
@@ -90,11 +90,14 @@ def main():
         energy_file(talys_job)
         input_file(talys_job)
 
-        talys_job.doc.setdefault("database_file", database_file_path(talys_job))
+        talys_job.doc.setdefault(
+            "database_file", database_file_path(talys_job).as_posix()
+        )
 
         p = pathlib.Path(talys_job.doc["database_file"])
+        database_file_backup = p.parent / (p.stem + f"_{talys_job}.bck")
         talys_job.doc.setdefault(
-            "database_file_backup", p.parent / (p.stem + f"_{talys_job}.bck")
+            "database_file_backup", database_file_backup.as_posix()
         )
 
         rpa_job = rpa_proj.open_job(
