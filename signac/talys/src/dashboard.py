@@ -19,6 +19,7 @@ class MyDashboard(Dashboard):
     def job_title(self, job):
         return f"(Z, N) = ({job.sp['proton_number']}, {job.sp['neutron_number']}), T = {job.sp.temperature}"
 
+# todo update this file
 
 if __name__ == '__main__':
     config = {'DASHBOARD_PATHS': ['src/']}

@@ -74,7 +74,7 @@ def main():
         temperature=2.0,
         # transition energy in MeV
         transition_energy=0.42,  # 0.42 is random
-        # todo add description
+        # flag for calculation of astrophysics reaction rate
         astro="n",  # / "y"
         # incoming neutron energy
         projectile_energy=energy_values(),

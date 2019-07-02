@@ -27,6 +27,11 @@ logfname = "project.log"
 # UTILITY FUNCTIONS #
 #####################
 
+def file_contains(filename, text):
+    """Checks if ``filename`` contains ``text``."""
+    return (
+        lambda job: job.isfile(filename) and text in open(job.fn(filename), "r").read()
+    )
 
 def arefiles(file_names):
     """Check if all ``file_names`` are in ``job`` folder."""
@@ -78,7 +83,8 @@ def replace_database_file(job):
 @with_job
 @cmd
 @Project.pre.after(replace_database_file)
-@Project.post(arefiles((talys.output_fn, talys.cross_section_fn)))
+@Project.post.isfile(talys.output_fn)
+@Project.post(file_contains(talys.output_fn, "The TALYS team congratulates you with this successful calculation."))
 def run_talys(job):
     """Run TALYS binary with the new database file."""
     command: str = talys.run_command
@@ -101,6 +107,7 @@ def restore_database_file(job):
 
 
 @Project.operation
+@Project.pre.after(run_talys)
 @Project.pre.after(restore_database_file)
 @Project.post(lambda job: not os.path.isfile(job.doc["database_file_backup"]))
 def remove_database_file_backup(job):
@@ -110,7 +117,7 @@ def remove_database_file_backup(job):
 
 @Project.operation
 @Project.pre.after(run_talys)
-@Project.pre.after(remove_database_file_backup)
+@Project.pre.isfile(talys.cross_section_fn)
 @Project.post.isfile(talys.cross_section_png_fn)
 def plot_cross_section(job):
     """Plot the TALYS output to get cross-section."""
