@@ -67,7 +67,7 @@ def backup_database_file(job):
 @Project.pre(lambda job: job.isfile(job.doc["z_file"]))
 @Project.pre(lambda job: os.path.isfile(job.doc["database_file"]))
 @Project.pre.after(backup_database_file)
-@Project.post(
+@Project.post(  # what if they are already identical from previous incomplete run?
     lambda job: areidentical(job.fn(job.doc["z_file"]), job.doc["database_file"])
 )
 def replace_database_file(job):
@@ -78,6 +78,9 @@ def replace_database_file(job):
         exist_ok=True,
     )
 
+# todo make a manual backup called Sn.bck to compare against
+# todo store Sn.bck on GDrive and restore it on home PC
+# todo remove all operations and replace with my context manager
 
 @Project.operation
 @with_job
@@ -94,7 +97,7 @@ def run_talys(job):
 
 @Project.operation
 @Project.pre.after(run_talys)
-@Project.post(
+@Project.post(  # will not restore if they are already identical from previous run
     lambda job: areidentical(job.doc["database_file"], job.doc["database_file_backup"])
 )
 def restore_database_file(job):

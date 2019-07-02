@@ -4,7 +4,6 @@
 Iterates over all defined state points and initializes
 the associated job workspace directories."""
 import logging
-import math
 import os
 import pathlib
 
@@ -24,12 +23,31 @@ logger = logging.getLogger(__name__)
 logfname = "project.log"
 
 
-def energy_values():
+def energy_values(log=False, digits=None):
     """Generate TALYS energy input file contents."""
-    my_v, step = np.linspace(0.1, 30.0, 300, retstep=True)
-    assert math.isclose(step, 0.1), f"step {step} is not 0.1!"
+    import math
 
-    return my_v.round(1)
+    if log:
+        digits = 3
+
+        v1 = np.linspace(0.001, 0.01, 10)
+        v2 = np.linspace(0.015, 0.03, 4)
+        v3 = np.linspace(0.04, 0.2, 17)
+        v4 = np.linspace(0.22, 0.3, 5)
+        v5 = np.linspace(0.35, 0.4, 2)
+        v6 = np.linspace(0.5, 30.0, 296)
+
+        my_v = np.empty(
+            v1.size + v2.size + v3.size + v4.size + v5.size + v6.size, dtype=np.float64
+        )
+        np.concatenate((v1, v2, v3, v4, v5, v6), out=my_v)
+    else:
+        digits = 1
+
+        my_v, step = np.linspace(0.1, 30.0, 300, retstep=True)
+        assert math.isclose(step, 0.1), f"step {step} is not 0.1!"
+        
+    return my_v.round(digits)
 
 
 def input_file(job):
@@ -77,7 +95,7 @@ def main():
         # flag for calculation of astrophysics reaction rate
         astro="n",  # / "y"
         # incoming neutron energy
-        projectile_energy=energy_values(),
+        projectile_energy=energy_values(log=True),
     )
     extra_keys = ("astro", "projectile_energy")
 
