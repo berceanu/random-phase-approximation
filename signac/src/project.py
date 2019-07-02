@@ -12,11 +12,10 @@ import logging
 import os
 import random
 import shutil
-import filecmp
 
 import numpy as np
 import pandas as pd
-from flow import FlowProject, cmd, with_job
+from flow import FlowProject, cmd
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 from matplotlib.gridspec import GridSpec
@@ -26,15 +25,7 @@ logger = logging.getLogger(__name__)
 import mypackage.code_api as code_api
 import mypackage.util as util
 import mypackage.talys_api as talys
-import pathlib
-from jinja2 import Environment, FileSystemLoader
-from dataclasses import dataclass
 
-# pass folder containing the template
-file_loader = FileSystemLoader("src/templates")
-env = Environment(loader=file_loader)
-
-# @with_job
 logfname = "rpa-project.log"
 
 #####################
@@ -403,46 +394,6 @@ def dipole_trans_finite(job):
 #################################
 
 
-@dataclass
-class TalysData:
-    input_fname: str = "talys_input.txt"
-    energy_fname: str = "talys_energy.in"
-    input_template: str = "input.j2"
-    output_fname: str = "talys_output.txt"
-    talys_bin = pathlib.PosixPath("~/bin/talys").expanduser()
-    stderr_fname: str = "talys_stderr.txt"
-    cross_section_fname: str = "xs000000.tot"
-    cross_section_png: str = "xsec.png"
-
-    # todo create separate TALYS project, with its own init and copy each of the `z050`-type files there.
-
-    @staticmethod
-    def energy_values():
-        """Generate energy input file contents."""
-        v1 = np.linspace(0.001, 0.01, 10)
-        v2 = np.linspace(0.015, 0.03, 4)
-        v3 = np.linspace(0.04, 0.2, 17)
-        v4 = np.linspace(0.22, 0.3, 5)
-        v5 = np.linspace(0.35, 0.4, 2)
-        v6 = np.linspace(0.5, 30.0, 296)
-
-        my_v = np.empty(
-            v1.size + v2.size + v3.size + v4.size + v5.size + v6.size, dtype=np.float64
-        )
-        np.concatenate((v1, v2, v3, v4, v5, v6), out=my_v)
-
-        return my_v
-
-    def run_command(self) -> str:
-        """Construct the TALYS command to be ran."""
-        assert self.talys_bin.is_file(), f"{self.talys_bin} not found!"
-
-        return f"{self.talys_bin} < {self.input_fname} > {self.output_fname} 2> {self.stderr_fname}"
-
-
-talys_data = TalysData()
-
-
 def z_fn(job):
     return "z{:03d}".format(job.sp.proton_number)
 
@@ -505,154 +456,6 @@ def generate_talys_input_zero(job):
 @Project.post(lambda job: job.isfile(z_fn(job)))
 def generate_talys_input_finite(job):
     _generate_talys_input(job, temp="finite", code_mapping=code)
-
-
-#############
-#############
-def get_element_path(job):
-    hfb_path = pathlib.PosixPath("~/src/talys/structure/gamma/hfb/").expanduser()
-
-    element, _ = util.split_element_mass(job)
-    element_path = hfb_path / f"{element}.psf"
-
-    assert element_path.is_file(), f"{element_path} not found!"
-
-    return element_path
-
-
-def get_backup_path(job):
-    p = get_element_path(job)
-    return p.parent / (p.stem + f"_{job}.bck")
-
-
-def copy_file(source, destination, exist_ok=False):
-    assert source.is_file(), f"{source} not found!"
-
-    mode = 'wb' if exist_ok else 'xb'
-    with destination.open(mode=mode) as fid:
-        fid.write(source.read_bytes())
-
-    assert filecmp.cmp(source, destination), f"{source} and {destination} are not identical!"
-    logger.info("Copied %s to %s" % (source, destination))
-
-
-def write_contents_to(file_path, contents):
-    with file_path.open("w", encoding="utf-8") as f:
-        f.write(contents)
-    logger.info("Wrote %s" % file_path)
-
-
-@Project.operation
-@Project.post.isfile(talys_data.input_fname)
-def talys_input_file(job):
-    """Generate TALYS input file."""
-    element, mass = util.split_element_mass(job)
-    # we hit the element with N - 1 with 1 neutron
-    input_contents = env.get_template(talys_data.input_template).render(
-        element=element, mass=mass - 1, energy_fname=talys_data.energy_fname, astro="n"
-    )
-
-    filepath = pathlib.Path(job.fn(talys_data.input_fname))
-    write_contents_to(filepath, input_contents)
-
-
-@Project.operation
-@Project.post.isfile(talys_data.energy_fname)
-def talys_energy_file(job):
-    """Generate TALYS energy input file."""
-    file_path = pathlib.Path(job.fn(talys_data.energy_fname))
-    np.savetxt(file_path, talys_data.energy_values(), fmt="%.3f", newline=os.linesep)
-    logger.info("Wrote %s" % file_path)
-
-
-@Project.operation
-@Project.pre.after(talys_input_file)
-@Project.pre.after(talys_energy_file)
-@Project.pre(lambda job: get_element_path(job).is_file())
-@Project.post(lambda job: get_backup_path(job).is_file())
-def backup_element(job):
-    """run TALYS"""
-    copy_file(source=get_element_path(job), destination=get_backup_path(job))
-
-
-@Project.operation
-@Project.pre(lambda job: job.isfile(z_fn(job)))
-@Project.pre.after(backup_element)
-@Project.post(lambda job: filecmp.cmp(get_element_path(job), pathlib.Path(job.fn(z_fn(job)))))
-def replace_talys_file(job):
-    copy_file(source=pathlib.Path(job.fn(z_fn(job))), destination=get_element_path(job), exist_ok=True)
-
-
-@Project.operation
-@with_job
-@cmd
-@Project.pre.after(replace_talys_file)
-@Project.post(arefiles((talys_data.output_fname, talys_data.cross_section_fname)))
-def run_talys(job):
-    """run TALYS"""
-    command: str = talys_data.run_command()
-
-    return f"echo {command} >> {logfname} && {command}"
-
-
-@Project.operation
-@Project.pre.after(run_talys)
-@Project.post(lambda job: filecmp.cmp(get_element_path(job), get_backup_path(job)))
-def restore_backup(job):
-    copy_file(source=get_backup_path(job), destination=get_element_path(job), exist_ok=True)
-    get_backup_path(job).unlink()  # delete backup file
-
-
-@Project.operation
-@Project.pre.after(run_talys)
-@Project.post.isfile(talys_data.cross_section_png)
-def plot_cross_section(job):
-    """Plot the TALYS output to get cross-section."""
-    cross_section = pd.read_csv(
-        job.fn(talys_data.cross_section_fname),
-        sep=r"\s+",
-        header=None,
-        comment="#",
-        names=[
-            "energy",
-            "xs",
-            "gamma_xs",
-            "xs_over_res_prod_xs",
-            "direct",
-            "preequilibrium",
-            "compound",
-        ],
-    )
-
-    fig = Figure(figsize=(6.4, 6.4))
-    canvas = FigureCanvas(fig)
-    ax = fig.add_subplot(111)
-
-    ax.loglog(
-        cross_section["energy"],
-        cross_section["compound"],
-        color="black",
-        label=f"T={job.sp.temperature}",
-    )
-
-    ax.set(
-        xlim=[1e-3, 10.0],
-        ylim=[1e-4, 100.0],
-        ylabel=r"Cross-Section [mb]",
-        xlabel=r"$E_n$ [MeV]",
-    )
-    element, mass = util.split_element_mass(job)
-    ax.text(
-        0.7,
-        0.95,
-        r"${}^{%d}$%s(n,$\gamma$)${}^{%d}$%s"
-        % (mass - 1, element, mass, element),
-        transform=ax.transAxes,
-        color="black",
-    )
-    ax.legend(loc="lower left")
-    canvas.print_png(job.fn(talys_data.cross_section_png))
-    logger.info("Saved %s" % job.fn(talys_data.cross_section_png))
 
 
 if __name__ == "__main__":
