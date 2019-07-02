@@ -37,6 +37,10 @@ def areidentical(f1, f2):
     """Return True if the two files are identical."""
     from filecmp import cmp
 
+    # Not identical if either file is missing.
+    if (not os.path.isfile(f1)) or (not os.path.isfile(f2)):
+        return False
+
     return cmp(f1, f2)
 
 
@@ -105,6 +109,7 @@ def remove_database_file_backup(job):
 
 
 @Project.operation
+@Project.pre.after(run_talys)
 @Project.pre.after(remove_database_file_backup)
 @Project.post.isfile(talys.cross_section_png_fn)
 def plot_cross_section(job):
