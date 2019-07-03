@@ -428,7 +428,7 @@ def _generate_talys_input(job, temp, code_mapping=code_api.NameMapping()):
         )
         new_talys_dict = talys.df_to_dict(talys_df_new)
         talys.dict_to_fn(new_talys_dict, fname=job.fn(z_fn(job)))
-        job.doc["z_file"] = z_fn(job)
+        job.doc.setdefault("z_file", z_fn(job))
     else:
         logger.warning(
             "(Z,A)=({},{}) not found in {}!".format(
