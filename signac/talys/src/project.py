@@ -79,7 +79,6 @@ def replace_database_file(job):
     )
 
 # todo make a manual backup called Sn.bck to compare against
-# todo store Sn.bck on GDrive and restore it on home PC
 # todo remove all operations and replace with my context manager
 
 @Project.operation
