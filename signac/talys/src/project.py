@@ -17,11 +17,12 @@ from flow import FlowProject, cmd, with_job
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 
-from mypackage.talys_api import talys
+from mypackage.talys_api import TalysAPI
 
 logger = logging.getLogger(__name__)
 logfname = "project.log"
 
+talys_api = TalysAPI()
 
 #####################
 # UTILITY FUNCTIONS #
@@ -87,11 +88,11 @@ def replace_database_file(job):
 @with_job
 @cmd
 @Project.pre.after(replace_database_file)
-@Project.post.isfile(talys.output_fn)
-@Project.post(file_contains(talys.output_fn, "The TALYS team congratulates you with this successful calculation."))
+@Project.post.isfile(talys_api.output_fn)
+@Project.post(file_contains(talys_api.output_fn, "The TALYS team congratulates you with this successful calculation."))
 def run_talys(job):
     """Run TALYS binary with the new database file."""
-    command: str = talys.run_command
+    command: str = talys_api.run_command
 
     return f"echo {command} >> {logfname} && {command}"
 
@@ -117,16 +118,17 @@ def restore_database_file(job):
 def remove_database_file_backup(job):
     """Delete TALYS database file backup (eg. Sn_<job._id>.bck)."""
     os.remove(job.doc["database_file_backup"])
+    logger.info("Removed %s" % job.doc["database_file_backup"])
 
 
 @Project.operation
 @Project.pre.after(run_talys)
-@Project.pre.isfile(talys.cross_section_fn)
-@Project.post.isfile(talys.cross_section_png_fn)
+@Project.pre.isfile(talys_api.cross_section_fn)
+@Project.post.isfile(talys_api.cross_section_png_fn)
 def plot_cross_section(job):
     """Plot the TALYS output to get cross-section."""
     cross_section = pd.read_csv(
-        job.fn(talys.cross_section_fn),
+        job.fn(talys_api.cross_section_fn),
         sep=r"\s+",
         header=None,
         comment="#",
@@ -167,8 +169,8 @@ def plot_cross_section(job):
         color="black",
     )
     ax.legend(loc="lower left")
-    canvas.print_png(job.fn(talys.cross_section_png_fn))
-    logger.info("Saved %s" % job.fn(talys.cross_section_png_fn))
+    canvas.print_png(job.fn(talys_api.cross_section_png_fn))
+    logger.info("Saved %s" % job.fn(talys_api.cross_section_png_fn))
 
 
 if __name__ == "__main__":

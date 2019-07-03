@@ -42,9 +42,6 @@ class TalysAPI:
         )
 
 
-talys = TalysAPI()
-
-
 def cast_to(to_type, iterable):
     return (to_type(val) for val in iterable)
 
@@ -57,6 +54,8 @@ def z_from_fname(fname):
 
 α = 7.297352570e-03  # fine structure constant
 u_factor = 10 * 16 * math.pi ** 3 * α / 9  # 4.022 mb / (e^2 * fm^2)
+
+
 # see src/temp/sum_rule.ipynb
 
 
@@ -205,9 +204,10 @@ def replace_table(Z, A, talys, lorvec):
 def main():
     logging.basicConfig(level=logging.INFO)
     # todo for debugging, remove later
-    print(talys.run_command)
-    print(talys.hfb_path)
-    print(talys.backup_hfb_path)
+    talys_api = TalysAPI()
+    print(talys_api.run_command)
+    print(talys_api.hfb_path)
+    print(talys_api.backup_hfb_path)
 
 
 if __name__ == "__main__":

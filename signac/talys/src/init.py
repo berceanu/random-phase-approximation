@@ -11,7 +11,7 @@ import mypackage.util as util
 import numpy as np
 import signac
 from jinja2 import Environment, FileSystemLoader
-from mypackage.talys_api import ConfigurationSyntaxError, talys
+from mypackage.talys_api import ConfigurationSyntaxError, TalysAPI
 
 
 # pass folder containing the template
@@ -21,6 +21,7 @@ env = Environment(loader=file_loader)
 logger = logging.getLogger(__name__)
 logfname = "project.log"
 
+talys_api = TalysAPI()
 
 def energy_values(log=False, digits=None):
     """Generate TALYS energy input file contents."""
@@ -53,15 +54,15 @@ def input_file(job):
     """Generate TALYS input file."""
     element, mass = util.split_element_mass(job)
     # we hit the element with N - 1 with 1 neutron
-    input_contents = env.get_template(talys.input_template_fn).render(
-        element=element, mass=mass - 1, energy_fname=talys.energy_fn, astro=job.sp.astro
+    input_contents = env.get_template(talys_api.input_template_fn).render(
+        element=element, mass=mass - 1, energy_fname=talys_api.energy_fn, astro=job.sp.astro
     )
-    util.write_contents_to(job.fn(talys.input_fn), input_contents)
+    util.write_contents_to(job.fn(talys_api.input_fn), input_contents)
 
 
 def energy_file(job):
     """Generate TALYS energy input file."""
-    file_path = pathlib.Path(job.fn(talys.energy_fn))
+    file_path = pathlib.Path(job.fn(talys_api.energy_fn))
     np.savetxt(file_path, job.sp.projectile_energy, fmt="%.3f", newline=os.linesep)
     logger.info("Wrote %s" % file_path)
 
@@ -69,7 +70,7 @@ def energy_file(job):
 def database_file_path(job):
     """Return path to job's nucleus data file in TALYS database."""
     element, _ = util.split_element_mass(job)
-    database_file = talys.hfb_path / f"{element}.psf"
+    database_file = talys_api.hfb_path / f"{element}.psf"
 
     assert database_file.is_file(), f"{database_file} not found!"
     return database_file
