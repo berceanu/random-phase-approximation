@@ -79,6 +79,8 @@ def database_file_path(job):
 def main():
     talys_proj = signac.init_project("talys", workspace="workspace")
 
+    # todo run on full 56-job workspace/
+
     statepoint = dict(
         # atomic number Z
         proton_number=50,
