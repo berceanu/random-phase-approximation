@@ -10,13 +10,13 @@ See also: $ python src/project.py --help
 """
 import logging
 import os
+from contextlib import contextmanager
 
 import mypackage.util as util
 import pandas as pd
 from flow import FlowProject, cmd, with_job
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
-
 from mypackage.talys_api import TalysAPI
 
 logger = logging.getLogger(__name__)
@@ -24,9 +24,11 @@ logfname = "project.log"
 
 talys_api = TalysAPI()
 
+
 #####################
 # UTILITY FUNCTIONS #
 #####################
+
 
 def file_contains(filename, text):
     """Checks if ``filename`` contains ``text``."""
@@ -51,74 +53,61 @@ def areidentical(f1, f2):
     return cmp(f1, f2)
 
 
+@contextmanager
+def replaced_database_file(job, api):
+    # remove previous backup files
+    all_bck_files = api.hfb_path.glob("*.bck")
+    for path in all_bck_files:
+        path.unlink()
+        logger.info("Removed %s" % path)
+
+    # restore original database file
+    db_fn = job.doc["database_file"]
+    util.copy_file(source=api.backup_hfb_path / db_fn, destination=api.hfb_path / db_fn)
+
+    # Backup TALYS database file (eg Sn.psf to Sn_<job._id>.bck)
+    db_fn_bck = job.doc["database_file_backup"]
+    util.copy_file(source=db_fn, destination=db_fn_bck)
+
+    # Replace TALYS database file (eg Sn.psf) with the job's file (eg. z050).
+    util.copy_file(source=job.fn(job.doc["z_file"]), destination=db_fn, exist_ok=True)
+    try:
+        yield
+    finally:
+        # Restore original TALYS database file (eg Sn.psf) from backup.
+        util.copy_file(source=db_fn_bck, destination=db_fn, exist_ok=True)
+
+        # Delete TALYS database file backup (eg. Sn_<job._id>.bck).
+        os.remove(db_fn_bck)
+        logger.info("Removed %s" % db_fn_bck)
+
+
 class Project(FlowProject):
     pass
 
 
-@Project.operation
-@Project.pre(lambda job: os.path.isfile(job.doc["database_file"]))
-@Project.post(lambda job: os.path.isfile(job.doc["database_file_backup"]))
-def backup_database_file(job):
-    """Backup TALYS database file (eg Sn.psf to Sn_<job._id>.bck)"""
-    util.copy_file(
-        source=job.doc["database_file"], destination=job.doc["database_file_backup"]
-    )
+# todo add sh() infrastructure
 
 
 @Project.operation
-@Project.pre(lambda job: job.isfile(job.doc["z_file"]))
-@Project.pre(lambda job: os.path.isfile(job.doc["database_file"]))
-@Project.pre.after(backup_database_file)
-@Project.post(  # what if they are already identical from previous incomplete run?
-    lambda job: areidentical(job.fn(job.doc["z_file"]), job.doc["database_file"])
-)
-def replace_database_file(job):
-    """Replace TALYS database file (eg Sn.psf) with the job's file (eg. z050)."""
-    util.copy_file(
-        source=job.fn(job.doc["z_file"]),
-        destination=job.doc["database_file"],
-        exist_ok=True,
-    )
-
-
-# todo make a manual backup called Sn.bck to compare against
-# todo remove all operations and replace with my context manager
-
-@Project.operation
-@with_job
-@cmd
-@Project.pre.after(replace_database_file)
 @Project.post.isfile(talys_api.output_fn)
-@Project.post(file_contains(talys_api.output_fn, "The TALYS team congratulates you with this successful calculation."))
+@Project.post(
+    file_contains(
+        talys_api.output_fn,
+        "The TALYS team congratulates you with this successful calculation.",
+    )
+)
+@replaced_database_file(job="a1b2c3", api=talys_api)
 def run_talys(job):
     """Run TALYS binary with the new database file."""
     command: str = talys_api.run_command
+    # /home/berceanu/bin/talys < input.txt > output.txt 2> stderr.txt
 
     return f"echo {command} >> {logfname} && {command}"
 
 
-@Project.operation
-@Project.pre.after(run_talys)
-@Project.post(  # will not restore if they are already identical from previous run
-    lambda job: areidentical(job.doc["database_file"], job.doc["database_file_backup"])
-)
-def restore_database_file(job):
-    """Restore original TALYS database file (eg Sn.psf)."""
-    util.copy_file(
-        source=job.doc["database_file_backup"],
-        destination=job.doc["database_file"],
-        exist_ok=True,
-    )
-
-
-@Project.operation
-@Project.pre.after(run_talys)
-@Project.pre.after(restore_database_file)
-@Project.post(lambda job: not os.path.isfile(job.doc["database_file_backup"]))
-def remove_database_file_backup(job):
-    """Delete TALYS database file backup (eg. Sn_<job._id>.bck)."""
-    os.remove(job.doc["database_file_backup"])
-    logger.info("Removed %s" % job.doc["database_file_backup"])
+def run_talys():
+    pass
 
 
 @Project.operation
