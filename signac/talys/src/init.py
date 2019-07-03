@@ -124,7 +124,7 @@ def main():
 
         if rpa_job in rpa_proj:
             logger.info(f"Processing %s.." % rpa_job.workspace())
-            z_fn = rpa_job.doc["talys_input"]  # todo change this to "z_file"
+            z_fn = rpa_job.doc["z_file"]
             util.copy_file(source=rpa_job.fn(z_fn), destination=talys_job.fn(z_fn))
             talys_job.doc.setdefault("z_file", z_fn)
         else:
