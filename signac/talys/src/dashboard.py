@@ -20,6 +20,7 @@ class MyDashboard(Dashboard):
         return f"(Z, N) = ({job.sp['proton_number']}, {job.sp['neutron_number']}), T = {job.sp.temperature}"
 
 # todo update this file
+# todo talys_aggregation project
 
 if __name__ == '__main__':
     config = {'DASHBOARD_PATHS': ['src/']}
