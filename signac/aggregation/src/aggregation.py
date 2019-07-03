@@ -124,7 +124,7 @@ def main_groupby(args):
         logger.info("(Z, N) =  (%s, %s)" % key)
         nucleus = util.get_nucleus(*key)
         mass_number = sum(key)
-        element = util.atomic_symbol_for_Z(key[0]).title()
+        element = util.atomic_symbol_for_z(key[0]).title()
 
         gr1, gr2 = it.tee(group)
 
