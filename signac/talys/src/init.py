@@ -101,8 +101,8 @@ def main():
 
     talys_proj.open_job(statepoint).init()
     rpa_proj = signac.get_project(root="../")
-    logger.info("rpa project: %s" % rpa_proj.root_directory())
-    logger.info("talys project: %s" % talys_proj.root_directory())
+    logger.info("rpa project: %s" % rpa_proj.workspace())
+    logger.info("talys project: %s" % talys_proj.workspace())
 
     for talys_job in talys_proj:
         energy_file(talys_job)
@@ -123,6 +123,7 @@ def main():
         )
 
         if rpa_job in rpa_proj:
+            logger.info(f"Processing %s.." % rpa_job.workspace())
             z_fn = rpa_job.doc["talys_input"]  # todo change this to "z_file"
             util.copy_file(source=rpa_job.fn(z_fn), destination=talys_job.fn(z_fn))
             talys_job.doc.setdefault("z_file", z_fn)
