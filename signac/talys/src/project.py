@@ -79,7 +79,7 @@ def replaced_database_file(job, api):
 class Project(FlowProject):
     pass
 
-
+# NB: do not run this operation in parallel because of race conditions on the database file.
 @Project.operation
 @Project.pre(arefiles((talys_api.input_fn, talys_api.energy_fn)))
 @Project.post.isfile(talys_api.output_fn)
