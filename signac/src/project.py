@@ -8,24 +8,24 @@ line with
 
 See also: $ python src/project.py --help
 """
-from flow import FlowProject, cmd, with_job
-from signac import get_project
+import logging
 import os
-import shutil
 import random
+import shutil
+
 import numpy as np
 import pandas as pd
-from matplotlib.figure import Figure
+from flow import FlowProject, cmd
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
 from matplotlib.gridspec import GridSpec
-import logging
+from signac import get_project
 
 logger = logging.getLogger(__name__)
 import mypackage.code_api as code_api
 import mypackage.util as util
 import mypackage.talys_api as talys
 
-# @with_job
 logfname = "rpa-project.log"
 
 #####################
@@ -33,6 +33,7 @@ logfname = "rpa-project.log"
 #####################
 
 PNG_FILE = "iso_all.png"
+
 
 # https://stackoverflow.com/questions/3346430/what-is-the-most-efficient-way-to-get-first-and-last-line-of-a-text-file/18603065#18603065
 def read_last_line(filename):
