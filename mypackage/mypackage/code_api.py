@@ -154,7 +154,7 @@ class GenerateInputs:
         for t in ('zero', 'finite'):
             for s in ('ground', 'excited'):
                 fn = self._mapping.input_file(temp=t, state=s)
-                contents[fn] = env.get_template(f"{t}_{s}.dat").render(param=self._param)
+                contents[fn] = env.get_template(f"{t}_{s}.j2").render(param=self._param)
         return contents
 
     def write_param_files(self, temp=None, state=None):
