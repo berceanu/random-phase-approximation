@@ -11,9 +11,8 @@ import mypackage.util as util
 import numpy as np
 import signac
 from jinja2 import Environment, FileSystemLoader
-from mypackage.talys_api import ConfigurationSyntaxError
+from mypackage.talys_api import ConfigurationSyntaxError, talys
 
-from talys_utils import talys
 
 # pass folder containing the template
 file_loader = FileSystemLoader("src/templates")
