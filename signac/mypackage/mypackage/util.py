@@ -1,6 +1,6 @@
-import filecmp
 import logging
 import pathlib
+import subprocess
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +29,7 @@ def atomic_symbol_for_z(atomic_number):
     )
     assert len(periodic_table) == 2 * maxz + 2, "Error in periodic table!"
 
-    atomic_symbol = periodic_table[2 * atomic_number : 2 * atomic_number + 2]
+    atomic_symbol = periodic_table[2 * atomic_number: 2 * atomic_number + 2]
     assert len(atomic_symbol) == 2, "Error in atomic symbol selection!"
 
     return atomic_symbol
@@ -67,6 +67,18 @@ def write_contents_to(file_path, contents):
     logger.info("Wrote %s" % file_path)
 
 
+def areidentical(f1, f2):
+    """Return True if the two files are identical."""
+    from filecmp import cmp
+    import os
+
+    # Not identical if either file is missing.
+    if (not os.path.isfile(f1)) or (not os.path.isfile(f2)):
+        return False
+
+    return cmp(f1, f2)
+
+
 def copy_file(source, destination, exist_ok=False):
     """Copy ``source`` to ``destination``.
 
@@ -83,9 +95,8 @@ def copy_file(source, destination, exist_ok=False):
     with destination.open(mode=mode) as fid:
         fid.write(source.read_bytes())
 
-    assert filecmp.cmp(
-        source, destination
-    ), f"{source} and {destination} are not identical!"
+    assert areidentical(source, destination), f"{source} and {destination} are not identical!"
+
     logger.info("Copied %s to %s" % (source, destination))
 
 
@@ -97,3 +108,16 @@ def remove_from_dict(d, keys):
     :return: new dictionary with ``keys`` removed
     """
     return {k: v for k, v in d.items() if k not in keys}
+
+
+def sh(*cmd, **kwargs):
+    logger.info(cmd[0])
+    stdout = (
+        subprocess.Popen(
+            cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, **kwargs
+        )
+            .communicate()[0]
+            .decode("utf-8")
+    )
+    logger.info(stdout)
+    return stdout

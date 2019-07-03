@@ -11,10 +11,11 @@ See also: $ python src/project.py --help
 import logging
 import os
 from contextlib import contextmanager
+from pathlib import Path
 
 import mypackage.util as util
 import pandas as pd
-from flow import FlowProject, cmd, with_job
+from flow import FlowProject
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 from mypackage.talys_api import TalysAPI
@@ -42,28 +43,21 @@ def arefiles(file_names):
     return lambda job: all(job.isfile(fn) for fn in file_names)
 
 
-def areidentical(f1, f2):
-    """Return True if the two files are identical."""
-    from filecmp import cmp
-
-    # Not identical if either file is missing.
-    if (not os.path.isfile(f1)) or (not os.path.isfile(f2)):
-        return False
-
-    return cmp(f1, f2)
-
-
 @contextmanager
 def replaced_database_file(job, api):
     # remove previous backup files
     all_bck_files = api.hfb_path.glob("*.bck")
+    counter = 0
     for path in all_bck_files:
+        counter += 1
         path.unlink()
         logger.info("Removed %s" % path)
+    if counter == 0:
+        logger.info("No previous backup files found.")
 
     # restore original database file
     db_fn = job.doc["database_file"]
-    util.copy_file(source=api.backup_hfb_path / db_fn, destination=api.hfb_path / db_fn)
+    util.copy_file(source=api.backup_hfb_path / Path(db_fn).name, destination=db_fn, exist_ok=True)
 
     # Backup TALYS database file (eg Sn.psf to Sn_<job._id>.bck)
     db_fn_bck = job.doc["database_file_backup"]
@@ -86,10 +80,8 @@ class Project(FlowProject):
     pass
 
 
-# todo add sh() infrastructure
-
-
 @Project.operation
+@Project.pre(arefiles((talys_api.input_fn, talys_api.energy_fn)))
 @Project.post.isfile(talys_api.output_fn)
 @Project.post(
     file_contains(
@@ -97,17 +89,15 @@ class Project(FlowProject):
         "The TALYS team congratulates you with this successful calculation.",
     )
 )
-@replaced_database_file(job="a1b2c3", api=talys_api)
 def run_talys(job):
-    """Run TALYS binary with the new database file."""
-    command: str = talys_api.run_command
-    # /home/berceanu/bin/talys < input.txt > output.txt 2> stderr.txt
+    @replaced_database_file(job=job, api=talys_api)
+    def really_run_talys():
+        """Run TALYS binary with the new database file."""
+        command: str = talys_api.run_command
+        # run TALYS in the job's folder
+        util.sh(command, shell=True, cwd=job.workspace())
 
-    return f"echo {command} >> {logfname} && {command}"
-
-
-def run_talys():
-    pass
+    really_run_talys()
 
 
 @Project.operation
