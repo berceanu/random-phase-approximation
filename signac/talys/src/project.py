@@ -33,6 +33,7 @@ def file_contains(filename, text):
         lambda job: job.isfile(filename) and text in open(job.fn(filename), "r").read()
     )
 
+
 def arefiles(file_names):
     """Check if all ``file_names`` are in ``job`` folder."""
     return lambda job: all(job.isfile(fn) for fn in file_names)
@@ -77,6 +78,7 @@ def replace_database_file(job):
         destination=job.doc["database_file"],
         exist_ok=True,
     )
+
 
 # todo make a manual backup called Sn.bck to compare against
 # todo remove all operations and replace with my context manager
