@@ -11,7 +11,7 @@ import mypackage.code_api as code_api
 import mypackage.util as util
 
 def main():
-    project = signac.init_project('rpa')
+    project = signac.init_project('rpa', workspace="/media/berceanu/berc/rpa/workspace")
 
     for N in range(76, 96 + 2, 2):
         for T in (0.0, 0.5, 1.0, 2.0):
