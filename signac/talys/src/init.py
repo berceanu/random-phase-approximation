@@ -88,9 +88,7 @@ def main():
     rpa_proj = signac.get_project(root="../")
     logger.info("rpa project: %s" % rpa_proj.workspace())
 
-    for z_fn, jobs in rpa_proj.find_jobs({"proton_number": 50}).groupbydoc(
-        "talys_input"
-    ):  # todo change to "z_file"
+    for z_fn, jobs in rpa_proj.find_jobs({"proton_number": 50}).groupbydoc("z_file"):
         for rpa_job in jobs:
             logger.info(f"Processing %s.." % rpa_job.workspace())
             sp = rpa_proj.get_statepoint(rpa_job.get_id())

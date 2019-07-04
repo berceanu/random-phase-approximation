@@ -8,30 +8,30 @@ from signac_dashboard.modules.notes import Notes
 import mypackage.dipole_transitions as dt
 
 
-
 class MyDashboard(Dashboard):
-
     def job_sorter(self, job):
         # shuld return key for
         # sorted(jobs, key=lambda job: job_sorter(job))
-        return job.sp['proton_number'], job.sp['neutron_number'], job.sp['temperature']
+        return job.sp["proton_number"], job.sp["neutron_number"], job.sp["temperature"]
 
     def job_title(self, job):
         return f"(Z, N) = ({job.sp['proton_number']}, {job.sp['neutron_number']}), T = {job.sp.temperature}"
 
-# todo update this file
-# todo talys_aggregation project
 
-if __name__ == '__main__':
-    config = {'DASHBOARD_PATHS': ['src/']}
-    dashboard = MyDashboard(modules=[
-        ImageViewer(name='Transition strength distribution', img_globs=['*.png']),
-        StatepointList(enabled=True),
-        DocumentList(max_chars=140),
-        FileList(enabled=True),
-        Notes(enabled=False),
-        dt.DipoleTransitions(name='Dipole Transitions', enabled=True),
+# todo update this file
+# todo talys_aggregation project, containing HFB + QRPA
+
+if __name__ == "__main__":
+    config = {"DASHBOARD_PATHS": ["src/"]}
+    dashboard = MyDashboard(
+        modules=[
+            ImageViewer(name="Transition strength distribution", img_globs=["*.png"]),
+            StatepointList(enabled=True),
+            DocumentList(max_chars=140),
+            FileList(enabled=True),
+            Notes(enabled=False),
+            dt.DipoleTransitions(name="Dipole Transitions", enabled=True),
         ],
-        config=config
-        )
+        config=config,
+    )
     dashboard.main()

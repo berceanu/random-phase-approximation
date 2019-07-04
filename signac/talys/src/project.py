@@ -12,6 +12,7 @@ import logging
 import os
 from contextlib import contextmanager
 from pathlib import Path
+import math
 
 import mypackage.util as util
 import pandas as pd
@@ -57,7 +58,9 @@ def replaced_database_file(job, api):
 
     # restore original database file
     db_fn = job.doc["database_file"]
-    util.copy_file(source=api.backup_hfb_path / Path(db_fn).name, destination=db_fn, exist_ok=True)
+    util.copy_file(
+        source=api.backup_hfb_path / Path(db_fn).name, destination=db_fn, exist_ok=True
+    )
 
     # Backup TALYS database file (eg Sn.psf to Sn_<job._id>.bck)
     db_fn_bck = job.doc["database_file_backup"]
@@ -78,6 +81,25 @@ def replaced_database_file(job, api):
 
 class Project(FlowProject):
     pass
+
+
+# todo for T=0 TALYS will run twice in the same folder, overwriting results.
+@Project.operation
+@Project.pre(lambda job: math.isclose(job.sp["temperature"], 0.0))
+@Project.pre(arefiles((talys_api.input_fn, talys_api.energy_fn)))
+@Project.post.isfile(talys_api.output_fn)
+@Project.post(
+    file_contains(
+        talys_api.output_fn,
+        "The TALYS team congratulates you with this successful calculation.",
+    )
+)
+def run_talys_hfb(job):
+    """Run TALYS binary with the original database file (HFB + QRPA result)."""
+    command: str = talys_api.run_command
+    # run TALYS in the job's folder
+    util.sh(command, shell=True, cwd=job.workspace())
+
 
 # NB: do not run this operation in parallel because of race conditions on the database file.
 @Project.operation
