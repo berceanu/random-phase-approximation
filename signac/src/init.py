@@ -10,6 +10,7 @@ import numpy as np
 import mypackage.code_api as code_api
 import mypackage.util as util
 
+# todo test aggregation and animation sub-projects
 def main():
     project = signac.init_project('rpa', workspace="/media/berceanu/berc/rpa/workspace")
 
