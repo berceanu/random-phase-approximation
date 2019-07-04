@@ -397,7 +397,7 @@ def dipole_trans_finite(job):
 def z_fn(job):
     return "z{:03d}".format(job.sp.proton_number)
 
-
+# todo NB: src/templates/z050 is identical to ~/src/backup_talys/structure/gamma/hfb/Sn.psf
 def talys_template_file(job, top_level_dir="src/templates", fname=None):
     if not fname:
         fname = z_fn(job)
