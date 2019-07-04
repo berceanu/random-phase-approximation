@@ -9,7 +9,6 @@ line with
 See also: $ python src/project.py --help
 """
 import logging
-import math
 
 import mypackage.util as util
 import pandas as pd
@@ -46,7 +45,6 @@ class Project(FlowProject):
 
 
 @Project.operation
-@Project.pre(lambda job: math.isclose(job.sp["temperature"], 0.0))
 @Project.pre(arefiles((talys_api.input_fn, talys_api.energy_fn)))
 @Project.post.isfile(talys_api.output_fn)
 @Project.post(
