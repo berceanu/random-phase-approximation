@@ -31,4 +31,5 @@ dependencies:
   - pip
   - setuptools
   - wheel
+  - pre_commit
 
