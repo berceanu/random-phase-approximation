@@ -11,8 +11,7 @@ import mypackage.util as util
 import numpy as np
 import signac
 from jinja2 import Environment, FileSystemLoader
-from mypackage.talys_api import ConfigurationSyntaxError, TalysAPI
-
+from mypackage.talys_api import TalysAPI
 
 # pass folder containing the template
 file_loader = FileSystemLoader("src/templates")
@@ -29,7 +28,8 @@ def energy_values(log=False, digits=None):
     import math
 
     if log:
-        digits = 3
+        if digits is None:
+            digits = 3
 
         v1 = np.linspace(0.001, 0.01, 10)
         v2 = np.linspace(0.015, 0.03, 4)
@@ -43,12 +43,20 @@ def energy_values(log=False, digits=None):
         )
         np.concatenate((v1, v2, v3, v4, v5, v6), out=my_v)
     else:
-        digits = 1
+        if digits is None:
+            digits = 1
 
         my_v, step = np.linspace(0.1, 30.0, 300, retstep=True)
         assert math.isclose(step, 0.1), f"step {step} is not 0.1!"
 
     return my_v.round(digits)
+
+
+def energy_file(job):
+    """Generate TALYS energy input file."""
+    file_path = pathlib.Path(job.fn(talys_api.energy_fn))
+    np.savetxt(file_path, job.sp.projectile_energy, fmt="%.3f", newline=os.linesep)
+    logger.info("Wrote %s" % file_path)
 
 
 def input_file(job):
@@ -64,13 +72,6 @@ def input_file(job):
     util.write_contents_to(job.fn(talys_api.input_fn), input_contents)
 
 
-def energy_file(job):
-    """Generate TALYS energy input file."""
-    file_path = pathlib.Path(job.fn(talys_api.energy_fn))
-    np.savetxt(file_path, job.sp.projectile_energy, fmt="%.3f", newline=os.linesep)
-    logger.info("Wrote %s" % file_path)
-
-
 def database_file_path(job):
     """Return path to job's nucleus data file in TALYS database."""
     element, _ = util.split_element_mass(job)
@@ -82,61 +83,46 @@ def database_file_path(job):
 
 def main():
     talys_proj = signac.init_project("talys", workspace="workspace")
-
-    # todo run on full 56-job workspace/
-
-    statepoint = dict(
-        # atomic number Z
-        proton_number=50,
-        # neutron number N
-        neutron_number=96,
-        # nucleus angular momentum
-        angular_momentum=1,
-        # nucleus parity
-        parity="-",
-        # system temperature in MeV
-        temperature=2.0,
-        # transition energy in MeV
-        transition_energy=0.42,  # 0.42 is random
-        # flag for calculation of astrophysics reaction rate
-        astro="n",  # / "y" todo run with "y" as well
-        # incoming neutron energy
-        projectile_energy=energy_values(log=True),
-    )
-    extra_keys = ("astro", "projectile_energy")
-
-    talys_proj.open_job(statepoint).init()
-    rpa_proj = signac.get_project(root="../")
-    logger.info("rpa project: %s" % rpa_proj.workspace())
     logger.info("talys project: %s" % talys_proj.workspace())
 
-    for talys_job in talys_proj:
-        energy_file(talys_job)
-        input_file(talys_job)
+    rpa_proj = signac.get_project(root="../")
+    logger.info("rpa project: %s" % rpa_proj.workspace())
 
-        talys_job.doc.setdefault(
-            "database_file", database_file_path(talys_job).as_posix()
-        )
-
-        p = pathlib.Path(talys_job.doc["database_file"])
-        database_file_backup = p.parent / (p.stem + f"_{talys_job}.bck")
-        talys_job.doc.setdefault(
-            "database_file_backup", database_file_backup.as_posix()
-        )
-
-        rpa_job = rpa_proj.open_job(
-            statepoint=util.remove_from_dict(dict(talys_job.sp), extra_keys)
-        )
-
-        if rpa_job in rpa_proj:
+    for z_fn, jobs in rpa_proj.find_jobs({"proton_number": 50}).groupbydoc(
+        "talys_input"
+    ):  # todo change to "z_file"
+        for rpa_job in jobs:
             logger.info(f"Processing %s.." % rpa_job.workspace())
-            z_fn = rpa_job.doc["talys_input"]  # todo change back to "z_file"
-            util.copy_file(source=rpa_job.fn(z_fn), destination=talys_job.fn(z_fn))
-            talys_job.doc.setdefault("z_file", z_fn)
-        else:
-            msg = f"{rpa_job} not found in {rpa_proj.root_directory()}"
-            logger.error(msg)
-            raise ConfigurationSyntaxError(msg)
+            sp = rpa_proj.get_statepoint(rpa_job.get_id())
+
+            for yn in "y", "n":
+                sp.update(
+                    dict(
+                        # flag for calculation of astrophysics reaction rate
+                        astro=yn,
+                        # incoming neutron energy
+                        projectile_energy=energy_values(log=True),
+                    )
+                )
+                talys_job = talys_proj.open_job(sp).init()
+
+                util.copy_file(source=rpa_job.fn(z_fn), destination=talys_job.fn(z_fn))
+                talys_job.doc.setdefault("z_file", z_fn)
+
+                energy_file(talys_job)
+                input_file(talys_job)
+
+                talys_job.doc.setdefault(
+                    "database_file", database_file_path(talys_job).as_posix()
+                )
+
+                db_fpath = pathlib.Path(talys_job.doc["database_file"])
+                database_file_backup = db_fpath.parent / (
+                    db_fpath.stem + f"_{talys_job.get_id()}.bck"
+                )
+                talys_job.doc.setdefault(
+                    "database_file_backup", database_file_backup.as_posix()
+                )
 
 
 if __name__ == "__main__":
@@ -146,6 +132,6 @@ if __name__ == "__main__":
         level=logging.INFO,
         datefmt="%Y-%m-%d %H:%M:%S",
     )
-    logger.info("==INIT STARTED==")
+    logger.info("==NEW INIT STARTED==")
     main()
-    logger.info("==INIT FINISHED==")
+    logger.info("==NEW INIT FINISHED==")
