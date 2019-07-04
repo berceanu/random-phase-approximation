@@ -14,7 +14,7 @@ from jinja2 import Environment, FileSystemLoader
 from mypackage.talys_api import TalysAPI
 
 # pass folder containing the template
-file_loader = FileSystemLoader("src/templates")
+file_loader = FileSystemLoader("../src/templates")
 env = Environment(loader=file_loader)
 
 logger = logging.getLogger(__name__)
@@ -76,7 +76,7 @@ def main():
     hfb_qrpa_proj = signac.init_project("hfb_qrpa", workspace="workspace")
     logger.info("hfb_qrpa project: %s" % hfb_qrpa_proj.workspace())
 
-    rpa_proj = signac.get_project(root="../rpa/")
+    rpa_proj = signac.get_project(root="../../rpa/")
     logger.info("rpa project: %s" % rpa_proj.workspace())
 
     for rpa_job in rpa_proj.find_jobs(dict(proton_number=50, temperature=0.0)):
