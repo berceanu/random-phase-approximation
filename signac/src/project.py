@@ -21,11 +21,11 @@ from matplotlib.figure import Figure
 from matplotlib.gridspec import GridSpec
 from signac import get_project
 
-logger = logging.getLogger(__name__)
 import mypackage.code_api as code_api
 import mypackage.util as util
 import mypackage.talys_api as talys
 
+logger = logging.getLogger(__name__)
 logfname = "rpa-project.log"
 
 #####################
@@ -187,7 +187,7 @@ def _run_code(job, temp, state, codepath="../bin", code_mapping=code_api.NameMap
     return command
 
 
-#### ZERO TEMP GROUND STATE ####
+# ZERO TEMP GROUND STATE #
 @Project.operation
 @cmd
 # @Project.pre.true('run_zero_temp_ground_state')
@@ -203,7 +203,7 @@ def run_zero_temp_ground_state(job):
     return _run_code(job, temp="zero", state="ground", code_mapping=code)
 
 
-#### ZERO TEMP EXCITED STATE ####
+# ZERO TEMP EXCITED STATE #
 @Project.operation
 @cmd
 @Project.pre.isfile(code.input_file(temp="zero", state="excited"))
@@ -222,7 +222,7 @@ def run_zero_temp_excited_state(job):
     return _run_code(job, temp="zero", state="excited", code_mapping=code)
 
 
-#### FINITE TEMP GROUND STATE ####
+# FINITE TEMP GROUND STATE #
 @Project.operation
 @cmd
 # @Project.pre.true('run_finite_temp_ground_state')
@@ -240,7 +240,7 @@ def run_finite_temp_ground_state(job):
     return _run_code(job, temp="finite", state="ground", code_mapping=code)
 
 
-#### FINITE TEMP EXCITED STATE ####
+# FINITE TEMP EXCITED STATE #
 @Project.operation
 @cmd
 @Project.pre.isfile(code.input_file(temp="finite", state="excited"))
@@ -322,7 +322,10 @@ def _plot_iso(job, temp, code_mapping=code_api.NameMapping()):
 
     element, mass = util.split_element_mass(job)
     fig.suptitle(
-        fr"Transition strength distribution of ${{}}^{{{mass}}} {element} \; {job.sp.angular_momentum}^{{{job.sp.parity}}}$ at T = {job.sp.temperature} MeV"
+        (
+            fr"Transition strength distribution of ${{}}^{{{mass}}} {element} \; "
+            fr"{job.sp.angular_momentum}^{{{job.sp.parity}}}$ at T = {job.sp.temperature} MeV"
+        )
     )
 
     canvas.print_png(job.fn(PNG_FILE))
@@ -397,7 +400,9 @@ def dipole_trans_finite(job):
 def z_fn(job):
     return "z{:03d}".format(job.sp.proton_number)
 
-# todo NB: src/templates/z050 is identical to ~/src/backup_talys/structure/gamma/hfb/Sn.psf
+
+# NB: src/templates/z050 is identical to ~/src/backup_talys/structure/gamma/hfb/Sn.psf
+# todo take z<NNN> directly from backup_talys/ dir and include other elements besides Sn
 def talys_template_file(job, top_level_dir="src/templates", fname=None):
     if not fname:
         fname = z_fn(job)
@@ -438,6 +443,7 @@ def _generate_talys_input(job, temp, code_mapping=code_api.NameMapping()):
         )
 
 
+# only Sn isotopes (Z = 50) will get processed because we only have templates/z050
 @Project.operation
 @Project.pre(lambda job: os.path.isfile(talys_template_file(job)))
 @Project.pre.isfile(
