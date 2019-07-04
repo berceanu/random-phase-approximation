@@ -12,7 +12,6 @@ import logging
 import os
 from contextlib import contextmanager
 from pathlib import Path
-import math
 
 import mypackage.util as util
 import pandas as pd
@@ -83,24 +82,6 @@ class Project(FlowProject):
     pass
 
 
-# todo for T=0 TALYS will run twice in the same folder, overwriting results.
-@Project.operation
-@Project.pre(lambda job: math.isclose(job.sp["temperature"], 0.0))
-@Project.pre(arefiles((talys_api.input_fn, talys_api.energy_fn)))
-@Project.post.isfile(talys_api.output_fn)
-@Project.post(
-    file_contains(
-        talys_api.output_fn,
-        "The TALYS team congratulates you with this successful calculation.",
-    )
-)
-def run_talys_hfb(job):
-    """Run TALYS binary with the original database file (HFB + QRPA result)."""
-    command: str = talys_api.run_command
-    # run TALYS in the job's folder
-    util.sh(command, shell=True, cwd=job.workspace())
-
-
 # NB: do not run this operation in parallel because of race conditions on the database file.
 @Project.operation
 @Project.pre(arefiles((talys_api.input_fn, talys_api.energy_fn)))
@@ -155,12 +136,7 @@ def plot_cross_section(job):
         label=f"T={job.sp.temperature}",
     )
 
-    ax.set(
-        xlim=[1e-3, 10.0],
-        ylim=[1e-4, 100.0],
-        ylabel=r"Cross-Section [mb]",
-        xlabel=r"$E_n$ [MeV]",
-    )
+    ax.set(ylabel=r"Cross-Section [mb]", xlabel=r"$E_n$ [MeV]")
     element, mass = util.split_element_mass(job)
     ax.text(
         0.7,

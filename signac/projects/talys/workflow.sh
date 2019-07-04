@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
-./cleanup.sh
-./init.sh
-./run.sh
+rm -rf workspace/
+rm -rf signac.rc
+rm -rf project.log
+
+./src/init.py
+
+./src/project.py run
+
