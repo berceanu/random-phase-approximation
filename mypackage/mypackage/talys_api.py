@@ -203,11 +203,6 @@ def replace_table(Z, A, talys, lorvec):
 
 def main():
     logging.basicConfig(level=logging.INFO)
-    # todo for debugging, remove later
-    talys_api = TalysAPI()
-    print(talys_api.run_command)
-    print(talys_api.hfb_path)
-    print(talys_api.backup_hfb_path)
 
 
 if __name__ == "__main__":

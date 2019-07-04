@@ -29,7 +29,7 @@ def atomic_symbol_for_z(atomic_number):
     )
     assert len(periodic_table) == 2 * maxz + 2, "Error in periodic table!"
 
-    atomic_symbol = periodic_table[2 * atomic_number: 2 * atomic_number + 2]
+    atomic_symbol = periodic_table[2 * atomic_number : 2 * atomic_number + 2]
     assert len(atomic_symbol) == 2, "Error in atomic symbol selection!"
 
     return atomic_symbol
@@ -88,14 +88,17 @@ def copy_file(source, destination, exist_ok=False):
     """
     source = pathlib.Path(source)
     destination = pathlib.Path(destination)
-    # todo check source and destination are not identical
+
+    assert source != destination, f"{source} and {destination} are identical!"
     assert source.is_file(), f"{source} not found!"
 
     mode = "wb" if exist_ok else "xb"
     with destination.open(mode=mode) as fid:
         fid.write(source.read_bytes())
 
-    assert areidentical(source, destination), f"{source} and {destination} are not identical!"
+    assert areidentical(
+        source, destination
+    ), f"{source} and {destination} are not identical!"
 
     logger.info("Copied %s to %s" % (source, destination))
 
@@ -116,8 +119,8 @@ def sh(*cmd, **kwargs):
         subprocess.Popen(
             cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, **kwargs
         )
-            .communicate()[0]
-            .decode("utf-8")
+        .communicate()[0]
+        .decode("utf-8")
     )
     logger.info(stdout)
     return stdout

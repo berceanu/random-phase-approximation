@@ -132,6 +132,6 @@ if __name__ == "__main__":
         level=logging.INFO,
         datefmt="%Y-%m-%d %H:%M:%S",
     )
-    logger.info("==NEW INIT STARTED==")
+    logger.info("==INIT STARTED==")
     main()
-    logger.info("==NEW INIT FINISHED==")
+    logger.info("==INIT FINISHED==")
