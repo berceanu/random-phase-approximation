@@ -88,7 +88,7 @@ def copy_file(source, destination, exist_ok=False):
     """
     source = pathlib.Path(source)
     destination = pathlib.Path(destination)
-
+    # todo check source and destination are not identical
     assert source.is_file(), f"{source} not found!"
 
     mode = "wb" if exist_ok else "xb"

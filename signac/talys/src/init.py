@@ -79,6 +79,8 @@ def database_file_path(job):
 def main():
     talys_proj = signac.init_project("talys", workspace="workspace")
 
+    # todo run on full 56-job workspace/
+
     statepoint = dict(
         # atomic number Z
         proton_number=50,
@@ -93,7 +95,7 @@ def main():
         # transition energy in MeV
         transition_energy=0.42,  # 0.42 is random
         # flag for calculation of astrophysics reaction rate
-        astro="n",  # / "y"
+        astro="n",  # / "y" todo run with "y" as well
         # incoming neutron energy
         projectile_energy=energy_values(log=True),
     )
