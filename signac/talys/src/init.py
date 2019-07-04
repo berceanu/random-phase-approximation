@@ -23,6 +23,7 @@ logfname = "project.log"
 
 talys_api = TalysAPI()
 
+
 def energy_values(log=False, digits=None):
     """Generate TALYS energy input file contents."""
     import math
@@ -46,7 +47,7 @@ def energy_values(log=False, digits=None):
 
         my_v, step = np.linspace(0.1, 30.0, 300, retstep=True)
         assert math.isclose(step, 0.1), f"step {step} is not 0.1!"
-        
+
     return my_v.round(digits)
 
 
@@ -55,7 +56,10 @@ def input_file(job):
     element, mass = util.split_element_mass(job)
     # we hit the element with N - 1 with 1 neutron
     input_contents = env.get_template(talys_api.input_template_fn).render(
-        element=element, mass=mass - 1, energy_fname=talys_api.energy_fn, astro=job.sp.astro
+        element=element,
+        mass=mass - 1,
+        energy_fname=talys_api.energy_fn,
+        astro=job.sp.astro,
     )
     util.write_contents_to(job.fn(talys_api.input_fn), input_contents)
 
@@ -126,7 +130,7 @@ def main():
 
         if rpa_job in rpa_proj:
             logger.info(f"Processing %s.." % rpa_job.workspace())
-            z_fn = rpa_job.doc["z_file"]
+            z_fn = rpa_job.doc["talys_input"]  # todo change back to "z_file"
             util.copy_file(source=rpa_job.fn(z_fn), destination=talys_job.fn(z_fn))
             talys_job.doc.setdefault("z_file", z_fn)
         else:

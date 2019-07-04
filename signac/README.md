@@ -6,3 +6,5 @@ python3 src/init.py
 python3 src/project.py run --parallel
 python3 src/project.py status --pretty --full --stack
 python3 src/dashboard.py run --host 0.0.0.0 --port 7777 
+
+# todo revert signac.rc to commit 6be6498f34a4472738eb65cffe6d1832bb19ffe1
