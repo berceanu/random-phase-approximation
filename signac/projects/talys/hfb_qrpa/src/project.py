@@ -90,15 +90,10 @@ def plot_cross_section(job):
         cross_section["energy"],
         cross_section["compound"],
         color="black",
-        label=f"T={job.sp.temperature}",
+        label=f"HFB-QRPA",
     )
 
-    ax.set(
-        xlim=[1e-3, 10.0],
-        ylim=[1e-4, 100.0],
-        ylabel=r"Cross-Section [mb]",
-        xlabel=r"$E_n$ [MeV]",
-    )
+    ax.set(ylabel=r"Cross-Section [mb]", xlabel=r"$E_n$ [MeV]")
     element, mass = util.split_element_mass(job)
     ax.text(
         0.7,
