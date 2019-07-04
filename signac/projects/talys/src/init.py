@@ -85,7 +85,7 @@ def main():
     talys_proj = signac.init_project("talys", workspace="workspace")
     logger.info("talys project: %s" % talys_proj.workspace())
 
-    rpa_proj = signac.get_project(root="../")
+    rpa_proj = signac.get_project(root="../rpa/")
     logger.info("rpa project: %s" % rpa_proj.workspace())
 
     for z_fn, jobs in rpa_proj.find_jobs({"proton_number": 50}).groupbydoc("z_file"):
