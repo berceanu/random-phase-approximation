@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 import signac
 
-# todo: run this at home on old workspace
-
 
 def main():
     rpa_proj = signac.get_project()
