@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from signac_dashboard import Dashboard
 from signac_dashboard.modules.statepoint_list import StatepointList
+from signac_dashboard.modules.document_list import DocumentList
 from signac_dashboard.modules.image_viewer import ImageViewer
 from signac_dashboard.modules.file_list import FileList
 from signac_dashboard.modules.notes import Notes
@@ -29,7 +30,8 @@ if __name__ == "__main__":
     dashboard = MyDashboard(
         modules=[
             ImageViewer(name="Figures", img_globs=["*.png"]),
-            StatepointList(enabled=True),
+            StatepointList(enabled=False),
+            DocumentList(max_chars=140),
             FileList(enabled=False),
             Notes(enabled=False),
         ],
