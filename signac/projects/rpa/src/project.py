@@ -26,7 +26,7 @@ import mypackage.util as util
 import mypackage.talys_api as talys
 
 logger = logging.getLogger(__name__)
-logfname = "rpa-project.log"
+logfname = "project.log"
 
 #####################
 # UTILITY FUNCTIONS #
@@ -174,7 +174,9 @@ def prepare_run_finite(job):
 #################
 
 
-def _run_code(job, temp, state, codepath="../bin", code_mapping=code_api.NameMapping()):
+def _run_code(
+    job, temp, state, codepath="../../../bin", code_mapping=code_api.NameMapping()
+):
     code = os.path.join(codepath, code_mapping.exec_file(temp, state))
     assert os.path.isfile(code), f"{code} not found!"
 

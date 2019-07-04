@@ -10,7 +10,7 @@ import mypackage.util as util
 
 
 def main():
-    project = signac.init_project("rpa", workspace="/media/berceanu/berc/rpa/workspace")
+    project = signac.init_project("rpa", workspace="workspace")
 
     for N in range(76, 96 + 2, 2):
         for T in (0.0, 0.5, 1.0, 2.0):
@@ -53,11 +53,6 @@ def main():
         nneutr = job.sp.neutron_number
         nucleus = util.get_nucleus(proton_number=nprot, neutron_number=nneutr)
         job.doc.setdefault("nucleus", nucleus)
-
-    # project.write_statepoints()
-    # for job in project:
-    #     job.doc.setdefault('run_zero_temp_ground_state', True)
-    #     job.doc.setdefault('run_finite_temp_ground_state', True)
 
 
 if __name__ == "__main__":
