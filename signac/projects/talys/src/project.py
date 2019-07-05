@@ -38,6 +38,9 @@ def file_contains(filename, text):
     )
 
 
+# todo move to mypackage.util
+
+
 def arefiles(file_names):
     """Check if all ``file_names`` are in ``job`` folder."""
     return lambda job: all(job.isfile(fn) for fn in file_names)
@@ -87,7 +90,7 @@ class Project(FlowProject):
 @Project.pre(arefiles((talys_api.input_fn, talys_api.energy_fn)))
 @Project.post.isfile(talys_api.output_fn)
 @Project.post(
-    file_contains(
+    file_contains(  # todo check last line only
         talys_api.output_fn,
         "The TALYS team congratulates you with this successful calculation.",
     )
