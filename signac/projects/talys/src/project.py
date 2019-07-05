@@ -106,6 +106,7 @@ def run_talys(job):
     really_run_talys()
 
 
+# todo move to mypackage.talys_plots
 @Project.operation
 @Project.pre.after(run_talys)
 @Project.pre.isfile(talys_api.cross_section_fn)
