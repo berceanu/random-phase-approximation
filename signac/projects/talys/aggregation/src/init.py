@@ -5,29 +5,52 @@ Iterates over all defined state points and initializes
 the associated job workspace directories."""
 import logging
 
-import mypackage.util as util
 import signac
-from mypackage.talys_api import TalysAPI
 
 # pass folder containing the template
 
 logger = logging.getLogger(__name__)
 logfname = "project.log"
 
-talys_api = TalysAPI()
+
+# {
+#  'proton_number': 'int([50], 1)',
+#  'neutron_number': 'int([76, 78, 80, ..., 94, 96], 11)',
+
+#  'temperature': 'float([0.0, 0.5, 1.0, 2.0], 4)',
+
+# *'astro': 'str([n, y], 2)',
+# }
 
 
 def main():
-    talys_proj = signac.init_project("talys", workspace="workspace")
+    talys_aggregation_proj = signac.init_project("talys-aggregation")
+    logger.info("talys-aggregation project: %s" % talys_aggregation_proj.workspace())
+
+    talys_proj = signac.get_project(root="../")
     logger.info("talys project: %s" % talys_proj.workspace())
 
-    rpa_proj = signac.get_project(root="../rpa/")
-    logger.info("rpa project: %s" % rpa_proj.workspace())
+    hfb_qrpa_proj = signac.get_project(root="../hfb_qrpa/")
+    logger.info("hfb+qrpa project: %s" % hfb_qrpa_proj.workspace())
 
-    for z_fn, jobs in rpa_proj.find_jobs({"proton_number": 50}).groupbydoc("z_file"):
+    # astro="n"
+    # cross section: (temperature, mass number, energy)
+
+    # cross section vs energy @ fixed (aggregated) temperature
+    # cross section vs energy @ fixed (aggregated) mass number
+    # Note: add HFB+QRPA result as well from hfb_qrpa_proj
+
+    # astro="y"
+    # neutron capture rate: (mass number, temperature)
+
+    # neutron capture rate vs mass number @ fixed (aggregated) temperature
+    # neutron capture rate vs temperature @ fixed (aggregated) mass number
+    # Note: the HFB+QRPA result now depends on temperature
+
+    for z_fn, jobs in talys_proj.find_jobs({"proton_number": 50}).groupbydoc("z_file"):
         for rpa_job in jobs:
             logger.info(f"Processing %s.." % rpa_job.workspace())
-            sp = rpa_proj.get_statepoint(rpa_job.get_id())
+            sp = talys_proj.get_statepoint(rpa_job.get_id())
 
             for yn in "y", "n":
                 sp.update(
@@ -36,10 +59,7 @@ def main():
                         astro=yn
                     )
                 )
-                talys_job = talys_proj.open_job(sp).init()
-
-                util.copy_file(source=rpa_job.fn(z_fn), destination=talys_job.fn(z_fn))
-                talys_job.doc.setdefault("z_file", z_fn)
+                # talys_job = talys_aggregation_proj.open_job(sp).init()
 
 
 if __name__ == "__main__":
