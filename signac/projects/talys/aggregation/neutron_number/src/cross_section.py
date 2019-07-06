@@ -1,8 +1,4 @@
 #!/usr/bin/env python3
-"""Initialize the project's data space.
-
-Iterates over all defined state points and initializes
-the associated job workspace directories."""
 import logging
 
 import signac
@@ -12,13 +8,13 @@ logfname = "project.log"
 
 
 def main():
-    talys_aggregation_proj = signac.init_project("talys-aggregation")
-    logger.info("talys-aggregation project: %s" % talys_aggregation_proj.workspace())
+    proj = signac.init_project("proj")
+    logger.info("current project: %s" % proj.workspace())
 
-    talys_proj = signac.get_project(root="../")
+    talys_proj = signac.get_project(root="../../")
     logger.info("talys project: %s" % talys_proj.workspace())
 
-    hfb_qrpa_proj = signac.get_project(root="../hfb_qrpa/")
+    hfb_qrpa_proj = signac.get_project(root="../../hfb_qrpa/")
     logger.info("hfb+qrpa project: %s" % hfb_qrpa_proj.workspace())
 
 
