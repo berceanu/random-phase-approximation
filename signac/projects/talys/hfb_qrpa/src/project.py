@@ -11,11 +11,12 @@ See also: $ python src/project.py --help
 import logging
 
 import mypackage.util as util
-import pandas as pd
 from flow import FlowProject
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 from mypackage.talys_api import TalysAPI
+import mypackage.talys_data as data
+import mypackage.talys_plotting as plotting
 
 logger = logging.getLogger(__name__)
 logfname = "project.log"
@@ -70,43 +71,32 @@ def run_talys(job):
 @Project.post.isfile(talys_api.cross_section_png_fn)
 def plot_cross_section(job):
     """Plot the TALYS output to get cross-section."""
-    cross_section = pd.read_csv(
-        job.fn(talys_api.cross_section_fn),
-        sep=r"\s+",
-        header=None,
-        comment="#",
-        names=[
-            "energy",
-            "xs",
-            "gamma_xs",
-            "xs_over_res_prod_xs",
-            "direct",
-            "preequilibrium",
-            "compound",
-        ],
-    )
+
+    cross_section = data.read_cross_section(job.fn(talys_api.cross_section_fn))
 
     fig = Figure(figsize=(6.4, 6.4))
     canvas = FigureCanvas(fig)
     ax = fig.add_subplot(111)
 
-    ax.loglog(
+    atomic_symbol, mass_number = util.get_nucleus(
+        job.sp.proton_number, job.sp.neutron_number, joined=False
+    )
+    text = r"${}^{%d}$%s(n,$\gamma$)${}^{%d}$%s" % (
+        mass_number - 1,
+        atomic_symbol,
+        mass_number,
+        atomic_symbol,
+    )
+
+    plotting.plot_cross_section(
+        ax,
         cross_section["energy"],
         cross_section["compound"],
         color="black",
         label=f"HFB-QRPA",
+        text=text,
     )
 
-    ax.set(ylabel=r"Cross-Section [mb]", xlabel=r"$E_n$ [MeV]")
-    element, mass = util.split_element_mass(job)
-    ax.text(
-        0.7,
-        0.95,
-        r"${}^{%d}$%s(n,$\gamma$)${}^{%d}$%s" % (mass - 1, element, mass, element),
-        transform=ax.transAxes,
-        color="black",
-    )
-    ax.legend(loc="lower left")
     canvas.print_png(job.fn(talys_api.cross_section_png_fn))
     logger.info("Saved %s" % job.fn(talys_api.cross_section_png_fn))
 
