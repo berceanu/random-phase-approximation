@@ -23,6 +23,8 @@ def main():
     for rpa_job in rpa_proj.find_jobs(dict(proton_number=50, temperature=0.0)):
         logger.info(f"Processing %s.." % rpa_job.workspace())
         sp = rpa_proj.get_statepoint(rpa_job.get_id())
+        del sp["temperature"]
+        del sp["transition_energy"]
 
         for yn in "y", "n":
             sp.update(
