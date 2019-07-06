@@ -35,19 +35,25 @@ def atomic_symbol_for_z(atomic_number):
     return atomic_symbol
 
 
-def get_nucleus(proton_number, neutron_number):
+def get_nucleus(proton_number, neutron_number, joined=True):
     """Return nuclide symbol, given the proton and neutron numbers.
 
     >>> get_nucleus(proton_number=50, neutron_number=82)
-    'SN132'
+    '132Sn'
     """
 
-    atomic_symbol = atomic_symbol_for_z(proton_number)
+    atomic_symbol = atomic_symbol_for_z(proton_number).title()
     mass_number = proton_number + neutron_number  # A = Z + N
-    return f"{atomic_symbol}{mass_number}"
+
+    if joined:
+        return f"{mass_number}{atomic_symbol}"
+    else:
+        return atomic_symbol, mass_number
 
 
-def split_element_mass(job):
+def split_element_mass(
+    job
+):  # todo remove and use ``get_nucleus(.., joined=False)`` instead
     mass_number = job.sp.proton_number + job.sp.neutron_number
     element = atomic_symbol_for_z(job.sp.proton_number)
     element = element.title()  # capitalize first letter only
