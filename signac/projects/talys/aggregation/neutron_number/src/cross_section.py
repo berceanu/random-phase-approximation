@@ -17,6 +17,13 @@ def main():
     hfb_qrpa_proj = signac.get_project(root="../../hfb_qrpa/")
     logger.info("hfb+qrpa project: %s" % hfb_qrpa_proj.workspace())
 
+    for neutron_number, jobs in talys_proj.find_jobs(
+        {"proton_number": 50, "astro": "n"}
+    ).groupby("neutron_number"):
+        print("\n", neutron_number, "\n")
+        for job in jobs:
+            print(job.sp.neutron_number + job.sp.proton_number, job.sp.temperature)
+
 
 if __name__ == "__main__":
     logging.basicConfig(
