@@ -33,21 +33,6 @@ def main():
     hfb_qrpa_proj = signac.get_project(root="../hfb_qrpa/")
     logger.info("hfb+qrpa project: %s" % hfb_qrpa_proj.workspace())
 
-    # cross section: (temperature, mass number, energy)
-    # neutron capture rate: (temperature, mass number)
-
-    # index: job.sp.proton_number, job.sp.neutron_number
-    # * cross section vs energy @ fixed (aggregated) temperature (11 plots) | astro="n"
-    # Note: add HFB+QRPA result as well from hfb_qrpa_proj
-    # neutron capture rate vs temperature @ fixed mass number (11 plots) | astro="y"
-    # Note: the HFB+QRPA result now depends on temperature
-
-    # index: job.sp.proton_number, job.sp.temperature
-    # cross section vs energy @ fixed (aggregated) mass number (4 plots) | astro="n"
-    # Note: add HFB+QRPA result as well from hfb_qrpa_proj
-    # * neutron capture rate vs mass number @ fixed temperature (4 plots) | astro="y"
-    # Note: the HFB+QRPA result now depends on temperature
-
     for z_fn, jobs in talys_proj.find_jobs({"proton_number": 50}).groupbydoc("z_file"):
         for rpa_job in jobs:
             logger.info(f"Processing %s.." % rpa_job.workspace())
