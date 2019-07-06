@@ -21,6 +21,8 @@ env = Environment(loader=loader)
 
 logger = logging.getLogger(__name__)
 
+# move this file to talys/api submodule
+
 
 class ConfigurationSyntaxError(Exception):
     pass
