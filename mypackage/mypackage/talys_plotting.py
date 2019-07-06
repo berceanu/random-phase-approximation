@@ -9,17 +9,12 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def plot_cross_section(ax, horiz_data, vert_data, label, color, text):
-    ax.loglog(horiz_data, vert_data, color=color, label=label)
+# todo refactor
+def plot_cross_section(ax, horiz_data, vert_data, label, color, text, linestyle="-"):
+    ax.loglog(horiz_data, vert_data, color=color, linestyle=linestyle, label=label)
 
     ax.set(ylabel=r"Cross-Section [mb]", xlabel=r"$E_n$ [MeV]")
-    ax.text(
-        0.7,
-        0.95,
-        text,
-        transform=ax.transAxes,
-        # color="black",
-    )
+    ax.text(0.7, 0.95, text, transform=ax.transAxes)
     ax.legend(loc="lower left")
 
 
