@@ -3,24 +3,27 @@ This module contains functions for generating TALYS database files.
 It also stores the common filenames / paths used when running TALYS.
 """
 
-import pandas as pd
-import re
-import os
-import math
-import numpy as np
-from collections import OrderedDict
-import pathlib
-from dataclasses import dataclass
 import logging
-from . import util
-from . import talys_data as data
+import math
+import os
+import pathlib
+import re
+from collections import OrderedDict
+from dataclasses import dataclass
+
+import numpy as np
+import pandas as pd
 from jinja2 import Environment, PackageLoader
+
+from . import talys_data as data
+from . import util
 
 # pass folder containing the template
 loader = PackageLoader("mypackage", "templates")
 env = Environment(loader=loader)
 
 logger = logging.getLogger(__name__)
+
 
 # move this file to talys/api submodule
 

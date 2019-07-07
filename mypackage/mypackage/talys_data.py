@@ -1,10 +1,9 @@
 """
 This module contains functions for loading/postprocessing TALYS data.
 """
-import pandas as pd
 import logging
 
-# from . import util
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
