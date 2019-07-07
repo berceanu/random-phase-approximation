@@ -46,10 +46,6 @@ def main():
             {"proton_number": 50, "neutron_number": neutron_number}
         ).init()
 
-        fig = Figure(figsize=(6.4, 6.4))
-        canvas = FigureCanvas(fig)
-        ax = fig.add_subplot(111)
-
         atomic_symbol, mass_number = util.get_nucleus(50, neutron_number, joined=False)
         text = r"${}^{%d}$%s(n,$\gamma$)${}^{%d}$%s" % (
             mass_number - 1,
@@ -57,6 +53,11 @@ def main():
             mass_number,
             atomic_symbol,
         )
+
+        fig = Figure(figsize=(6.4, 6.4))
+        fig.suptitle(text)
+        canvas = FigureCanvas(fig)
+        ax = fig.add_subplot(111)
 
         for talys_job in sorted(talys_jobs, key=lambda jb: jb.sp.temperature):
             cross_section = data.read_cross_section(
@@ -70,7 +71,6 @@ def main():
                 color=STYLE[str(talys_job.sp.temperature)]["color"],
                 linestyle=STYLE[str(talys_job.sp.temperature)]["linestyle"],
                 label=f"T={talys_job.sp.temperature}",
-                text=text,
             )
 
         # add HFB+QRPA data
@@ -95,7 +95,6 @@ def main():
             color="black",
             linestyle="-",
             label=f"HFB-QRPA",
-            text=text,
         )
 
         png_fn = "cross_section_all_T.png"
