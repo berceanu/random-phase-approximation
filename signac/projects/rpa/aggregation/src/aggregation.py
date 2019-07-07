@@ -28,6 +28,8 @@ y_formatter.set_powerlimits((min_exp, 5))
 line_colors = ["C0", "C1", "C2", "C3"]
 line_styles = ["-", "--", ":", "-."]
 
+# todo move to plotting module in mypackage
+
 cyl = cycler(color=line_colors) + cycler(linestyle=line_styles)
 vert_cyl = cycler(colors=line_colors) + cycler(linestyles=line_styles)
 

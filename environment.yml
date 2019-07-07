@@ -32,4 +32,5 @@ dependencies:
   - setuptools
   - wheel
   - pre_commit
-
+  - pip:
+    - matplotlib-label-lines
