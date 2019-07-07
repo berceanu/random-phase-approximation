@@ -31,3 +31,5 @@ ng_col = f"(n,g){nucleus}"
 neutron_capture_rate_df = astrorate_df[["T9", ng_col]]
 
 print(neutron_capture_rate_df)
+
+# todo remove file

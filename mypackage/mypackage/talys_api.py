@@ -13,6 +13,7 @@ import pathlib
 from dataclasses import dataclass
 import logging
 from . import util
+from . import talys_data as data
 from jinja2 import Environment, PackageLoader
 
 # pass folder containing the template
@@ -39,6 +40,7 @@ class TalysAPI:
     backup_hfb_path = pathlib.Path(str(hfb_path).replace("talys", "backup_talys"))
     stderr_fn = "stderr.txt"
     cross_section_fn = "xs000000.tot"
+    astrorate_fn = "astrorate.tot"
     cross_section_png_fn = "xsec.png"
 
     @property
@@ -52,6 +54,14 @@ class TalysAPI:
 
 
 # todo refactor functions below into TalysAPI methods
+
+
+def read_neutron_capture_rate(job, api=TalysAPI()):
+    nucleus = util.get_nucleus(job.sp.proton_number, job.sp.neutron_number)
+    ng_col = f"(n,g){nucleus}"
+    astrorate_df = data.read_astrorate(job.fn(api.astrorate_fn))
+    df = astrorate_df[["T9", ng_col]]
+    return df
 
 
 def database_file_path(job, api=TalysAPI()):

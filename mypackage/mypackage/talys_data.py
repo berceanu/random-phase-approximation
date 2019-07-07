@@ -28,6 +28,11 @@ def read_cross_section(fn):
     return df
 
 
+def read_astrorate(fn):
+    df = pd.read_csv(fn, sep=r"\s+", comment="#")
+    return df
+
+
 def main():
     logging.basicConfig(level=logging.INFO)
 
