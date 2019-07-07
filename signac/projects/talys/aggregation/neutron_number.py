@@ -15,8 +15,6 @@ from matplotlib.figure import Figure
 line_colors = ["C0", "C1", "C2", "C3"]
 line_styles = ["-", "--", ":", "-."]
 
-# todo move to plotting module in mypackage
-
 cyl = cycler(color=line_colors) + cycler(linestyle=line_styles)
 
 loop_cy_iter = cyl()
@@ -30,13 +28,13 @@ talys_api = api.TalysAPI()
 
 
 def main():
-    proj = signac.init_project("proj")
+    proj = signac.init_project("proj", root="neutron_number/")
     logger.info("current project: %s" % proj.workspace())
 
-    talys_proj = signac.get_project(root="../../")
+    talys_proj = signac.get_project(root="../")
     logger.info("talys project: %s" % talys_proj.workspace())
 
-    hfb_qrpa_proj = signac.get_project(root="../../hfb_qrpa/")
+    hfb_qrpa_proj = signac.get_project(root="../hfb_qrpa/")
     logger.info("hfb+qrpa project: %s" % hfb_qrpa_proj.workspace())
 
     # cross section vs energy @ fixed mass number
