@@ -51,15 +51,6 @@ def get_nucleus(proton_number, neutron_number, joined=True):
         return atomic_symbol, mass_number
 
 
-def split_element_mass(
-    job
-):  # todo remove and use ``get_nucleus(.., joined=False)`` instead
-    mass_number = job.sp.proton_number + job.sp.neutron_number
-    element = atomic_symbol_for_z(job.sp.proton_number)
-    element = element.title()  # capitalize first letter only
-    return element, mass_number
-
-
 def write_contents_to(file_path, contents):
     """Write ``contents`` to ``file_path``.
 

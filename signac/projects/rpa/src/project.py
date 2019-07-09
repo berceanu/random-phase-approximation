@@ -322,10 +322,10 @@ def _plot_iso(job, temp, code_mapping=code_api.NameMapping()):
     ax["isovector"].set(xlabel="E (MeV)")
     fig.subplots_adjust(hspace=0.3)
 
-    element, mass = util.split_element_mass(job)
+    atomic_symbol, mass_number = util.get_nucleus(job.sp.proton_number, job.sp.neutron_number, joined=False)
     fig.suptitle(
         (
-            fr"Transition strength distribution of ${{}}^{{{mass}}} {element} \; "
+            fr"Transition strength distribution of ${{}}^{{{mass_number}}} {atomic_symbol} \; "
             fr"{job.sp.angular_momentum}^{{{job.sp.parity}}}$ at T = {job.sp.temperature} MeV"
         )
     )

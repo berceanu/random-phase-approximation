@@ -69,8 +69,9 @@ def read_neutron_capture_rate(job, api=TalysAPI()):
 
 def database_file_path(job, api=TalysAPI()):
     """Return path to job's nucleus data file in TALYS database."""
-    element, _ = util.split_element_mass(job)
-    database_file = api.hfb_path / f"{element}.psf"
+    atomic_symbol, _ = util.get_nucleus(job.sp.proton_number, job.sp.neutron_number, joined=False)
+
+    database_file = api.hfb_path / f"{atomic_symbol}.psf"
 
     assert database_file.is_file(), f"{database_file} not found!"
     return database_file
@@ -112,10 +113,11 @@ def energy_file(job, api=TalysAPI()):
 
 def input_file(job, api=TalysAPI()):
     """Generate TALYS input file."""
-    element, mass = util.split_element_mass(job)
+    atomic_symbol, mass_number = util.get_nucleus(job.sp.proton_number, job.sp.neutron_number, joined=False)
+
     # we hit the element with N - 1 with 1 neutron
     input_contents = env.get_template(api.input_template_fn).render(
-        element=element, mass=mass - 1, energy_fname=api.energy_fn, astro=job.sp.astro
+        element=atomic_symbol, mass=mass_number - 1, energy_fname=api.energy_fn, astro=job.sp.astro
     )
     util.write_contents_to(job.fn(api.input_fn), input_contents)
 
