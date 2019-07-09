@@ -138,11 +138,10 @@ def main_groupby(args):
 
     code = code_api.NameMapping()
 
-    for key, group in rpa.groupby(("proton_number", "neutron_number")):
-        logger.info("(Z, N) =  (%s, %s)" % key)
-        nucleus = util.get_nucleus(*key)
-        mass_number = sum(key)
-        element = util.atomic_symbol_for_z(key[0]).title()
+    for (z, n), group in rpa.groupby(("proton_number", "neutron_number")):
+        logger.info("(Z, N) =  (%s, %s)" % (z, n))
+
+        atomic_symbol, mass_number = util.get_nucleus(z, n, joined=False)
 
         gr1, gr2 = it.tee(group)
 
@@ -168,12 +167,12 @@ def main_groupby(args):
         with aggregation.open_job(
             const_sp
         ) as agg_job:  # .init() implicitly called here
-            agg_job.doc["nucleus"] = nucleus
+            agg_job.doc["nucleus"] = str(mass_number) + atomic_symbol
             agg_job.doc.update(origin)
 
             fig.suptitle(
                 (
-                    fr"Transition strength distribution of ${{}}^{{{mass_number}}} {element} \; "
+                    fr"Transition strength distribution of ${{}}^{{{mass_number}}} {atomic_symbol} \; "
                     fr"{agg_job.sp.angular_momentum}^{{{agg_job.sp.parity}}}$"
                 )
             )

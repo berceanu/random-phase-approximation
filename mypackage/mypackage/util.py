@@ -35,14 +35,17 @@ def atomic_symbol_for_z(atomic_number):
     return atomic_symbol
 
 
-def get_nucleus(proton_number, neutron_number, joined=True):
+def get_nucleus(proton_number, neutron_number, joined=True, capitalize=True):
     """Return nuclide symbol, given the proton and neutron numbers.
 
     >>> get_nucleus(proton_number=50, neutron_number=82)
     '132Sn'
     """
+    atomic_symbol = atomic_symbol_for_z(proton_number)
 
-    atomic_symbol = atomic_symbol_for_z(proton_number).title()
+    if capitalize:
+        atomic_symbol = atomic_symbol.title()
+
     mass_number = proton_number + neutron_number  # A = Z + N
 
     if joined:
