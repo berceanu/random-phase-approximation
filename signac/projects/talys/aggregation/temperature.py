@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 import logging
 from collections import defaultdict
+import pathlib
 
 import mypackage.talys_api as api
 import mypackage.talys_data as data
 import mypackage.talys_plotting as plotting
+from cleanup import cleanup_proj
 import pandas as pd
 import signac
 from cycler import cycler
@@ -21,14 +23,14 @@ loop_cy_iter = cyl()
 
 STYLE = defaultdict(lambda: next(loop_cy_iter))
 
+proj_root = pathlib.Path("temperature/")
 logger = logging.getLogger(__name__)
-logfname = "project.log"
 
 talys_api = api.TalysAPI()
 
 
 def main():
-    proj = signac.init_project("proj", root="temperature/")
+    proj = signac.init_project("proj", root=proj_root)
     logger.info("current project: %s" % proj.workspace())
 
     talys_proj = signac.get_project(root="../")
@@ -176,8 +178,10 @@ def main():
 # todo refactor
 
 if __name__ == "__main__":
+    cleanup_proj(root=proj_root)
+
     logging.basicConfig(
-        filename=logfname,
+        filename=proj_root / "project.log",
         format="%(asctime)s - %(name)s - %(levelname)-8s - %(message)s",
         level=logging.INFO,
         datefmt="%Y-%m-%d %H:%M:%S",
