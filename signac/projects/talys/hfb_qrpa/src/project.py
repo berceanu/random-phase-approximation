@@ -93,7 +93,7 @@ def plot_cross_section(job):
         cross_section["compound"],
         color="black",
         label=f"HFB-QRPA",
-        text=text,
+        title=text,
     )
 
     canvas.print_png(job.fn(talys_api.cross_section_png_fn))
