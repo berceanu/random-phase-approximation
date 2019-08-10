@@ -8,7 +8,6 @@ from matplotlib.ticker import MaxNLocator
 logger = logging.getLogger(__name__)
 
 
-# todo refactor
 def plot_cross_section(
     ax,
     horiz_data,

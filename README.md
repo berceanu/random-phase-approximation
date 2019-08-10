@@ -57,6 +57,3 @@ ACRONYMS:
 - _FTRRPA_ : self-consistent Finite-Temperature Relativistic Random Phase Approximation
 - _QRPA_ : Quasiparticle Random Phase Approximation
 
-TODO:
-
-- [ ] rename `Jinja` template files to `.j2` extension
