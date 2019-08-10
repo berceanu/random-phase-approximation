@@ -52,28 +52,46 @@ class TalysAPI:
             f"{self.binary_fn} < {self.input_fn} > {self.output_fn} 2> {self.stderr_fn}"
         )
 
+    def read_neutron_capture_rate(self, job):
+        nucleus = util.get_nucleus(job.sp.proton_number, job.sp.neutron_number)
+        ng_col = f"(n,g){nucleus}"
+        astrorate_df = data.read_astrorate(job.fn(self.astrorate_fn))
+        df = astrorate_df[["T9", ng_col]]
+        return df
 
-# todo refactor functions below into TalysAPI methods
+    def database_file_path(self, job):
+        """Return path to job's nucleus data file in TALYS database."""
+        atomic_symbol, _ = util.get_nucleus(
+            job.sp.proton_number, job.sp.neutron_number, joined=False
+        )
 
+        database_file = self.hfb_path / f"{atomic_symbol}.psf"
 
-def read_neutron_capture_rate(job, api=TalysAPI()):
-    nucleus = util.get_nucleus(job.sp.proton_number, job.sp.neutron_number)
-    ng_col = f"(n,g){nucleus}"
-    astrorate_df = data.read_astrorate(job.fn(api.astrorate_fn))
-    df = astrorate_df[["T9", ng_col]]
-    return df
+        assert database_file.is_file(), f"{database_file} not found!"
+        return database_file
 
+    def input_file(self, job):
+        """Generate TALYS input file."""
+        atomic_symbol, mass_number = util.get_nucleus(
+            job.sp.proton_number, job.sp.neutron_number, joined=False
+        )
 
-def database_file_path(job, api=TalysAPI()):
-    """Return path to job's nucleus data file in TALYS database."""
-    atomic_symbol, _ = util.get_nucleus(
-        job.sp.proton_number, job.sp.neutron_number, joined=False
-    )
+        # we hit the element with N - 1 with 1 neutron
+        input_contents = env.get_template(self.input_template_fn).render(
+            element=atomic_symbol,
+            mass=mass_number - 1,
+            energy_fname=self.energy_fn,
+            astro=job.sp.astro,
+        )
+        util.write_contents_to(job.fn(self.input_fn), input_contents)
 
-    database_file = api.hfb_path / f"{atomic_symbol}.psf"
-
-    assert database_file.is_file(), f"{database_file} not found!"
-    return database_file
+    def energy_file(self, job):
+        """Generate TALYS energy input file."""
+        file_path = pathlib.Path(job.fn(self.energy_fn))
+        np.savetxt(
+            file_path, energy_values(job, log=True), fmt="%.3f", newline=os.linesep
+        )
+        logger.info("Wrote %s" % file_path)
 
 
 def energy_values(job, log=False, digits=None):
@@ -101,29 +119,6 @@ def energy_values(job, log=False, digits=None):
         assert math.isclose(step, 0.1), f"step {step} is not 0.1!"
 
     return my_v.round(digits)
-
-
-def energy_file(job, api=TalysAPI()):
-    """Generate TALYS energy input file."""
-    file_path = pathlib.Path(job.fn(api.energy_fn))
-    np.savetxt(file_path, energy_values(job, log=True), fmt="%.3f", newline=os.linesep)
-    logger.info("Wrote %s" % file_path)
-
-
-def input_file(job, api=TalysAPI()):
-    """Generate TALYS input file."""
-    atomic_symbol, mass_number = util.get_nucleus(
-        job.sp.proton_number, job.sp.neutron_number, joined=False
-    )
-
-    # we hit the element with N - 1 with 1 neutron
-    input_contents = env.get_template(api.input_template_fn).render(
-        element=atomic_symbol,
-        mass=mass_number - 1,
-        energy_fname=api.energy_fn,
-        astro=job.sp.astro,
-    )
-    util.write_contents_to(job.fn(api.input_fn), input_contents)
 
 
 def cast_to(to_type, iterable):

@@ -118,7 +118,7 @@ def main():
         rate_hfb_df = pd.DataFrame(columns=cols)
 
         for talys_job in sorted(talys_jobs, key=lambda jb: jb.sp.neutron_number):
-            df = api.read_neutron_capture_rate(talys_job)
+            df = talys_api.read_neutron_capture_rate(talys_job)
             #  find closest temperature to the job's temperature
             closest_df = df.iloc[(df["T9"] - temperature).abs().argsort()[:1]]
             row = {
@@ -141,7 +141,7 @@ def main():
                     )
                 )
             )
-            df = api.read_neutron_capture_rate(hfb_qrpa_job)
+            df = talys_api.read_neutron_capture_rate(hfb_qrpa_job)
             #  find closest temperature to the job's temperature
             closest_df = df.iloc[(df["T9"] - temperature).abs().argsort()[:1]]
             row = {

@@ -6,11 +6,13 @@ the associated job workspace directories."""
 import logging
 import signac
 
-from mypackage.talys.api import energy_file, input_file
+from mypackage.talys.api import TalysAPI
 
 
 logger = logging.getLogger(__name__)
 logfname = "project.log"
+
+talys_api = TalysAPI()
 
 
 def main():
@@ -35,8 +37,8 @@ def main():
             )
             talys_job = hfb_qrpa_proj.open_job(sp).init()
 
-            energy_file(talys_job)
-            input_file(talys_job)
+            talys_api.energy_file(talys_job)
+            talys_api.input_file(talys_job)
 
 
 if __name__ == "__main__":

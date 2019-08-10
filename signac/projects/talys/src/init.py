@@ -8,11 +8,12 @@ import pathlib
 
 import signac
 import mypackage.util as util
-from mypackage.talys.api import energy_file, input_file, database_file_path
-
+from mypackage.talys.api import TalysAPI
 
 logger = logging.getLogger(__name__)
 logfname = "project.log"
+
+talys_api = TalysAPI()
 
 
 def main():
@@ -39,11 +40,11 @@ def main():
                 util.copy_file(source=rpa_job.fn(z_fn), destination=talys_job.fn(z_fn))
                 talys_job.doc.setdefault("z_file", z_fn)
 
-                energy_file(talys_job)
-                input_file(talys_job)
+                talys_api.energy_file(talys_job)
+                talys_api.input_file(talys_job)
 
                 talys_job.doc.setdefault(
-                    "database_file", database_file_path(talys_job).as_posix()
+                    "database_file", talys_api.database_file_path(talys_job).as_posix()
                 )
 
                 db_fpath = pathlib.Path(talys_job.doc["database_file"])
