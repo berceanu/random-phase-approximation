@@ -9,9 +9,6 @@ line with
 See also: $ python src/project.py --help
 """
 import logging
-import os
-from contextlib import contextmanager
-from pathlib import Path
 
 import mypackage.util as util
 from flow import FlowProject
@@ -26,41 +23,6 @@ logger = logging.getLogger(__name__)
 logfname = "project.log"
 
 talys_api = TalysAPI()
-
-
-@contextmanager
-def replaced_database_file(job, api):
-    # remove previous backup files
-    all_bck_files = api.hfb_path.glob("*.bck")
-    counter = 0
-    for path in all_bck_files:
-        counter += 1
-        path.unlink()
-        logger.info("Removed %s" % path)
-    if counter == 0:
-        logger.info("No previous backup files found.")
-
-    # restore original database file
-    db_fn = job.doc["database_file"]
-    util.copy_file(
-        source=api.backup_hfb_path / Path(db_fn).name, destination=db_fn, exist_ok=True
-    )
-
-    # Backup TALYS database file (eg Sn.psf to Sn_<job._id>.bck)
-    db_fn_bck = job.doc["database_file_backup"]
-    util.copy_file(source=db_fn, destination=db_fn_bck)
-
-    # Replace TALYS database file (eg Sn.psf) with the job's file (eg. z050).
-    util.copy_file(source=job.fn(job.doc["z_file"]), destination=db_fn, exist_ok=True)
-    try:
-        yield
-    finally:
-        # Restore original TALYS database file (eg Sn.psf) from backup.
-        util.copy_file(source=db_fn_bck, destination=db_fn, exist_ok=True)
-
-        # Delete TALYS database file backup (eg. Sn_<job._id>.bck).
-        os.remove(db_fn_bck)
-        logger.info("Removed %s" % db_fn_bck)
 
 
 class Project(FlowProject):
@@ -78,7 +40,7 @@ class Project(FlowProject):
     )
 )
 def run_talys(job):
-    @replaced_database_file(job=job, api=talys_api)
+    @talys_api.replaced_database_file(job=job)
     def really_run_talys():
         """Run TALYS binary with the new database file."""
         command: str = talys_api.run_command

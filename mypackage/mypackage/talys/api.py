@@ -10,6 +10,7 @@ import pathlib
 import re
 from collections import OrderedDict
 from dataclasses import dataclass
+from contextlib import contextmanager
 
 import numpy as np
 import pandas as pd
@@ -69,6 +70,35 @@ class TalysAPI:
 
         assert database_file.is_file(), f"{database_file} not found!"
         return database_file
+
+    @contextmanager
+    def replaced_database_file(self, job):
+        if list(self.hfb_path.glob("*.bck")):
+            raise AssertionError("Found previous backup files!")
+
+        db_fn = job.doc["database_file"]
+        if not util.areidentical(
+            self.backup_hfb_path / pathlib.Path(db_fn).name, db_fn
+        ):
+            raise AssertionError("TALYS photon strength function file corrupt!")
+
+        # Backup TALYS database file (eg Sn.psf to Sn_<job._id>.bck)
+        db_fn_bck = job.doc["database_file_backup"]
+        util.copy_file(source=db_fn, destination=db_fn_bck)
+
+        # Replace TALYS database file (eg Sn.psf) with the job's file (eg. z050).
+        util.copy_file(
+            source=job.fn(job.doc["z_file"]), destination=db_fn, exist_ok=True
+        )
+        try:
+            yield
+        finally:
+            # Restore original TALYS database file (eg Sn.psf) from backup.
+            util.copy_file(source=db_fn_bck, destination=db_fn, exist_ok=True)
+
+            # Delete TALYS database file backup (eg. Sn_<job._id>.bck).
+            os.remove(db_fn_bck)
+            logger.info("Removed %s" % db_fn_bck)
 
     def input_file(self, job):
         """Generate TALYS input file."""
