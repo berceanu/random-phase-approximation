@@ -19,13 +19,10 @@ from . import data
 from mypackage import util
 
 # pass folder containing the template
-loader = PackageLoader("mypackage", "templates")
+loader = PackageLoader("mypackage.talys")
 env = Environment(loader=loader)
 
 logger = logging.getLogger(__name__)
-
-
-# move this file to talys/api submodule
 
 
 class ConfigurationSyntaxError(Exception):
