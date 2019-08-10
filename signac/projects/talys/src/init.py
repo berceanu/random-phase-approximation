@@ -4,7 +4,6 @@
 Iterates over all defined state points and initializes
 the associated job workspace directories."""
 import logging
-import pathlib
 
 import signac
 import mypackage.util as util
@@ -46,15 +45,10 @@ def main():
                 talys_job.doc.setdefault(
                     "database_file", talys_api.database_file_path(talys_job).as_posix()
                 )
-
-                db_fpath = pathlib.Path(talys_job.doc["database_file"])
-                database_file_backup = db_fpath.parent / (
-                    db_fpath.stem + f"_{talys_job.get_id()}.bck"
-                )
                 talys_job.doc.setdefault(
-                    "database_file_backup", database_file_backup.as_posix()
+                    "database_file_backup",
+                    talys_api.database_file_backup_path(talys_job).as_posix(),
                 )
-                # todo refactor into mypackage.talys_api
 
 
 if __name__ == "__main__":

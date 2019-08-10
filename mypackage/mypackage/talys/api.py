@@ -71,6 +71,13 @@ class TalysAPI:
         assert database_file.is_file(), f"{database_file} not found!"
         return database_file
 
+    def database_file_backup_path(self, job):
+        db_fpath = pathlib.Path(self.database_file_path(job).as_posix())
+        database_file_backup = db_fpath.parent / (
+            db_fpath.stem + f"_{job.get_id()}.bck"
+        )
+        return database_file_backup
+
     @contextmanager
     def replaced_database_file(self, job):
         if list(self.hfb_path.glob("*.bck")):

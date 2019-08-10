@@ -172,8 +172,6 @@ def main():
         logger.info("Saved %s" % job.fn(png_fn))
 
 
-# todo refactor
-
 if __name__ == "__main__":
     cleanup_proj(root=proj_root)
 
