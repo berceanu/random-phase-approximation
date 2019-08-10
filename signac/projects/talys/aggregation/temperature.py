@@ -3,9 +3,9 @@ import logging
 from collections import defaultdict
 import pathlib
 
-import mypackage.talys_api as api
-import mypackage.talys_data as data
-import mypackage.talys_plotting as plotting
+import mypackage.talys.api as api
+import mypackage.talys.data as data
+import mypackage.talys.plotting as plotting
 from cleanup import cleanup_proj
 import pandas as pd
 import signac

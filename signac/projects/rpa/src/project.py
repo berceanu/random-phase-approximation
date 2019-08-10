@@ -23,7 +23,7 @@ from signac import get_project
 
 import mypackage.code_api as code_api
 import mypackage.util as util
-import mypackage.talys_api as talys
+import mypackage.talys.api as talys
 
 logger = logging.getLogger(__name__)
 logfname = "project.log"
@@ -322,7 +322,9 @@ def _plot_iso(job, temp, code_mapping=code_api.NameMapping()):
     ax["isovector"].set(xlabel="E (MeV)")
     fig.subplots_adjust(hspace=0.3)
 
-    atomic_symbol, mass_number = util.get_nucleus(job.sp.proton_number, job.sp.neutron_number, joined=False)
+    atomic_symbol, mass_number = util.get_nucleus(
+        job.sp.proton_number, job.sp.neutron_number, joined=False
+    )
     fig.suptitle(
         (
             fr"Transition strength distribution of ${{}}^{{{mass_number}}} {atomic_symbol} \; "

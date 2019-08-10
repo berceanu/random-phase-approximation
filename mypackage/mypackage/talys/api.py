@@ -15,8 +15,8 @@ import numpy as np
 import pandas as pd
 from jinja2 import Environment, PackageLoader
 
-from . import talys_data as data
-from . import util
+from . import data
+from mypackage import util
 
 # pass folder containing the template
 loader = PackageLoader("mypackage", "templates")
@@ -69,7 +69,9 @@ def read_neutron_capture_rate(job, api=TalysAPI()):
 
 def database_file_path(job, api=TalysAPI()):
     """Return path to job's nucleus data file in TALYS database."""
-    atomic_symbol, _ = util.get_nucleus(job.sp.proton_number, job.sp.neutron_number, joined=False)
+    atomic_symbol, _ = util.get_nucleus(
+        job.sp.proton_number, job.sp.neutron_number, joined=False
+    )
 
     database_file = api.hfb_path / f"{atomic_symbol}.psf"
 
@@ -113,11 +115,16 @@ def energy_file(job, api=TalysAPI()):
 
 def input_file(job, api=TalysAPI()):
     """Generate TALYS input file."""
-    atomic_symbol, mass_number = util.get_nucleus(job.sp.proton_number, job.sp.neutron_number, joined=False)
+    atomic_symbol, mass_number = util.get_nucleus(
+        job.sp.proton_number, job.sp.neutron_number, joined=False
+    )
 
     # we hit the element with N - 1 with 1 neutron
     input_contents = env.get_template(api.input_template_fn).render(
-        element=atomic_symbol, mass=mass_number - 1, energy_fname=api.energy_fn, astro=job.sp.astro
+        element=atomic_symbol,
+        mass=mass_number - 1,
+        energy_fname=api.energy_fn,
+        astro=job.sp.astro,
     )
     util.write_contents_to(job.fn(api.input_fn), input_contents)
 

@@ -6,7 +6,7 @@ the associated job workspace directories."""
 import logging
 import signac
 
-from mypackage.talys_api import energy_file, input_file
+from mypackage.talys.api import energy_file, input_file
 
 
 logger = logging.getLogger(__name__)

@@ -17,9 +17,9 @@ import mypackage.util as util
 from flow import FlowProject
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
-from mypackage.talys_api import TalysAPI
-import mypackage.talys_data as data
-import mypackage.talys_plotting as plotting
+from mypackage.talys.api import TalysAPI
+import mypackage.talys.data as data
+import mypackage.talys.plotting as plotting
 
 logger = logging.getLogger(__name__)
 logfname = "project.log"

@@ -8,7 +8,7 @@ import pathlib
 
 import signac
 import mypackage.util as util
-from mypackage.talys_api import energy_file, input_file, database_file_path
+from mypackage.talys.api import energy_file, input_file, database_file_path
 
 
 logger = logging.getLogger(__name__)
