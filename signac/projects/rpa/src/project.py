@@ -29,14 +29,9 @@ from mypackage.util import arefiles, file_contains, read_last_line, isemptyfile
 logger = logging.getLogger(__name__)
 logfname = "project.log"
 
-#####################
-# UTILITY FUNCTIONS #
-#####################
 
 PNG_FILE = "iso_all.png"
 
-
-###########################
 
 code = code_api.NameMapping()
 

@@ -17,7 +17,7 @@ from matplotlib.figure import Figure
 from mypackage.talys.api import TalysAPI
 import mypackage.talys.data as data
 import mypackage.talys.plotting as plotting
-from mypackage.util import arefiles, file_contains
+from mypackage.util import arefiles, last_line_contains
 
 logger = logging.getLogger(__name__)
 logfname = "project.log"
@@ -34,7 +34,7 @@ class Project(FlowProject):
 @Project.pre(arefiles((talys_api.input_fn, talys_api.energy_fn)))
 @Project.post.isfile(talys_api.output_fn)
 @Project.post(
-    file_contains(  # todo check last line only
+    last_line_contains(
         talys_api.output_fn,
         "The TALYS team congratulates you with this successful calculation.",
     )

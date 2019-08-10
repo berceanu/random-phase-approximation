@@ -139,6 +139,18 @@ def file_contains(filename, text):
     )
 
 
+def last_line_contains(filename, text):
+    """Checks if last line of a file contains a given string."""
+
+    def foo(job):
+        if not job.isfile(filename):
+            return False
+        last_line = read_last_line(job.fn(filename)).decode("UTF-8")
+        return text in last_line
+
+    return foo
+
+
 # https://stackoverflow.com/questions/3346430/what-is-the-most-efficient-way-to-get-first-and-last-line-of-a-text-file/18603065#18603065
 def read_last_line(filename):
     with open(filename, "rb") as f:

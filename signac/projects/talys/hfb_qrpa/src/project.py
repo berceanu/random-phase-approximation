@@ -17,17 +17,12 @@ from matplotlib.figure import Figure
 from mypackage.talys.api import TalysAPI
 import mypackage.talys.data as data
 import mypackage.talys.plotting as plotting
-from mypackage.util import arefiles, file_contains
+from mypackage.util import arefiles, last_line_contains
 
 logger = logging.getLogger(__name__)
 logfname = "project.log"
 
 talys_api = TalysAPI()
-
-
-#####################
-# UTILITY FUNCTIONS #
-#####################
 
 
 class Project(FlowProject):
@@ -38,7 +33,7 @@ class Project(FlowProject):
 @Project.pre(arefiles((talys_api.input_fn, talys_api.energy_fn)))
 @Project.post.isfile(talys_api.output_fn)
 @Project.post(
-    file_contains(  # todo check last line only
+    last_line_contains(
         talys_api.output_fn,
         "The TALYS team congratulates you with this successful calculation.",
     )
@@ -85,8 +80,6 @@ def plot_cross_section(job):
     canvas.print_png(job.fn(talys_api.cross_section_png_fn))
     logger.info("Saved %s" % job.fn(talys_api.cross_section_png_fn))
 
-
-# todo extract datapoint(s) for the astro="y" case
 
 if __name__ == "__main__":
     logging.basicConfig(
