@@ -1,4 +1,5 @@
 import logging
+import os
 import pathlib
 import subprocess
 
@@ -124,3 +125,30 @@ def sh(*cmd, **kwargs):
     )
     logger.info(stdout)
     return stdout
+
+
+def arefiles(file_names):
+    """Check if all ``file_names`` are in ``job`` folder."""
+    return lambda job: all(job.isfile(fn) for fn in file_names)
+
+
+def file_contains(filename, text):
+    """Checks if `filename` contains `text`."""
+    return (
+        lambda job: job.isfile(filename) and text in open(job.fn(filename), "r").read()
+    )
+
+
+# https://stackoverflow.com/questions/3346430/what-is-the-most-efficient-way-to-get-first-and-last-line-of-a-text-file/18603065#18603065
+def read_last_line(filename):
+    with open(filename, "rb") as f:
+        _ = f.readline()  # Read the first line.
+        f.seek(-2, os.SEEK_END)  # Jump to the second last byte.
+        while f.read(1) != b"\n":  # Until EOL is found...
+            f.seek(-2, os.SEEK_CUR)  # ...jump back the read byte plus one more.
+        last = f.readline()  # Read last line.
+    return last
+
+
+def isemptyfile(filename):
+    return lambda job: job.isfile(filename) and os.stat(job.fn(filename)).st_size == 0

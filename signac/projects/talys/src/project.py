@@ -20,31 +20,12 @@ from matplotlib.figure import Figure
 from mypackage.talys.api import TalysAPI
 import mypackage.talys.data as data
 import mypackage.talys.plotting as plotting
+from mypackage.util import arefiles, file_contains
 
 logger = logging.getLogger(__name__)
 logfname = "project.log"
 
 talys_api = TalysAPI()
-
-
-#####################
-# UTILITY FUNCTIONS #
-#####################
-
-
-def file_contains(filename, text):
-    """Checks if ``filename`` contains ``text``."""
-    return (
-        lambda job: job.isfile(filename) and text in open(job.fn(filename), "r").read()
-    )
-
-
-# todo move to mypackage.util
-
-
-def arefiles(file_names):
-    """Check if all ``file_names`` are in ``job`` folder."""
-    return lambda job: all(job.isfile(fn) for fn in file_names)
 
 
 @contextmanager
