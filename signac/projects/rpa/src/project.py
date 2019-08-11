@@ -62,7 +62,7 @@ def _progress(job, temp, code_mapping=code_api.NameMapping()):
     else:  # didn't yet start the matrix calculation
         percentage = "0.00"
 
-    return f"run_{temp}_temp_excited_state: {float(percentage):.2f}%"
+    return "run_{}_temp_excited_state: {:.2f}%".format(temp, float(percentage))
 
 
 @Project.label
@@ -86,7 +86,7 @@ def bin_files_exist(job, temp):
 
 
 def _prepare_run(job, temp, code_mapping=code_api.NameMapping()):
-    filter = {
+    my_filter = {
         param: job.sp[param]
         for param in (
             "proton_number",
@@ -99,7 +99,7 @@ def _prepare_run(job, temp, code_mapping=code_api.NameMapping()):
 
     project = get_project()
     jobs_for_restart = [
-        job for job in project.find_jobs(filter) if bin_files_exist(job, temp)
+        job for job in project.find_jobs(my_filter) if bin_files_exist(job, temp)
     ]
     assert job not in jobs_for_restart
     try:
@@ -107,7 +107,7 @@ def _prepare_run(job, temp, code_mapping=code_api.NameMapping()):
     except IndexError:  # prepare full calculation
         logger.info("Full calculation required.")
         code_input = code_api.GenerateInputs(
-            **job.sp, out_path=job.ws, mapping=code_mapping
+            out_path=job.ws, mapping=code_mapping, **dict(job.sp)
         )
         code_input.write_param_files(temp)
         # job.doc[f'run_{temp}_temp_ground_state'] = True
@@ -121,7 +121,7 @@ def _prepare_run(job, temp, code_mapping=code_api.NameMapping()):
         shutil.copy(job_for_restart.fn(dotwelfn), job.fn(dotwelfn))
         for fn in code_mapping.bin_files(temp):
             shutil.copy(job_for_restart.fn(fn), job.fn(fn))
-        job.doc["restarted_from"] = job_for_restart._id
+        job.doc["restarted_from"] = job_for_restart.get_id()
         # job.doc[f'run_{temp}_temp_ground_state'] = False
 
 
