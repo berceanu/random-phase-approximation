@@ -16,7 +16,7 @@ import numpy as np
 import pandas as pd
 from jinja2 import Environment, PackageLoader
 
-from . import data
+from mypackage.talys import data
 from mypackage import util
 
 # pass folder containing the template
@@ -32,6 +32,29 @@ class ConfigurationSyntaxError(Exception):
 
 @dataclass
 class TalysAPI:
+    """
+    Examples
+    --------
+    >>> import signac
+
+    >>> pr = signac.init_project('example')
+    >>> job = pr.open_job({'proton_number': 20, 'neutron_number': 20})
+
+    >>> talys_api = TalysAPI()
+
+    >>> talys_api.run_command
+    '/home/berceanu/bin/talys < input.txt > output.txt 2> stderr.txt'
+
+    >>> print(talys_api.database_file_path(job))
+    /home/berceanu/src/talys/structure/gamma/hfb/Ca.psf
+
+    >>> print(talys_api.template_photon_strength_function_path(job))
+    /home/berceanu/src/backup_talys/structure/gamma/hfb/Ca.psf
+
+    >>> print(talys_api.database_file_backup_path(job))
+    /home/berceanu/src/talys/structure/gamma/hfb/Ca_d94bb7f1e9fb6c1c5d6cc61c61b6e47d.bck
+    """
+
     input_fn = "input.txt"
     input_template_fn = "input.j2"
     energy_fn = "energy.in"
@@ -62,50 +85,50 @@ class TalysAPI:
 
     def database_file_path(self, job):
         """Return path to job's nucleus data file in TALYS database."""
-        atomic_symbol, _ = util.get_nucleus(
-            job.sp.proton_number, job.sp.neutron_number, joined=False
-        )
-
-        database_file = self.hfb_path / f"{atomic_symbol}.psf"
-
-        assert database_file.is_file(), f"{database_file} not found!"
-        return database_file
+        path = self.hfb_path / psf_fn(job)
+        assert path.is_file(), f"{path} not found!"
+        return path
 
     def database_file_backup_path(self, job):
-        db_fpath = pathlib.Path(self.database_file_path(job).as_posix())
-        database_file_backup = db_fpath.parent / (
-            db_fpath.stem + f"_{job.get_id()}.bck"
-        )
-        return database_file_backup
+        db_fn_path = self.database_file_path(job)
+        path = db_fn_path.parent / (db_fn_path.stem + "_%s.bck" % job.get_id())
+        return path
+
+    def template_photon_strength_function_path(self, job):
+        fname = self.database_file_path(job).name
+        path = self.backup_hfb_path / fname
+        return path
 
     @contextmanager
     def replaced_database_file(self, job):
         if list(self.hfb_path.glob("*.bck")):
             raise AssertionError("Found previous backup files!")
 
-        db_fn = job.doc["database_file"]
-        if not util.areidentical(
-            self.backup_hfb_path / pathlib.Path(db_fn).name, db_fn
-        ):
+        db_fn_path = self.database_file_path(job)
+
+        template_psf_path = self.template_photon_strength_function_path(job)
+        if not util.areidentical(template_psf_path, db_fn_path):
             raise AssertionError("TALYS photon strength function file corrupt!")
 
         # Backup TALYS database file (eg Sn.psf to Sn_<job._id>.bck)
-        db_fn_bck = job.doc["database_file_backup"]
-        util.copy_file(source=db_fn, destination=db_fn_bck)
+        db_fn_bck_path = self.database_file_backup_path(job)
+        util.copy_file(source=db_fn_path, destination=db_fn_bck_path)
 
-        # Replace TALYS database file (eg Sn.psf) with the job's file (eg. z050).
+        # Replace TALYS database file (eg Sn.psf) with the job's .psf file.
         util.copy_file(
-            source=job.fn(job.doc["z_file"]), destination=db_fn, exist_ok=True
+            source=job.fn(job.doc["photon_strength_function"]),
+            destination=db_fn_path,
+            exist_ok=True,
         )
         try:
             yield
         finally:
             # Restore original TALYS database file (eg Sn.psf) from backup.
-            util.copy_file(source=db_fn_bck, destination=db_fn, exist_ok=True)
+            util.copy_file(source=db_fn_bck_path, destination=db_fn_path, exist_ok=True)
 
             # Delete TALYS database file backup (eg. Sn_<job._id>.bck).
-            os.remove(db_fn_bck)
-            logger.info("Removed %s" % db_fn_bck)
+            os.remove(db_fn_bck_path)
+            logger.info("Removed %s" % db_fn_bck_path)
 
     def input_file(self, job):
         """Generate TALYS input file."""
@@ -162,10 +185,12 @@ def cast_to(to_type, iterable):
     return (to_type(val) for val in iterable)
 
 
-def z_from_fname(fname):
-    fn = os.path.basename(fname)
-    Z = int("".join(filter(lambda c: not c.isalpha(), fn)))
-    return Z
+def psf_fn(job):
+    """Gets the job's associated photon strength function file name."""
+    atomic_symbol, _ = util.get_nucleus(
+        job.sp.proton_number, job.sp.neutron_number, joined=False
+    )
+    return "%s.psf" % atomic_symbol
 
 
 α = 7.297352570e-03  # fine structure constant
@@ -200,7 +225,7 @@ def lorvec_to_df(fname, Z, A, unit_factor=u_factor):  # mb / (e^2 * fm^2)
     return df3
 
 
-def fn_to_dict(fname):
+def fn_to_dict(fname, proton_number):
     with open(fname) as f:
         contents = f.read()
     logger.info("Read %s" % fname)
@@ -212,16 +237,15 @@ def fn_to_dict(fname):
     assert len(blocks[:-1]) == 82, "Not right number of blocks!"
     # there is a gap from A = 170 to A = 178 for Z = 50
 
-    z_fn = z_from_fname(fname)
     ond = OrderedDict()  # ordered_nested_dict
-    ond[z_fn] = OrderedDict()
+    ond[proton_number] = OrderedDict()
 
     for blk in blocks[:-1]:  # except last line
         block = blk.splitlines()
 
         nucleus_header = block[0].split()
         Z, A = cast_to(int, nucleus_header[1::2])
-        if (nucleus_header[0::2] != ["Z=", "A="]) or (Z != z_fn):
+        if (nucleus_header[0::2] != ["Z=", "A="]) or (Z != proton_number):
             raise ConfigurationSyntaxError("Wrong header inside %s!" % fname)
 
         col_header = block[1].split()
@@ -240,13 +264,12 @@ def fn_to_dict(fname):
     return ond
 
 
-def dict_to_fn(ordered_nested_dict, fname):
+def dict_to_fn(ordered_nested_dict, fname, proton_number):
     ond = ordered_nested_dict
 
     assert len(ond.keys()) == 1, "More than one Z present in dict!"
 
-    z_fn = z_from_fname(fname)
-    assert list(ond.keys())[0] == z_fn, "Z from dict and file does not match!"
+    assert list(ond.keys())[0] == proton_number, "Z from dict and file does not match!"
 
     col_header = f"  U[MeV]  fE1[mb/MeV]"
 

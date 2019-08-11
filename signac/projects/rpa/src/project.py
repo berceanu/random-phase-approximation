@@ -34,6 +34,7 @@ PNG_FILE = "iso_all.png"
 
 
 code = code_api.NameMapping()
+talys_api = talys.TalysAPI()
 
 
 class Project(FlowProject):
@@ -370,19 +371,6 @@ def dipole_trans_finite(job):
 #################################
 
 
-def z_fn(job):
-    return "z{:03d}".format(job.sp.proton_number)
-
-
-# NB: src/templates/z050 is identical to ~/src/backup_talys/structure/gamma/hfb/Sn.psf
-# todo take z<NNN> directly from backup_talys/ dir and include other elements besides Sn
-def talys_template_file(job, top_level_dir="src/templates", fname=None):
-    if not fname:
-        fname = z_fn(job)
-    full_path = os.path.join(top_level_dir, fname)
-    return full_path
-
-
 def _generate_talys_input(job, temp, code_mapping=code_api.NameMapping()):
     job_mass_number = job.sp.proton_number + job.sp.neutron_number
     fn = job.fn(
@@ -391,13 +379,18 @@ def _generate_talys_input(job, temp, code_mapping=code_api.NameMapping()):
 
     lorvec_df = talys.lorvec_to_df(fname=fn, Z=job.sp.proton_number, A=job_mass_number)
 
-    talys_dict = talys.fn_to_dict(fname=talys_template_file(job))
+    talys_dict = talys.fn_to_dict(
+        fname=talys_api.template_photon_strength_function_path(job),
+        proton_number=int(job.sp.proton_number),
+    )
     talys_df = talys.dict_to_df(talys_dict)
 
     mass_numbers = talys.atomic_mass_numbers(talys_df)
     logger.info(
         "{} contains atomic mass numbers from A={} to A={}.".format(
-            talys_template_file(job), mass_numbers.min(), mass_numbers.max()
+            talys_api.template_photon_strength_function_path(job),
+            mass_numbers.min(),
+            mass_numbers.max(),
         )
     )
 
@@ -406,33 +399,43 @@ def _generate_talys_input(job, temp, code_mapping=code_api.NameMapping()):
             Z=job.sp.proton_number, A=job_mass_number, talys=talys_df, lorvec=lorvec_df
         )
         new_talys_dict = talys.df_to_dict(talys_df_new)
-        talys.dict_to_fn(new_talys_dict, fname=job.fn(z_fn(job)))
-        job.doc.setdefault("z_file", z_fn(job))
+        talys.dict_to_fn(
+            new_talys_dict,
+            fname=job.fn(talys.psf_fn(job)),
+            proton_number=int(job.sp.proton_number),
+        )
+        job.doc.setdefault("photon_strength_function", talys.psf_fn(job))
     else:
         logger.warning(
             "(Z,A)=({},{}) not found in {}!".format(
-                job.sp.proton_number, job_mass_number, talys_template_file(job)
+                job.sp.proton_number,
+                job_mass_number,
+                talys_api.template_photon_strength_function_path(job),
             )
         )
 
 
-# only Sn isotopes (Z = 50) will get processed because we only have templates/z050
+# only Sn isotopes (Z = 50) will get processed
 @Project.operation
-@Project.pre(lambda job: os.path.isfile(talys_template_file(job)))
+@Project.pre(
+    lambda job: os.path.isfile(talys_api.template_photon_strength_function_path(job))
+)
 @Project.pre.isfile(
     code.out_file(temp="zero", skalvec="isovector", lorexc="lorentzian")
 )
-@Project.post(lambda job: job.isfile(z_fn(job)))
+@Project.post(lambda job: job.isfile(talys.psf_fn(job)))
 def generate_talys_input_zero(job):
     _generate_talys_input(job, temp="zero", code_mapping=code)
 
 
 @Project.operation
-@Project.pre(lambda job: os.path.isfile(talys_template_file(job)))
+@Project.pre(
+    lambda job: os.path.isfile(talys_api.template_photon_strength_function_path(job))
+)
 @Project.pre.isfile(
     code.out_file(temp="finite", skalvec="isovector", lorexc="lorentzian")
 )
-@Project.post(lambda job: job.isfile(z_fn(job)))
+@Project.post(lambda job: job.isfile(talys.psf_fn(job)))
 def generate_talys_input_finite(job):
     _generate_talys_input(job, temp="finite", code_mapping=code)
 

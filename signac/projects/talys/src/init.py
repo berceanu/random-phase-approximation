@@ -22,7 +22,9 @@ def main():
     rpa_proj = signac.get_project(root="../rpa/")
     logger.info("rpa project: %s" % rpa_proj.workspace())
 
-    for z_fn, jobs in rpa_proj.find_jobs({"proton_number": 50}).groupbydoc("z_file"):
+    for psf, jobs in rpa_proj.find_jobs({"proton_number": 50}).groupbydoc(
+        "photon_strength_function"
+    ):
         for rpa_job in jobs:
             logger.info(f"Processing %s.." % rpa_job.workspace())
             sp = rpa_proj.get_statepoint(rpa_job.get_id())
@@ -36,19 +38,11 @@ def main():
                 )
                 talys_job = talys_proj.open_job(sp).init()
 
-                util.copy_file(source=rpa_job.fn(z_fn), destination=talys_job.fn(z_fn))
-                talys_job.doc.setdefault("z_file", z_fn)
+                util.copy_file(source=rpa_job.fn(psf), destination=talys_job.fn(psf))
+                talys_job.doc.setdefault("photon_strength_function", psf)
 
                 talys_api.energy_file(talys_job)
                 talys_api.input_file(talys_job)
-
-                talys_job.doc.setdefault(
-                    "database_file", talys_api.database_file_path(talys_job).as_posix()
-                )
-                talys_job.doc.setdefault(
-                    "database_file_backup",
-                    talys_api.database_file_backup_path(talys_job).as_posix(),
-                )
 
 
 if __name__ == "__main__":
