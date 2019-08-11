@@ -6,6 +6,7 @@ See the original [paper](http://dx.doi.org/10.1016/j.physletb.2009.10.046).
 DEPENDENCIES:
 
 - `cmake` >= 3.10.2
+- `build-essential` on Ubuntu
 - `gfortran` >= 7.3.0
 - `$ conda env create -f environment.yml`
 
