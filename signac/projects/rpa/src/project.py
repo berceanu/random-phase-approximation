@@ -381,7 +381,7 @@ def _generate_talys_input(job, temp, code_mapping=code_api.NameMapping()):
 
     talys_dict = talys.fn_to_dict(
         fname=talys_api.template_photon_strength_function_path(job),
-        proton_number=int(job.sp.proton_number),
+        proton_number=job.sp.proton_number,
     )
     talys_df = talys.dict_to_df(talys_dict)
 
@@ -402,7 +402,7 @@ def _generate_talys_input(job, temp, code_mapping=code_api.NameMapping()):
         talys.dict_to_fn(
             new_talys_dict,
             fname=job.fn(talys.psf_fn(job)),
-            proton_number=int(job.sp.proton_number),
+            proton_number=job.sp.proton_number,
         )
         job.doc.setdefault("photon_strength_function", talys.psf_fn(job))
     else:

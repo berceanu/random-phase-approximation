@@ -368,10 +368,11 @@ int main(int argc, char **argv) {
 	
         	
 // add print out
-
+	if (matprint == 1)
+        {
             mout(xrpa,npair,6,"rel. RPA-X","ftes_xrpa.con");
             mout(yrpa,npair,6,"rel. RPA-Y","ftes_yrpa.con");
-
+        }
 
     
 //	delete[] xrpac;
