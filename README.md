@@ -7,8 +7,7 @@ DEPENDENCIES:
 
 - `cmake` >= 3.10.2
 - `gfortran` >= 7.3.0
-- `ffmpeg` >= 3.4.4 (for animations)
-- `$ conda install -c conda-forge signac signac-flow signac-dashboard`
+- `$ conda env create -f environment.yml`
 
 PARAMETERS TO VARY:
 
