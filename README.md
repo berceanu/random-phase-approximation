@@ -8,6 +8,7 @@ DEPENDENCIES:
 - `cmake` >= 3.10.2
 - `build-essential` on Ubuntu
 - `gfortran` >= 7.3.0
+- `TALYS >= 1.9`
 - `$ conda env create -f environment.yml`
 
 PARAMETERS TO VARY:
