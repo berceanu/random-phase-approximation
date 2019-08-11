@@ -234,7 +234,7 @@ def fn_to_dict(fname, proton_number):
     blocks = new_line.split(contents)
 
     assert blocks[-1].strip() == "", "Last line not empty!"
-    assert len(blocks[:-1]) == 82, "Not right number of blocks!"
+    assert len(blocks[:-1]) > 0, "Not right number of blocks!"
     # there is a gap from A = 170 to A = 178 for Z = 50
 
     ond = OrderedDict()  # ordered_nested_dict
