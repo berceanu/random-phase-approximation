@@ -190,3 +190,4 @@ debug_workspace/
 *.png
 
 temp/
+signac/projects/rpa/\.signac_shell_history

@@ -18,7 +18,7 @@ dependencies:
   - line_profiler
   # other
   - unyt=2.2*
-  - signac=1.1*
+  - signac=1.2*
   - signac-dashboard=0.2*
   - signac-flow=0.7*
   - jinja2=2.10*
@@ -34,3 +34,4 @@ dependencies:
   - pre_commit
   - pip:
     - matplotlib-label-lines
+
