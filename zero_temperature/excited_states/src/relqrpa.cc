@@ -364,8 +364,11 @@ int main(int argc, char **argv) {
 	vbout(c_erpac,2*npair,"ztes_c_erpa.bin");
 
 
+	if (matprint == 1)
+	{
             mout(xrpa,npair,6,"rel. RPA-X","ztes_xrpa.con");
             mout(yrpa,npair,6,"rel. RPA-Y","ztes_yrpa.con");
+	}
 
 //            mout(erpa,2*npair,6,"rel. RPA-eigenvalue","ztes_erpa.con");
 //            mout(c_erpa,2*npair,6,"rel. RPA-eigenvalue-c","ztes_c_erpa.con"); 	
