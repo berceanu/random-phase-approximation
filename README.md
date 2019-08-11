@@ -56,4 +56,5 @@ ACRONYMS:
 - _RMF_ : Relativistic Mean-Field
 - _FTRRPA_ : self-consistent Finite-Temperature Relativistic Random Phase Approximation
 - _QRPA_ : Quasiparticle Random Phase Approximation
+- _SKYS_ : Relativistic mean field theory in a spherical basis, `finite_temperature/ground_state`
 
