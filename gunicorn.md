@@ -69,5 +69,6 @@ $ sudo nginx -t
 $ sudo systemctl restart nginx
 ```
 
-Adapted from [this guide](https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-gunicorn-and-nginx-on-ubuntu-18-04)
-See also [how to configure `Nginx`](https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-18-04)
+Adapted from [this guide](https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-gunicorn-and-nginx-on-ubuntu-18-04).
+
+See also [how to configure `Nginx`](https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-18-04).
