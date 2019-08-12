@@ -8,7 +8,6 @@ from signac_dashboard.modules.notes import Notes
 import mypackage.dipole_transitions as dt
 
 
-
 class MyDashboard(Dashboard):
 
     def job_sorter(self, job):
@@ -19,17 +18,27 @@ class MyDashboard(Dashboard):
     def job_title(self, job):
         return f"(Z, N) = ({job.sp['proton_number']}, {job.sp['neutron_number']}), T = {job.sp.temperature}"
 
+# To use multiple workers, a single shared key must be used. By default, the
+# secret key is randomly generated at runtime by each worker. Using a provided
+# shared key allows sessions to be shared across workers. This key was
+# generated with os.urandom(16)
+
+config = {
+        'DASHBOARD_PATHS': ['src/'],
+        'SECRET_KEY': b"\x99o\x90'/\rK\xf5\x10\xed\x8bC\xaa\x03\x9d\x99"
+        }
+
+modules=[
+    ImageViewer(name='Transition strength distribution', img_globs=['*.png']),
+    StatepointList(enabled=True),
+    DocumentList(max_chars=140),
+    FileList(enabled=True),
+    Notes(enabled=False),
+    dt.DipoleTransitions(name='Dipole Transitions', enabled=True),
+    ]
+
+dashboard = MyDashboard(config=config, modules=modules)
+
 
 if __name__ == '__main__':
-    config = {'DASHBOARD_PATHS': ['src/']}
-    dashboard = MyDashboard(modules=[
-        ImageViewer(name='Transition strength distribution', img_globs=['*.png']),
-        StatepointList(enabled=True),
-        DocumentList(max_chars=140),
-        FileList(enabled=True),
-        Notes(enabled=False),
-        dt.DipoleTransitions(name='Dipole Transitions', enabled=True),
-        ],
-        config=config
-        )
     dashboard.main()
