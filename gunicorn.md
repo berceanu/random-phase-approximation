@@ -46,7 +46,10 @@ $ sudo systemctl enable rpa
 $ sudo systemctl status rpa
 ```
 
-**Note**: Add multiple services by changing the respective paths above and follow the same steps to enable them.
+**Notes**: 
+
+1) Add multiple services by changing the respective paths above and follow the same steps to enable them.
+1) Remember to run `sudo systemctl daemon-reload` after each repo update.
 
 ## Configure `Nginx`
 
