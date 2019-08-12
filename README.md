@@ -8,8 +8,9 @@ DEPENDENCIES:
 - `cmake` >= 3.10.2
 - `build-essential` on Ubuntu
 - `gfortran` >= 7.3.0
-- `TALYS >= 1.9`
+- `TALYS >= 1.9`, installed in `~/src/talys/` and `~/src/backup_talys/`
 - `$ conda env create -f environment.yml`
+- `$ python -m pip install -e mypackage`
 
 PARAMETERS TO VARY:
 
