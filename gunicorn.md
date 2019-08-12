@@ -78,6 +78,7 @@ $ sudo systemctl restart nginx
 
 1) Add more subdomains by changing the sock path above and making the respective symlinks.
 1) The subdomains need to have correct DNS A-record entries.
+1) The max socks path length is 107 chars.
 
 Adapted from [this guide](https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-gunicorn-and-nginx-on-ubuntu-18-04).
 
