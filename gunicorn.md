@@ -80,6 +80,70 @@ $ sudo systemctl restart nginx
 1) The subdomains need to have correct DNS A-record entries.
 1) The max socks path length is 107 chars.
 
+### Add page to root domain with links to subdomains
+
+```console
+$ sudo mkdir -p /var/www/ra5.ro/html
+$ sudo chown -R $USER:$USER /var/www/ra5.ro/html
+$ sudo chmod -R 755 /var/www/ra5.ro
+$ vi /var/www/ra5.ro/html/index.html
+```
+
+```html
+<html>
+    <head>
+        <title>ra5.ro</title>
+    </head>
+    <body>
+        <h1><a href="http://rpa.ra5.ro">rpa</a></h1>
+        <h1><a href="http://rpa.agg.ra5.ro">rpa-aggregation</a></h1>
+        <h1><a href="http://rpa.agg.anim.ra5.ro">rpa-animation</a></h1>
+    </body>
+</html>
+```
+
+```console
+$ sudo vi /etc/nginx/sites-available/ra5.ro
+```
+
+```
+# /etc/nginx/sites-available/ra5.ro
+server {
+        listen 80;
+        listen [::]:80;
+
+        root /var/www/ra5.ro/html;
+        index index.html index.htm index.nginx-debian.html;
+
+        server_name ra5.ro www.ra5.ro;
+
+        location / {
+                try_files $uri $uri/ =404;
+        }
+}
+```
+
+```console
+$ sudo ln -s /etc/nginx/sites-available/ra5.ro /etc/nginx/sites-enabled/
+$ sudo vi /etc/nginx/nginx.conf
+```
+
+```
+# /etc/nginx/nginx.conf
+...
+http {
+    ...
+    server_names_hash_bucket_size 64;
+    ...
+}
+...
+```
+
+```console
+$ sudo nginx -t
+$ sudo systemctl restart nginx
+```
+
 Adapted from [this guide](https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-gunicorn-and-nginx-on-ubuntu-18-04).
 
 See also [how to configure `Nginx`](https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-18-04)(and links therein).
