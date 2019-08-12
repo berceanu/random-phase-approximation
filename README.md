@@ -9,7 +9,11 @@ DEPENDENCIES:
 - `build-essential` on Ubuntu
 - `gfortran` >= 7.3.0
 - `TALYS >= 1.9`, installed in `~/src/talys/` and `~/src/backup_talys/`
+
+INSTALLATION:
+
 - `$ conda env create -f environment.yml`
+- `$ conda activate random-phase-approximation`
 - `$ python -m pip install -e mypackage`
 
 PARAMETERS TO VARY:
