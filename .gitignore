@@ -12,7 +12,6 @@
 *.pch
 
 # Compiled Dynamic libraries
-*.so
 *.dylib
 *.dll
 
@@ -28,7 +27,6 @@
 
 # Executables
 *.exe
-*.out
 *.app
 
 # PYTHON
@@ -36,9 +34,6 @@
 __pycache__/
 *.py[cod]
 *$py.class
-
-# C extensions
-*.so
 
 # Distribution / packaging
 .Python
@@ -138,56 +133,6 @@ venv.bak/
 .mypy_cache/
 
 # added by me
-*.py.swp
-workspace/
-*.code-workspace
-.vscode/
-signac_statepoints.json
-signac_project_document.json
-.signac_sp_cache.json.gz
-dipole_transitions.txt
-final_table.html
-
-*.bin
-*.con
-*.o
-*.out
-*.wel
-run
-*.20
-*.m
-T0*
-*.aka
-*.plo
-*.pot
-*.vpp
-*.wplo
-.vscode
-__pycache__
-2.0*
-log
-*.log
-start.dat
-dis.dat
-build-*
-Release/
-Debug/
-run
-CMakeLists.txt.user
-*.code-workspace
-ftes_*
-ztes_*
-skys_*
-dish_*
-ftes
-ztes
-skys
-dish
-out/
-.idea/
-workspace/
-debug_workspace/
-*.png
-
-temp/
-signac/projects/rpa/\.signac_shell_history
+bin/**
+finite_temperature/**/build-release/**
+zero_temperature/**/build-release/**
