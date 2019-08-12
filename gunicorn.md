@@ -51,12 +51,12 @@ $ sudo systemctl status rpa
 ## Configure `Nginx`
 
 ```
-# /etc/nginx/sites-available/random-phase-approximation
+# /etc/nginx/sites-available/rpa
 server {
     listen 80;
     listen [::]:80;
 
-    server_name ra5.ro www.ra5.ro;
+    server_name rpa.ra5.ro www.rpa.ra5.ro;
 
     location / {
         include proxy_params;
@@ -66,10 +66,15 @@ server {
 ```
 
 ```console
-$ sudo ln -s /etc/nginx/sites-available/random-phase-approximation /etc/nginx/sites-enabled
+$ sudo ln -s /etc/nginx/sites-available/rpa /etc/nginx/sites-enabled
 $ sudo nginx -t
 $ sudo systemctl restart nginx
 ```
+
+**Notes**
+
+1) Add more subdomains by changing the sock path above and making the respective symlinks.
+1) The subdomains need to have correct DNS A-record entries.
 
 Adapted from [this guide](https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-gunicorn-and-nginx-on-ubuntu-18-04).
 
