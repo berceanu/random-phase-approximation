@@ -137,4 +137,5 @@ bin/**
 finite_temperature/**/build-release/**
 zero_temperature/**/build-release/**
 .signac_sp_cache.json.gz
+sauron.py
 
