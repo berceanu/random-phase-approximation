@@ -26,7 +26,7 @@ $ gunicorn --bind 0.0.0.0:5000 wsgi:dashboard
 ```
 # /etc/systemd/system/rpa.service
 [Unit]
-Description=Gunicorn instance to serve random-phase-approximation
+Description=Gunicorn instance to serve random-phase-approximation/rpa
 After=network.target
 
 [Service]
@@ -45,6 +45,8 @@ $ sudo systemctl start rpa
 $ sudo systemctl enable rpa
 $ sudo systemctl status rpa
 ```
+
+**Note**: Add multiple services by changing the respective paths above and follow the same steps to enable them.
 
 ## Configure `Nginx`
 
