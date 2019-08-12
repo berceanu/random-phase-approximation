@@ -15,6 +15,7 @@ INSTALLATION:
 - `$ conda env create -f environment.yml`
 - `$ conda activate random-phase-approximation`
 - `$ python -m pip install -e mypackage`
+- `$ ./release_all.sh`
 
 PARAMETERS TO VARY:
 
