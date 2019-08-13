@@ -18,6 +18,7 @@ class MyDashboard(Dashboard):
     def job_title(self, job):
         return f"(Z, N) = ({job.sp['proton_number']}, {job.sp['neutron_number']}), T = {job.sp.temperature}"
 
+
 # To use multiple workers, a single shared key must be used. By default, the
 # secret key is randomly generated at runtime by each worker. Using a provided
 # shared key allows sessions to be shared across workers. This key was

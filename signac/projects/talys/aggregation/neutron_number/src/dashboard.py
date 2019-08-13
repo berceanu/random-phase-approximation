@@ -15,16 +15,26 @@ class MyDashboard(Dashboard):
         return f"(Z, N) = ({job.sp['proton_number']}, {job.sp['neutron_number']})"
 
 
+# To use multiple workers, a single shared key must be used. By default, the
+# secret key is randomly generated at runtime by each worker. Using a provided
+# shared key allows sessions to be shared across workers. This key was
+# generated with os.urandom(16)
+
+config = {
+    'DASHBOARD_PATHS': ['src/'],
+    'SECRET_KEY': b"\x99o\x90'/\rK\xf5\x10\xed\x8bC\xaa\x09\x9d\x99"
+}
+
+modules = [
+    ImageViewer(name="Figures", img_globs=["*.png"]),
+    StatepointList(enabled=False),
+    DocumentList(max_chars=140),
+    FileList(enabled=False),
+    Notes(enabled=False),
+]
+
+dashboard = MyDashboard(config=config, modules=modules)
+
+
 if __name__ == "__main__":
-    config = {"DASHBOARD_PATHS": ["src/"]}
-    dashboard = MyDashboard(
-        modules=[
-            ImageViewer(name="Figures", img_globs=["*.png"]),
-            StatepointList(enabled=False),
-            DocumentList(max_chars=140),
-            FileList(enabled=False),
-            Notes(enabled=False),
-        ],
-        config=config,
-    )
     dashboard.main()
