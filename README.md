@@ -66,4 +66,4 @@ ACRONYMS:
 - _QRPA_ : Quasiparticle Random Phase Approximation
 - _RQRPA_ : Relativistic Quasiparticle Random Phase Approximation, `excited_states`
 - _SKYS_ : Relativistic mean field theory in a spherical basis, `finite_temperature/ground_state`
-- _DISH_/_DISHFB_ : Relativistic mean field theory with HFB in a spherical basis, `zero_temperature/ground_state`
+- _DISH_ / _DISHFB_ : Relativistic mean field theory with HFB in a spherical basis, `zero_temperature/ground_state`
