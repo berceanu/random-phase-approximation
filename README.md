@@ -1,4 +1,5 @@
 # random-phase-approximation
+Visualization framework for microscopic nuclear models.
 
 DEPENDENCIES:
 
