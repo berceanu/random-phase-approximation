@@ -1,4 +1,4 @@
-# rpa
+# random-phase-approximation
 
 DEPENDENCIES:
 
