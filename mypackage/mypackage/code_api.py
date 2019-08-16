@@ -13,7 +13,25 @@ logger = logging.getLogger(__name__)
 
 
 class NameMapping:
-    """Mapping from executable names to what they represent."""
+    """Mapping from executable names to what they represent.
+
+    Examples
+    --------
+    >>> code_mapping = NameMapping()
+
+    >>> for temp in "zero", "finite":
+    ...     for skalvec in "isoscalar", "isovector":
+    ...        for lorexc in "excitation", "lorentzian":
+    ...             print(code_mapping.out_file(temp, skalvec, lorexc))
+    ztes_excskal.out
+    ztes_lorskal.out
+    ztes_excvec.out
+    ztes_lorvec.out
+    ftes_excskal.out
+    ftes_lorskal.out
+    ftes_excvec.out
+    ftes_lorvec.out
+    """
 
     def __init__(
         self,
