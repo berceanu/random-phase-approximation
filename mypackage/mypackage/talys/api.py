@@ -11,6 +11,7 @@ import re
 from collections import OrderedDict
 from dataclasses import dataclass
 from contextlib import contextmanager
+import pkg_resources
 
 import numpy as np
 import pandas as pd
@@ -49,7 +50,7 @@ class TalysAPI:
     /home/berceanu/src/talys/structure/gamma/hfb/Ca.psf
 
     >>> print(talys_api.template_photon_strength_function_path(job))
-    /home/berceanu/src/backup_talys/structure/gamma/hfb/Ca.psf
+    /home/berceanu/Development/random-phase-approximation/mypackage/mypackage/talys/database/structure/gamma/hfb/Ca.psf
 
     >>> print(talys_api.database_file_backup_path(job))
     /home/berceanu/src/talys/structure/gamma/hfb/Ca_d94bb7f1e9fb6c1c5d6cc61c61b6e47d.bck
@@ -59,9 +60,9 @@ class TalysAPI:
     input_template_fn = "input.j2"
     energy_fn = "energy.in"
     output_fn = "output.txt"
-    binary_fn = pathlib.PosixPath("~/bin/talys").expanduser()
-    hfb_path = pathlib.PosixPath("~/src/talys/structure/gamma/hfb/").expanduser()
-    backup_hfb_path = pathlib.Path(str(hfb_path).replace("talys", "backup_talys"))
+    binary_fn = pathlib.Path.home() / "bin" / "talys"
+    hfb_path = pathlib.Path.home() / "src" / "talys" / "structure" / "gamma" / "hfb"
+    backup_hfb_path = pathlib.Path(pkg_resources.resource_filename('mypackage', 'talys/database/structure/gamma/hfb'))
     stderr_fn = "stderr.txt"
     cross_section_fn = "xs000000.tot"
     astrorate_fn = "astrorate.tot"
