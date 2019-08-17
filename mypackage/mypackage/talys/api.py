@@ -71,7 +71,7 @@ class TalysAPI:
         """TALYS output filename for cross section data."""
         Z = job.sp.proton_number
         A = Z + job.sp.neutron_number
-        return f"rp{Z:03d}{A:03d}"
+        return f"rp{Z:03d}{A:03d}.tot"
 
     @property
     def run_command(self) -> str:

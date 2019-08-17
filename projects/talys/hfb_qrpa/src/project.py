@@ -70,7 +70,7 @@ def plot_cross_section(job):
     plotting.plot_cross_section(
         ax,
         cross_section["energy"],
-        cross_section["compound"],
+        cross_section["xs"],
         color="black",
         label=f"HFB-QRPA",
         title=text,

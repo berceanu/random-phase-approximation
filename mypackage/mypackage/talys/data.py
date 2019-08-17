@@ -17,11 +17,6 @@ def read_cross_section(fn):
         names=[
             "energy",
             "xs",
-            "gamma_xs",
-            "xs_over_res_prod_xs",
-            "direct",
-            "preequilibrium",
-            "compound",
         ],
     )
     return df
