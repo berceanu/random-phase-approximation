@@ -11,3 +11,7 @@ INSTALLATION:
 - `$ conda env create -f environment.yml`
 - `$ conda activate random-phase-approximation`
 - `$ python -m pip install -e mypackage`
+
+If you already have an older version of the environment installed, you can remove it via
+
+`$ conda remove --name random-phase-approximation --all`
