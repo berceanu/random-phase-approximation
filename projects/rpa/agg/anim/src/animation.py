@@ -46,10 +46,10 @@ def main_animate(args):
     logger.info(rpa_schema)
 
     aggregation = signac.get_project(root="../")
-    logger.info("aggregation project: %s" % aggregation.root_directory())
+    logger.info("agg project: %s" % aggregation.root_directory())
 
     animation = signac.get_project(root="./")
-    logger.info("animation project: %s" % animation.root_directory())
+    logger.info("anim project: %s" % animation.root_directory())
 
     pngfname = "iso_all_temp_all.png"
     pngstem, _ = pngfname.split(".")
@@ -85,7 +85,7 @@ def main_animate(args):
         # update job document with original hashes
         anim_job.doc.update(origin)
 
-        # copy all the `.png` files from `aggregation` project
+        # copy all the `.png` files from `agg` project
         for counter, agg_job in enumerate(selection2, 1):  # start counting from 1
             logger.info(
                 "(Z, N) = ({}, {}); id = {}; file = iso_all_temp_all_{:04d}.png".format(

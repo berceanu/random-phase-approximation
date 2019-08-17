@@ -132,7 +132,7 @@ def main_groupby(args):
     rpa = sg.get_project(root="../")
     aggregation = sg.get_project(root="./")
     logger.info("rpa project: %s" % rpa.root_directory())
-    logger.info("aggregation project: %s" % aggregation.root_directory())
+    logger.info("agg project: %s" % aggregation.root_directory())
 
     code = code_api.NameMapping()
 
