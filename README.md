@@ -4,7 +4,9 @@ Visualization framework for microscopic nuclear models.
 DEPENDENCIES:
 
 - compiled microscopic model binaries, from `nuclear-codes`
-- `TALYS >= 1.9`, installed in `~/src/talys/`
+- `TALYS >= 1.9`, with
+  - database in `~/src/talys/`
+  - binary at `~/bin/talys`
 
 INSTALLATION:
 
