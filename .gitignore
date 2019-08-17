@@ -47,3 +47,5 @@ _*
 .DS_Store
 
 .signac_sp_cache.json.gz
+
+mypackage/mypackage/talys/signac.rc
