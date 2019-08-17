@@ -145,7 +145,7 @@ def prepare_run_finite(job):
 
 
 def _run_code(
-    job, temp, state, codepath="../../../bin", code_mapping=code_api.NameMapping()
+    job, temp, state, codepath="../../bin", code_mapping=code_api.NameMapping()
 ):
     code = os.path.join(codepath, code_mapping.exec_file(temp, state))
     assert os.path.isfile(code), f"{code} not found!"
