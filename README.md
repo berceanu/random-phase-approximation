@@ -3,7 +3,10 @@ Visualization framework for microscopic nuclear models.
 
 DEPENDENCIES:
 
-- `TALYS >= 1.9`, installed in `~/src/talys/`
+- compiled microscopic model binaries, from `nuclear-codes`
+- `TALYS >= 1.9`, with
+  - database in `~/src/talys/`
+  - binary at `~/bin/talys`
 
 INSTALLATION:
 
@@ -12,6 +15,6 @@ INSTALLATION:
 - `$ conda activate random-phase-approximation`
 - `$ python -m pip install -e mypackage`
 
-If you already have an older version of the environment installed, you can remove it via
+**Note:** If you already have an older version of the environment installed, you can remove it via
 
 `$ conda remove --name random-phase-approximation --all`
