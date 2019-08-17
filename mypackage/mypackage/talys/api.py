@@ -64,9 +64,14 @@ class TalysAPI:
     hfb_path = pathlib.Path.home() / "src" / "talys" / "structure" / "gamma" / "hfb"
     backup_hfb_path = pathlib.Path(pkg_resources.resource_filename('mypackage', 'talys/database/structure/gamma/hfb'))
     stderr_fn = "stderr.txt"
-    cross_section_fn = "xs000000.tot"
     astrorate_fn = "astrorate.tot"
     cross_section_png_fn = "xsec.png"
+
+    def cross_section_fn(self, job) -> str:
+        """TALYS output filename for cross section data."""
+        Z = job.sp.proton_number
+        A = Z + job.sp.neutron_number
+        return f"rp{Z:03d}{A:03d}"
 
     @property
     def run_command(self) -> str:

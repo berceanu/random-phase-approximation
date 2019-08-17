@@ -52,12 +52,12 @@ def run_talys(job):
 
 @Project.operation
 @Project.pre.after(run_talys)
-@Project.pre.isfile(talys_api.cross_section_fn)
+@Project.pre(lambda job: job.isfile(talys_api.cross_section_fn(job)))
 @Project.post.isfile(talys_api.cross_section_png_fn)
 def plot_cross_section(job):
     """Plot the TALYS output to get cross-section."""
 
-    cross_section = data.read_cross_section(job.fn(talys_api.cross_section_fn))
+    cross_section = data.read_cross_section(job.fn(talys_api.cross_section_fn(job)))
 
     fig = Figure(figsize=(6.4, 6.4))
     canvas = FigureCanvas(fig)
