@@ -58,7 +58,7 @@ class TalysAPI:
 
     input_fn = "input.txt"
     input_template_fn = "input.j2"
-    energy_fn = "energy.in"
+    energy_fn = "n0-30.grid"
     output_fn = "output.txt"
     binary_fn = pathlib.Path.home() / "bin" / "talys"
     hfb_path = pathlib.Path.home() / "src" / "talys" / "structure" / "gamma" / "hfb"
@@ -150,7 +150,7 @@ class TalysAPI:
         """Generate TALYS energy input file."""
         file_path = pathlib.Path(job.fn(self.energy_fn))
         np.savetxt(
-            file_path, energy_values(job, log=True), fmt="%.3f", newline=os.linesep
+            file_path, energy_values(job, log=False), fmt="%.3f", newline=os.linesep
         )
         logger.info("Wrote %s" % file_path)
 
