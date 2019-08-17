@@ -31,7 +31,6 @@ class Project(FlowProject):
 
 @Project.operation
 @Project.pre(arefiles((talys_api.input_fn, talys_api.energy_fn)))
-@Project.post.isfile(talys_api.output_fn)
 @Project.post(
     last_line_contains(
         talys_api.output_fn,

@@ -32,7 +32,6 @@ class Project(FlowProject):
 # NB: do not run this operation in parallel because of race conditions on the database file.
 @Project.operation
 @Project.pre(arefiles((talys_api.input_fn, talys_api.energy_fn)))
-@Project.post.isfile(talys_api.output_fn)
 @Project.post(
     last_line_contains(
         talys_api.output_fn,
