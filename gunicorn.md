@@ -63,7 +63,7 @@ server {
 
     location / {
         include proxy_params;
-        proxy_pass http://unix:/home/berceanu/Development/random-phase-approximation/signac/projects/rpa/src/rpa.sock;
+        proxy_pass http://unix:/home/berceanu/Development/rpa/projects/rpa/src/rpa.sock;
     }
 }
 ```
