@@ -10,7 +10,6 @@ dist
 build
 eggs
 parts
-bin
 var
 sdist
 develop-eggs
@@ -49,3 +48,5 @@ _*
 .signac_sp_cache.json.gz
 
 mypackage/mypackage/talys/signac.rc
+
+.signac_shell_history
