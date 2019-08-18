@@ -90,6 +90,7 @@ $ vi /var/www/ra5.ro/html/index.html
 ```
 
 ```html
+# /var/www/ra5.ro/html/index.html
 <html>
     <head>
         <title>ra5.ro</title>
@@ -98,6 +99,8 @@ $ vi /var/www/ra5.ro/html/index.html
         <h1><a href="http://rpa.ra5.ro">rpa</a></h1>
         <h1><a href="http://rpa.agg.ra5.ro">rpa-aggregation</a></h1>
         <h1><a href="http://rpa.agg.anim.ra5.ro">rpa-animation</a></h1>
+        <h1><a href="http://talys.ra5.ro">talys</a></h1>
+        <h1><a href="http://talys.hfb.ra5.ro">hfb-qrpa</a></h1>
     </body>
 </html>
 ```
