@@ -27,13 +27,13 @@ $ gunicorn --bind 0.0.0.0:5000 wsgi:dashboard
 ```
 # /etc/systemd/system/rpa.service
 [Unit]
-Description=Gunicorn instance to serve random-phase-approximation/rpa
+Description=Gunicorn instance to serve computed dipole strengths
 After=network.target
 
 [Service]
 User=berceanu
 Group=www-data
-WorkingDirectory=/home/berceanu/Development/random-phase-approximation/signac/projects/rpa/src
+WorkingDirectory=/home/berceanu/Development/rpa/projects/rpa/src
 Environment="PATH=/home/berceanu/miniconda3/envs/random-phase-approximation/bin"
 ExecStart=/home/berceanu/miniconda3/envs/random-phase-approximation/bin/gunicorn --workers 3 --bind unix:rpa.sock -m 007 wsgi:dashboard
 
