@@ -5,7 +5,8 @@ from signac_dashboard.modules.image_viewer import ImageViewer
 from signac_dashboard.modules.document_list import DocumentList
 from signac_dashboard.modules.file_list import FileList
 from signac_dashboard.modules.notes import Notes
-import mypackage.dipole_transitions as dt
+# import mypackage.dipole_transitions as dt
+# FIXME: https://github.com/glotzerlab/signac-dashboard/issues/70
 
 
 class MyDashboard(Dashboard):
@@ -26,7 +27,8 @@ class MyDashboard(Dashboard):
 
 config = {
         'DASHBOARD_PATHS': ['src/'],
-        'SECRET_KEY': b"\x99o\x90'/\rK\xf5\x10\xed\x8bC\xaa\x03\x9d\x99"
+        'SECRET_KEY': b"\x99o\x90'/\rK\xf5\x10\xed\x8bC\xaa\x03\x9d\x99",
+        'DEBUG': True,  # FIXME
         }
 
 modules=[
@@ -35,7 +37,7 @@ modules=[
     DocumentList(max_chars=140),
     FileList(enabled=True),
     Notes(enabled=False),
-    dt.DipoleTransitions(name='Dipole Transitions', enabled=True),
+    #dt.DipoleTransitions(name='Dipole Transitions', enabled=True),  # FIXME
     ]
 
 dashboard = MyDashboard(config=config, modules=modules)
