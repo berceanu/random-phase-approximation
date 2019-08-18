@@ -26,6 +26,7 @@ dependencies:
   - pandas
   - pytest-flakes
   - sympy
+  - gunicorn
   # dev tools
   - black
   - pip
