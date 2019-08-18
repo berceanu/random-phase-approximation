@@ -1,45 +1,18 @@
 # TODO
 
-- [ ] move `C++`/`FORTRAN` sources to separate private repo, `RMF-RQRPA`
-    - [ ] keep only the compiled binaries, in LFS
-    - [ ] make `random-phase-approximation` public
+- [ ] oscillations
+    - [ ] create talys subproject `hfb_qrpa_no_micro`
+    - [ ] find isotope with maximal oscillations
+    - [ ] plot on same graph with `hfb_qrpa`
 
-- [ ] use shorter dir names, such as `anim`, `agg`, `temp`, `neutr`
-    - [ ] replace `signac/projects/` by `proj/`
-    - [ ] rename `random-phase-approximation` to `rpa` on vps instance
-    - [ ] check/update code paths
-
-- [ ] remove `util/`, `tests/`, `rsync/`, `cmake_fortran` etc
-
-- [ ] update weblinks to reflect tree structure of subprojects
-
-- [ ] update `talys/` (sub-)projects with the new input/insights
-    - [ ] run `hfb_qrpa`
-        - [ ] update `input.txt` and `init.py`
-        - [ ] use same energy grid for `rpa/` and `talys/`
-        - [ ] add output to LFS
-        - [ ] sync vps repo
-        - [ ] add link to webpage
-    - [ ] do the same for the remaining (sub-)projects
-
-
-- [ ] run `rpa/` projects
-    - [ ] update `init.py` to use only `Sn` isotopes
-    - [ ] update `agg` and `anim` to plot only *isovector*, no *vlines*
-    - [ ] run 
-    - [ ] update LFS `workspace/`
-    - [ ] sync vps instance repo
+## Aggregation via `pandas`
 
 - [ ] aggregation via `pandas`
     - [ ] replace `agg` and `anim` with global pandas dataframe
         - [ ] create plotting functions that act on the df
     - [ ] test plot recipe from gitter/matplotlib
         - [ ] extract/generate plotting data (21 curves)
-        - [ ] try using a Pandas dataframe for the aggregation
-        - [ ] find out what aggregation over variable v means
         - [ ] try aggregation over temperature and neutron number in same plot
-
-## Aggregation via `pandas`
 
 Create `proj/df` `signac` project, whose goal is it create a single data structure, namely a `pandas` dataframe, that contains all the project output data. This dataframe can then be operated on by user-defined functions, data in it can be aggregated and plotted interactively in `jupyter notebooks`.
 
@@ -49,17 +22,16 @@ Create `proj/df` `signac` project, whose goal is it create a single data structu
 - consider `lorentzian` electric dipole strengths only!
 - consider `isovector` data only!
 - consider only the tin (Sn) isotopes, `proton_number = 50`!
-- use same energy grid for `C++/FORTRAN` codes and `TALYS`!
+
 
 ```
 ztes_lorvec.out: T = 0.0
 ftes_lorvec.out: T = 0.5, 1.0, 2.0
 ```
-- see `rpa/aggregation/src/aggregation.py:109`
 
 
 ```
-sample z/ftes_lorvec.out file
+sample [zf]tes_lorvec.out file
 ```
 ```
 #RPA-results:
@@ -78,14 +50,115 @@ sample z/ftes_lorvec.out file
 0.000000e+00	0.000000e+00
 1.000000e-02	2.881808e-02
 ```
+- the first column (energies) goes from `0` up to `50` MeV in increments of `0.01` MeV: `np.linspace(0, 50, 5001, retstep=True)`
 
-- Q: where do the values in the left column come from? Check input files.
 
-- [ ] add samples/code links for `ncap` and `xsec`
+- `TALYS` contains the tabulated microscopic gamma-ray strength functions computed according to HF-QRPA [see manual, page 143]:
+```
+sample structure/gamma/hfb/Sn.psf
+```
+```
+ Z=  50 A=  90
+  U[MeV]  fE1[mb/MeV]
+    0.100   6.291E-03
+    0.200   6.776E-03
+    .....   .........
+    
+ Z=  50 A=  91
+  U[MeV]  fE1[mb/MeV]
+    0.100   6.350E-03
+    0.200   6.840E-03
+    .....   .........
+ ...
+```
+- the energy axis `U` goes from `0.1` up to `30` MeV in increments of `0.1` MeV: `np.linspace(0.1, 30, 300, retstep=True)`
+- the file contains tin (Z=`50`) isotopes with masses from A=`90` to A=`178`, with a gap from A = `171` to A = `177`; in total there are 82 isotopes in this file
+
+The `rpa` project workflow for generating each job's photon strength function (`.psf`) file, which is then passed to `TALYS`, is as follows:
+
+```flow
+st=>start: structure/gamma/hfb/Sn.psf
+e=>end: talys_df
+op=>operation: talys.api.fn_to_dict()
+op2=>operation: talys.api.dict_to_df()
+st->op->op2->e
+```
+
+```flow
+st=>start: [zf]tes_lorvec.out
+e=>end: lorvec_df
+op=>operation: talys.api.lorvec_to_df()
+st->op->e
+```
+
+```flow
+st=>start: talys.api.replace_table(talys_df, lorvec_df)
+e=>end: ${job._id}/Sn.psf
+op=>operation: talys.api.df_to_dict()
+op2=>operation: talys.api.dict_to_fn()
+
+st->op->op2->e
+```
+
+Of particular interest here is the function `mypackage.talys.api.lorvec_to_df()`, which has the following diagram:
+
+```flow
+st=>start: read columns E and R from [zf]tes_lorvec.out
+op=>operation: R = R * 4.022 mb / (e^2 * fm^2)
+op2=>operation: select E between 0.1 and 30 MeV
+op3=>operation: keep only every 10th row
+e=>end: return dataframe
+
+st->op->op2->op3->e
+```
+
+Reading the columns from `[zf]tes_lorvec.out` is achieved by
+
+```python
+df_lorvec = pd.read_csv(
+    fname,
+    delim_whitespace=True,
+    comment="#",
+    skip_blank_lines=True,
+    header=None,
+    names=["U", "fE1"],
+)
+```
+
+```
+sample astrorate.g
+```
+```
+# Reaction rate for 139Sn(n,g)
+#    T       Rate       MACS
+  0.0001 6.09702E+05 6.09702E+05
+  0.0005 4.01579E+05 4.01579E+05
+  ...... ........... ...........
+  9.0000 8.01139E+02 8.01139E+02
+ 10.0000 2.96834E+02 2.96834E+02 
+```
+
+```
+sample rp050140.tot
+```
+```
+# n + 139Sn: Production of 140Sn - Total
+# Q-value    = 3.16732E+00 mass= 139.963146
+# E-threshold= 0.00000E+00
+# # energies =    88
+#     E          xs
+ 1.00000E-11 1.87949E+03
+ 2.53000E-08 3.73663E+01
+ ........... ...........
+ 2.90000E+01 1.05665E-01
+ 3.00000E+01 9.39864E-02
+```
+- the energy grid `E` is given as an input file, `n0-30.grid`
+
 
 ### df structure
 
-|model| N  | T_9 |ncap |E_n | R | xsec  |
+|model| N  | T   |Rate |U   |fE1| xs    |
 |-----|--- |---- |-----| ---| --|-------|
 | A   | 76 | 0.0 |     | 0  | 1 | 1     |
 | A   | 76 | ..  |     | .. | ..| ..    |
@@ -95,28 +168,40 @@ sample z/ftes_lorvec.out file
 | A   | 76 | 2.0 |     | 30 | 7 | 0.7   |
 | A   | 78 | 0.0 |     | 0  | 3 | 0.3   |
 
-`model`: `A`/`B`
+`model`: `A`/`B`/`C`/`D`/`E`
 
-`A` = "YIFEI" (T-dep. RPA)
 
-`B` = "TALYS" (HFB+QRPA)
+- T = 0 gr state: `RHB`
+- T > 0 gr state: `FTRMF`
+- T =0 ex state: `QRPA`
+- T > 0 ex state: `FTRPA`
+- TALYS: `HF-QRPA`
+
+
 
 ```python
 units["model"] = None
 units["N"] = None
-units["T_9"] = "[MeV]"
-units["ncap"] = r"[s${}^{-1}$cm${}^{3}$mol${}^{-1}$]"
-units["E_n"] = "[MeV]"
-units["R"] = r"[e${}^{2}$ fm${}^{2}$/MeV]"
-units["xsec"] = "[mb]"
+
+# temperature
+units["T"] = "[MeV]"
+
+# # (n,g) reaction rate
+units["Rate"] = r"[s${}^{-1}$cm${}^{3}$mol${}^{-1}$]"
+
+units["U"] = "[MeV]"
+units["fE1"] = "[mb/MeV]"
+units["xs"] = "[mb]"
 ```
+
+- downsample Yifei's energy grid `E` to `TALYS`'s  `U`
+- convert Yifei's transition strength `R` [e${}^{2}$ fm${}^{2}$/MeV] to `fE1` [mb/MeV]
 
 ## Links
 
 - [cross validated](https://stats.stackexchange.com/questions/422009/best-way-to-plot-multiple-similar-lines/422067#422067)
 
 ![](https://i.imgur.com/wAcmc48.png)
-
 
 - [kde ridgeplot](https://seaborn.pydata.org/examples/kde_ridgeplot.html)
 
@@ -166,7 +251,6 @@ g.despine(bottom=True, left=True)
 
 ![](https://i.imgur.com/14TXqOY.png)
 
-
 - [joypy](https://github.com/sbebo/joypy)
 
 ![](https://i.imgur.com/VJFPQei.png)
@@ -188,3 +272,4 @@ for j in range(nplots):
 
 You can also do `x+dx * j` if you like, I find that harder to parse.
 You can also just do a `pcolormesh(x, np.range(nplots), y)`.
+
