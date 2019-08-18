@@ -10,7 +10,6 @@ from matplotlib import rcParams
 from cycler import cycler
 from collections import defaultdict
 import pandas as pd
-import copy
 import signac as sg
 import mypackage.code_api as code_api
 import mypackage.util as util
