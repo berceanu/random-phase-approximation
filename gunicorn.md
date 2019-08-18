@@ -20,7 +20,7 @@ $ conda activate random-phase-approximation
 First, test `gunicorn` via
 
 ```console
-$ cd ~/Development/random-phase-approximation/signac/projects/rpa/src
+$ cd projects/rpa/src
 $ gunicorn --bind 0.0.0.0:5000 wsgi:dashboard
 ```
 
