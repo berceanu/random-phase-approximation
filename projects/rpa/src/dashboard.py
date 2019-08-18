@@ -34,8 +34,8 @@ config = {
 modules=[
     ImageViewer(name='Transition strength distribution', img_globs=['*.png']),
     StatepointList(enabled=True),
-    DocumentList(max_chars=140),
-    FileList(enabled=True),
+    DocumentList(max_chars=140, enabled=False),
+    FileList(enabled=False),
     Notes(enabled=False),
     #dt.DipoleTransitions(name='Dipole Transitions', enabled=True),  # FIXME
     ]

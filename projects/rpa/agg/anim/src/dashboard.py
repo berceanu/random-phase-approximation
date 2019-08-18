@@ -28,10 +28,10 @@ config = {
         }
 
 modules=[
-    ImageViewer(name="Transition strength distribution", img_globs=["*.png"]),
+    #ImageViewer(name="Transition strength distribution", img_globs=["*.png"]),
     VideoViewer(name="Animation", video_globs=["*.mp4"], preload="auto"),
     StatepointList(enabled=True),
-    DocumentList(max_chars=140),
+    DocumentList(max_chars=140, enabled=False),
     FileList(enabled=False),
     Notes(enabled=False),
 ]
