@@ -15,8 +15,9 @@ $ sudo apt install python3-venv
 
 ```console
 $ conda activate random-phase-approximation
-$ conda install gunicorn
 ```
+
+First, test `gunicorn` via
 
 ```console
 $ cd ~/Development/random-phase-approximation/signac/projects/rpa/src
