@@ -1,5 +1,5 @@
 # random-phase-approximation
-Execution/visualization framework for microscopic nuclear models.
+Execution/visualization framework for microscopic nuclear models, based on [signac](https://signac.io/)
 
 DEPENDENCIES:
 
