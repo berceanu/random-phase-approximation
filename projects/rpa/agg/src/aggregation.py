@@ -147,7 +147,7 @@ def main_groupby(args):
         origin = {}
         for job in gr1:
             origin[f"T = {job.sp.temperature} MeV".replace(".", "_")] = str(job)
-            sp = copy.deepcopy(job.sp())
+            sp = job.sp._as_dict()
             statepoints.append(sp)
         const_sp = dict(set.intersection(*(set(d.items()) for d in statepoints)))
 
