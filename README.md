@@ -16,6 +16,13 @@ INSTALLATION:
 - `$ conda activate random-phase-approximation`
 - `$ python -m pip install -e mypackage`
 
+For interactive plots inside **jupyter lab**:
+
+```
+$ jupyter labextension install @jupyter-widgets/jupyterlab-manager
+$ jupyter labextension install jupyter-matplotlib
+```
+
 **Note:** If you already have an older version of the environment installed, you can remove it via
 
 `$ conda remove --name random-phase-approximation --all`
