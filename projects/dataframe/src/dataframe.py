@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import signac as sg
 
 from mypackage import code_api
@@ -11,6 +12,7 @@ code = code_api.NameMapping()
 
 model = {'zero': 'QRPA', 'finite': 'FTRPA'}
 
+
 def main():
     rpa = sg.get_project(root="../rpa")
     logger.info("rpa project: %s" % rpa.root_directory())
@@ -18,20 +20,43 @@ def main():
     dataframes = []
     for job in rpa.find_jobs({'proton_number': 50}):
         temp = "finite" if job.sp.temperature > 0 else "zero"
+
         print(model[temp], job.sp.neutron_number, job.sp.temperature)
         fname = job.fn(code.out_file(temp, "isovector", "lorentzian"))
 
-        df_lorvec = pd.read_csv(
+        df = pd.read_csv(
             fname,
             delim_whitespace=True,
             comment="#",
             skip_blank_lines=True,
             header=None,
-            names=["U", "fE1"],
+            names=["energy", "strength_function"],
         )
-        dataframes.append(df_lorvec)
 
-    print(len(dataframes))
+        df.set_index('energy', inplace=True)
+        df2 = pd.concat([df], keys=[(model[temp], job.sp.neutron_number, job.sp.temperature)], names=['model', 'neutron_number', 'temperature'])
+
+        dataframes.append(df2)
+
+    df = pd.concat(dataframes)
+    df.reset_index(inplace=True)
+
+    print(df.head().to_string())
+    print(df.tail().to_string())
+
+    df.to_pickle('dataframe.pkl')
+
+    units = dict()
+    units["model"] = None
+    units["neutron_number"] = None
+    units["temperature"] = "[MeV]"
+
+    units["energy"] = "[MeV]"
+    units["strength_function"] = "[e${}^{2}$fm${}^{2}$/MeV]"
+
+
+
+
 
 
 
