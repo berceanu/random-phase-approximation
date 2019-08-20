@@ -43,8 +43,8 @@ WantedBy=multi-user.target
 
 ```console
 $ sudo systemctl start rpa
-$ sudo systemctl enable rpa
 $ sudo systemctl status rpa
+$ sudo systemctl enable rpa
 ```
 
 **Notes**: 
