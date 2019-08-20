@@ -14,6 +14,8 @@ dependencies:
   - ipympl  # interactive plotting in jupyterlab
   # jupyter tools and extensions
   - jupyterlab
+  - voila=0.1.9
+  - nodejs
   - jupytext
   - line_profiler
   # other
