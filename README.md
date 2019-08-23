@@ -9,6 +9,15 @@ DEPENDENCIES:
   - database in `~/src/talys/`
   - binary at `~/bin/talys`
 
+```console
+$ sudo apt install libmagickwand-dev
+$ sudo vi /etc/ImageMagick-6/policy.xml
+```
+```
+# /etc/ImageMagick-6/policy.xml
+<policy domain="coder" rights="read|write" pattern="PDF" />
+```
+
 INSTALLATION:
 
 - install **Miniconda** Python distribution, then
