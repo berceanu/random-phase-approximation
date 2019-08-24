@@ -2,6 +2,7 @@
   <dictionary name="berceanu">
     <words>
       <w>cmap</w>
+      <w>dataframe</w>
     </words>
   </dictionary>
 </component>

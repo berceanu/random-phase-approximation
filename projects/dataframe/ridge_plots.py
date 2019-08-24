@@ -1,27 +1,8 @@
-# ---
-# jupyter:
-#   jupytext:
-#     text_representation:
-#       extension: .py
-#       format_name: light
-#       format_version: '1.4'
-#       jupytext_version: 1.2.1
-#   kernelspec:
-#     display_name: Python 3
-#     language: python
-#     name: python3
-# ---
-
-# Enabling the `widget` backend.
-# This requires jupyter-matplotlib a.k.a. ipympl.
-# ipympl can be install via pip or conda.
-# %matplotlib widget
-
-
-import pandas as pd
-
+import pathlib
 import warnings
 
+import pandas as pd
+import pkg_resources
 import seaborn as sns
 from matplotlib import pyplot
 
@@ -32,9 +13,10 @@ sns.set(style="white", rc={"axes.facecolor": (0, 0, 0, 0)})
 pal = sns.cubehelix_palette(n_colors=11, rot=-0.25, light=0.7)
 
 
-def ridgeplot(df, temperature=0.0):
+# https://seaborn.pydata.org/examples/kde_ridgeplot.html
+def ridge_plot(d_frame, temperature):
     # Define and use a simple function to label the plot in axes coordinates
-    def label(x, color, label):
+    def set_label(x, color, label):
         ax = pyplot.gca()
         ax.text(
             0,
@@ -47,7 +29,7 @@ def ridgeplot(df, temperature=0.0):
             transform=ax.transAxes,
         )
 
-    df2 = df.sort_values(by=["neutron_number", "energy"], ascending=[True, True])
+    df2 = d_frame.sort_values(by=["neutron_number", "energy"], ascending=[True, True])
 
     # filter by temperature
     df3 = df2[df2["temperature"] == temperature]
@@ -60,7 +42,7 @@ def ridgeplot(df, temperature=0.0):
         row="neutron_number",
         hue="neutron_number",
         aspect=15,
-        height=0.5,
+        height=3.3 / 15,
         palette=pal,
     )
 
@@ -70,7 +52,7 @@ def ridgeplot(df, temperature=0.0):
     g.map(pyplot.plot, "energy", "strength_function", clip_on=False, color="w", lw=2)
     g.map(pyplot.axhline, y=0, lw=2, clip_on=False)
 
-    g.map(label, "energy")
+    g.map(set_label, "energy")
     g.set_xlabels(r"$E$ (MeV)")
 
     # Set the subplots to overlap
@@ -81,19 +63,20 @@ def ridgeplot(df, temperature=0.0):
     g.set(yticks=[])
     g.despine(bottom=True, left=True)
 
-
-df = pd.read_pickle("../dataframe.pkl")
-
-lower = df["energy"] >= 0.1
-upper = df["energy"] <= 30
-both = lower & upper
-df_final = df[both]
+    pyplot.show()
 
 
-ridgeplot(df_final, temperature=0.0)
+if __name__ == "__main__":
+    df_path = pathlib.Path(pkg_resources.resource_filename("dataframe", "data"))
 
-ridgeplot(df_final, temperature=0.5)
+    df = pd.read_pickle(df_path / "dataframe.pkl")
 
-ridgeplot(df_final, temperature=1.0)
+    lower = df["energy"] >= 0.1
+    upper = df["energy"] <= 30
+    both = lower & upper
+    df_final = df[both]
 
-ridgeplot(df_final, temperature=2.0)
+    ridge_plot(df_final, temperature=0.0)
+    ridge_plot(df_final, temperature=0.5)
+    ridge_plot(df_final, temperature=1.0)
+    ridge_plot(df_final, temperature=2.0)
