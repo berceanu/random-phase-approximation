@@ -5,12 +5,14 @@ import pandas as pd
 import pkg_resources
 import seaborn as sns
 from matplotlib import pyplot
+import matplotlib as mpl
 
 warnings.filterwarnings("ignore", message="Tight layout not applied")
 
 sns.set(style="white", rc={"axes.facecolor": (0, 0, 0, 0)})
 
 pal = sns.cubehelix_palette(n_colors=11, rot=-0.25, light=0.7)
+mpl.use("Qt5Agg")
 
 
 # https://seaborn.pydata.org/examples/kde_ridgeplot.html

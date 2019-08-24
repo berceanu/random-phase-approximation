@@ -1,8 +1,31 @@
 <component name="ProjectDictionaryState">
   <dictionary name="berceanu">
     <words>
+      <w>axarr</w>
       <w>cmap</w>
+      <w>cmbright</w>
+      <w>colormesh</w>
       <w>dataframe</w>
+      <w>facecolor</w>
+      <w>fontenc</w>
+      <w>inputenc</w>
+      <w>isodf</w>
+      <w>matplotlib</w>
+      <w>mplstyle</w>
+      <w>mydf</w>
+      <w>nenergy</w>
+      <w>nisotopes</w>
+      <w>pcolormesh</w>
+      <w>pdflatex</w>
+      <w>pyplot</w>
+      <w>savefig</w>
+      <w>texsystem</w>
+      <w>toolkits</w>
+      <w>usepackage</w>
+      <w>vmax</w>
+      <w>vmin</w>
+      <w>xaxis</w>
+      <w>yaxis</w>
     </words>
   </dictionary>
 </component>

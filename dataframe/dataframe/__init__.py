@@ -3,5 +3,9 @@ Project for creating a `pandas` dataframe that will contain all the project's ou
 This dataframe can then be operated on by user-defined functions, data in it can be aggregated
 and plotted interactively in `jupyter` notebooks.
 """
+import pathlib
+import pkg_resources
 
-from dataframe.turbo_colormap import mpl_turbo_data  # NOQA: F401
+df_path = pathlib.Path(
+    pkg_resources.resource_filename("dataframe", "data/dataframe.pkl")
+)

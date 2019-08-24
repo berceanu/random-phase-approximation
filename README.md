@@ -9,15 +9,6 @@ DEPENDENCIES:
   - database in `~/src/talys/`
   - binary at `~/bin/talys`
 
-```console
-$ sudo apt install libmagickwand-dev
-$ sudo vi /etc/ImageMagick-6/policy.xml
-```
-```
-# /etc/ImageMagick-6/policy.xml
-<policy domain="coder" rights="read|write" pattern="PDF" />
-```
-
 INSTALLATION:
 
 - install **Miniconda** Python distribution, then
@@ -25,7 +16,7 @@ INSTALLATION:
 ```console
 $ conda env create -f environment.yml
 $ conda activate random-phase-approximation
-$ python -m pip install -e mypackage
+$ python -m pip install -e mypackage dataframe plotting
 ```
 
 For interactive plots inside **jupyter lab**:
