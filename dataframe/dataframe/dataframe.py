@@ -3,6 +3,7 @@ import signac as sg
 
 from mypackage import code_api
 
+
 import logging
 
 logger = logging.getLogger(__name__)
