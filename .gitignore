@@ -54,3 +54,11 @@ mypackage/mypackage/talys/signac.rc
 
 
 .ipynb_checkpoints
+
+# LaTeX
+revtex.aux
+revtex.out
+revtex.pdf
+revtex.synctex.gz
+revtexNotes.bib
+
