@@ -38,4 +38,5 @@ dependencies:
   - pre_commit
   - pip:
     - matplotlib-label-lines
+    - Wand
 
