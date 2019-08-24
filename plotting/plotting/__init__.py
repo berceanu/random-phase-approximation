@@ -7,13 +7,7 @@ mpl.use("TkAgg")
 
 import pkg_resources  # noqa: E402
 from matplotlib import pyplot  # noqa: E402
-from plotting.style import (
-    colourWheel,
-    dashesStyles,
-    width,
-    height,
-    golden_ratio,
-)  # NOQA: F401
+from plotting.style import colourWheel, dashesStyles, width, height  # NOQA: F401
 from plotting.turbo_colormap import mpl_turbo_data  # NOQA: F401
 
 # Load style file

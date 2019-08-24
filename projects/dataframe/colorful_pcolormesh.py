@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 # always import plotting first!
-from plotting import width, golden_ratio
+from plotting import width
 from dataframe import df_path
 
 from matplotlib import pyplot, ticker, colors
@@ -38,10 +38,11 @@ if __name__ == "__main__":
 
     # sort by neutron number and energy
     df3 = df2.sort_values(by=["neutron_number", "energy"], ascending=[True, True])
-    all_temperatures = np.sort(df3.temperature.unique())
+    all_temperatures = np.sort(df3.temperature.unique()).tolist()
+    all_temperatures.remove(0.5)
 
     # plot
-    fig, axarr = pyplot.subplots(4, 1, constrained_layout=True)
+    fig, axarr = pyplot.subplots(len(all_temperatures), 1, constrained_layout=True)
     axes = {str(temp): ax for temp, ax in zip(np.flip(all_temperatures), axarr.flat)}
 
     mappable = None
@@ -91,6 +92,7 @@ if __name__ == "__main__":
         ax.yaxis.set_minor_locator(ticker.NullLocator())
         ax.yaxis.set_minor_formatter(ticker.NullFormatter())
 
+        # https://jakevdp.github.io/PythonDataScienceHandbook/04.10-customizing-ticks.html
         ax.yaxis.set_major_locator(ticker.NullLocator())
         ax.yaxis.set_major_formatter(ticker.NullFormatter())
 
@@ -105,5 +107,5 @@ if __name__ == "__main__":
 
     axes["0.0"].set_xlabel(r"$E$ [MeV]", labelpad=-0.5)
 
-    fig.set_size_inches(width, width * golden_ratio)
-    # fig.savefig("colormesh.pdf")  # facecolor='C7'
+    fig.set_size_inches(width, 1.4 * width)
+    fig.savefig("colormesh.pdf")  # facecolor='C7'

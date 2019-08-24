@@ -53,3 +53,5 @@ if __name__ == "__main__":
 
     fig.set_size_inches(width, height)
     # fig.savefig("plot.pdf")  # facecolor='C7'
+
+    # See https://tomaugspurger.github.io/method-chaining
