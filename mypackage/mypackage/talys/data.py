@@ -9,16 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 def read_cross_section(fn):
-    df = pd.read_csv(
-        fn,
-        sep=r"\s+",
-        header=None,
-        comment="#",
-        names=[
-            "energy",
-            "xs",
-        ],
-    )
+    df = pd.read_csv(fn, sep=r"\s+", header=None, comment="#", names=["energy", "xs"])
     return df
 
 

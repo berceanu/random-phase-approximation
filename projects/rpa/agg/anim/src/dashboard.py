@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 from signac_dashboard import Dashboard
 from signac_dashboard.modules.statepoint_list import StatepointList
-from signac_dashboard.modules.image_viewer import ImageViewer
+
+# from signac_dashboard.modules.image_viewer import ImageViewer
 from signac_dashboard.modules.video_viewer import VideoViewer
 from signac_dashboard.modules.document_list import DocumentList
 from signac_dashboard.modules.file_list import FileList
@@ -17,18 +18,19 @@ class MyDashboard(Dashboard):
     def job_title(self, job):
         return f"Z = {job.sp['proton_number']}"
 
+
 # To use multiple workers, a single shared key must be used. By default, the
 # secret key is randomly generated at runtime by each worker. Using a provided
 # shared key allows sessions to be shared across workers. This key was
 # generated with os.urandom(16)
 
 config = {
-        'DASHBOARD_PATHS': ['src/'],
-        'SECRET_KEY': b"\x99o\x90'/\rK\xf5\x10\xed\x8bC\xaa\x05\x9d\x99"
-        }
+    "DASHBOARD_PATHS": ["src/"],
+    "SECRET_KEY": b"\x99o\x90'/\rK\xf5\x10\xed\x8bC\xaa\x05\x9d\x99",
+}
 
-modules=[
-    #ImageViewer(name="Transition strength distribution", img_globs=["*.png"]),
+modules = [
+    # ImageViewer(name="Transition strength distribution", img_globs=["*.png"]),
     VideoViewer(name="Animation", video_globs=["*.mp4"], preload="auto"),
     StatepointList(enabled=True),
     DocumentList(max_chars=140, enabled=False),

@@ -9,11 +9,10 @@ import mypackage.dipole_transitions as dt
 
 
 class MyDashboard(Dashboard):
-
     def job_sorter(self, job):
         # shuld return key for
         # sorted(jobs, key=lambda job: job_sorter(job))
-        return job.sp['proton_number'], job.sp['neutron_number'], job.sp['temperature']
+        return job.sp["proton_number"], job.sp["neutron_number"], job.sp["temperature"]
 
     def job_title(self, job):
         return f"(Z, N) = ({job.sp['proton_number']}, {job.sp['neutron_number']}), T = {job.sp.temperature}"
@@ -25,21 +24,21 @@ class MyDashboard(Dashboard):
 # generated with os.urandom(16)
 
 config = {
-        'DASHBOARD_PATHS': ['.'],
-        'SECRET_KEY': b"\x99o\x90'/\rK\xf5\x10\xed\x8bC\xaa\x03\x9d\x99",
-        }
+    "DASHBOARD_PATHS": ["."],
+    "SECRET_KEY": b"\x99o\x90'/\rK\xf5\x10\xed\x8bC\xaa\x03\x9d\x99",
+}
 
-modules=[
-    ImageViewer(name='Transition strength distribution', img_globs=['*.png']),
+modules = [
+    ImageViewer(name="Transition strength distribution", img_globs=["*.png"]),
     StatepointList(enabled=True),
     DocumentList(max_chars=140, enabled=False),
     FileList(enabled=False),
     Notes(enabled=False),
-    dt.DipoleTransitions(name='Dipole Transitions', enabled=False),
-    ]
+    dt.DipoleTransitions(name="Dipole Transitions", enabled=False),
+]
 
 dashboard = MyDashboard(config=config, modules=modules)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     dashboard.main()

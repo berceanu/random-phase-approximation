@@ -16,17 +16,18 @@ class MyDashboard(Dashboard):
     def job_title(self, job):
         return f"(Z, N) = ({job.sp['proton_number']}, {job.sp['neutron_number']})"
 
+
 # To use multiple workers, a single shared key must be used. By default, the
 # secret key is randomly generated at runtime by each worker. Using a provided
 # shared key allows sessions to be shared across workers. This key was
 # generated with os.urandom(16)
 
 config = {
-        'DASHBOARD_PATHS': ['src/'],
-        'SECRET_KEY': b"\x99o\x90'/\rK\xf5\x10\xed\x8bC\xaa\x04\x9d\x99"
-        }
+    "DASHBOARD_PATHS": ["src/"],
+    "SECRET_KEY": b"\x99o\x90'/\rK\xf5\x10\xed\x8bC\xaa\x04\x9d\x99",
+}
 
-modules=[
+modules = [
     ImageViewer(name="Transition strength distribution", img_globs=["*.png"]),
     StatepointList(enabled=True),
     DocumentList(max_chars=140, enabled=False),

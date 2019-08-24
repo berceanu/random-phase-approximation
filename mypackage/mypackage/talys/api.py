@@ -62,7 +62,11 @@ class TalysAPI:
     output_fn = "output.txt"
     binary_fn = pathlib.Path.home() / "bin" / "talys"
     hfb_path = pathlib.Path.home() / "src" / "talys" / "structure" / "gamma" / "hfb"
-    backup_hfb_path = pathlib.Path(pkg_resources.resource_filename('mypackage', 'talys/database/structure/gamma/hfb'))
+    backup_hfb_path = pathlib.Path(
+        pkg_resources.resource_filename(
+            "mypackage", "talys/database/structure/gamma/hfb"
+        )
+    )
     stderr_fn = "stderr.txt"
     astrorate_fn = "astrorate.tot"
     cross_section_png_fn = "xsec.png"

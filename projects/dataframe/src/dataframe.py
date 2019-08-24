@@ -1,16 +1,15 @@
 import pandas as pd
-import numpy as np
 import signac as sg
 
 from mypackage import code_api
-from mypackage import util
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 code = code_api.NameMapping()
 
-model = {'zero': 'QRPA', 'finite': 'FTRPA'}
+model = {"zero": "QRPA", "finite": "FTRPA"}
 
 
 def main():
@@ -18,7 +17,7 @@ def main():
     logger.info("rpa project: %s" % rpa.root_directory())
 
     dataframes = []
-    for job in rpa.find_jobs({'proton_number': 50}):
+    for job in rpa.find_jobs({"proton_number": 50}):
         temp = "finite" if job.sp.temperature > 0 else "zero"
 
         print(model[temp], job.sp.neutron_number, job.sp.temperature)
@@ -33,8 +32,12 @@ def main():
             names=["energy", "strength_function"],
         )
 
-        df.set_index('energy', inplace=True)
-        df2 = pd.concat([df], keys=[(model[temp], job.sp.neutron_number, job.sp.temperature)], names=['model', 'neutron_number', 'temperature'])
+        df.set_index("energy", inplace=True)
+        df2 = pd.concat(
+            [df],
+            keys=[(model[temp], job.sp.neutron_number, job.sp.temperature)],
+            names=["model", "neutron_number", "temperature"],
+        )
 
         dataframes.append(df2)
 
@@ -44,7 +47,7 @@ def main():
     print(df.head().to_string())
     print(df.tail().to_string())
 
-    df.to_pickle('dataframe.pkl')
+    df.to_pickle("dataframe.pkl")
 
     units = dict()
     units["model"] = None
@@ -53,11 +56,6 @@ def main():
 
     units["energy"] = "[MeV]"
     units["strength_function"] = "[e${}^{2}$fm${}^{2}$/MeV]"
-
-
-
-
-
 
 
 # for (z, n), group in rpa.groupby(("proton_number", "neutron_number")):
