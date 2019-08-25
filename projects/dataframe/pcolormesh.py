@@ -89,4 +89,4 @@ if __name__ == "__main__":
     axes["0.0"].set_xlabel("$E$ %s" % units["energy"], labelpad=-0.5)
 
     fig.set_size_inches(width, 1.4 * width)
-    # fig.savefig("colormesh.pdf")  # facecolor='C7'
+    fig.savefig("colormesh.pdf")  # facecolor='C7'
