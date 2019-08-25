@@ -6,6 +6,16 @@ and plotted interactively in `jupyter` notebooks.
 import pathlib
 import pkg_resources
 
+model = {"zero": "QRPA", "finite": "FTRPA"}
+
 df_path = pathlib.Path(
-    pkg_resources.resource_filename("dataframe", "data/dataframe.pkl")
+    pkg_resources.resource_filename("dataframe", "data/dataframe.h5")
 )
+
+units = dict()
+units["model"] = None
+units["neutron_number"] = None
+units["temperature"] = "[MeV]"
+
+units["energy"] = "[MeV]"
+units["strength_function"] = r"[e${}^{2}$fm${}^{2}$/MeV]"

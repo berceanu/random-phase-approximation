@@ -1,22 +1,23 @@
-import pathlib
 import warnings
 
-import pandas as pd
-import pkg_resources
-import seaborn as sns
-from matplotlib import pyplot
 import matplotlib as mpl
+
+mpl.use("TkAgg")
+
+from dataframe import df_path, units  # noqa: E402
+import pandas as pd  # noqa: E402
+import seaborn as sns  # noqa: E402
+from matplotlib import pyplot  # noqa: E402
 
 warnings.filterwarnings("ignore", message="Tight layout not applied")
 
 sns.set(style="white", rc={"axes.facecolor": (0, 0, 0, 0)})
 
 pal = sns.cubehelix_palette(n_colors=11, rot=-0.25, light=0.7)
-mpl.use("Qt5Agg")
 
 
 # https://seaborn.pydata.org/examples/kde_ridgeplot.html
-def ridge_plot(d_frame, temperature):
+def ridge_plot(d_frame, temp):
     # Define and use a simple function to label the plot in axes coordinates
     def set_label(x, color, label):
         ax = pyplot.gca()
@@ -31,20 +32,14 @@ def ridge_plot(d_frame, temperature):
             transform=ax.transAxes,
         )
 
-    df2 = d_frame.sort_values(by=["neutron_number", "energy"], ascending=[True, True])
-
-    # filter by temperature
-    df3 = df2[df2["temperature"] == temperature]
-    print(f"Selected temperature is {temperature} MeV.")
-
     # Initialize the FacetGrid object
     # https://seaborn.pydata.org/generated/seaborn.FacetGrid.html
     g = sns.FacetGrid(
-        df3,
+        d_frame,
         row="neutron_number",
         hue="neutron_number",
         aspect=15,
-        height=3.3 / 15,
+        height=0.5,
         palette=pal,
     )
 
@@ -55,30 +50,28 @@ def ridge_plot(d_frame, temperature):
     g.map(pyplot.axhline, y=0, lw=2, clip_on=False)
 
     g.map(set_label, "energy")
-    g.set_xlabels(r"$E$ (MeV)")
+    g.set_xlabels("$E$ %s" % units["energy"])
 
     # Set the subplots to overlap
-    g.fig.subplots_adjust(hspace=-0.93)
+    g.fig.subplots_adjust(hspace=-0.75)
 
     # Remove axes details that don't play well with overlap
     g.set_titles("")
     g.set(yticks=[])
     g.despine(bottom=True, left=True)
 
-    pyplot.show()
+    g.fig.suptitle(f"T = {temp} MeV.")
 
 
 if __name__ == "__main__":
-    df_path = pathlib.Path(pkg_resources.resource_filename("dataframe", "data"))
+    df = pd.read_hdf(df_path, "computed_dipole_strengths")
 
-    df = pd.read_pickle(df_path / "dataframe.pkl")
+    for temperature in df.index.unique(level="temperature"):
+        print(temperature)
+        df2 = (
+            df.loc[pd.IndexSlice[:, :, temperature], :]
+            .query("0.1 <= energy <= 30")
+            .reset_index()
+        )
 
-    lower = df["energy"] >= 0.1
-    upper = df["energy"] <= 30
-    both = lower & upper
-    df_final = df[both]
-
-    ridge_plot(df_final, temperature=0.0)
-    ridge_plot(df_final, temperature=0.5)
-    ridge_plot(df_final, temperature=1.0)
-    ridge_plot(df_final, temperature=2.0)
+        ridge_plot(df2, temperature)

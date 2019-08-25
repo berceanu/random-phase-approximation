@@ -3,58 +3,38 @@ import pandas as pd
 
 # always import plotting first!
 from plotting import width
-from dataframe import df_path
+from dataframe import df_path, units
 
 from matplotlib import pyplot, ticker, colors
 
-
-def all_strength_functions_for_temperature(temperature, d_frame, n_energy=2991):
-    all_neutron_numbers = d_frame.neutron_number.unique()
-    nisotopes = len(all_neutron_numbers)
-
-    d_frame_2 = d_frame[d_frame["temperature"] == temperature]
-
-    all_curves = np.empty((nisotopes, n_energy))
-    energy = np.empty(n_energy)
-
-    for i, neutron_nr in enumerate(all_neutron_numbers):
-        the_isotope = d_frame_2.neutron_number == neutron_nr
-        isodf = d_frame_2[the_isotope]
-        all_curves[i, :] = isodf.strength_function
-        energy = isodf.energy
-
-    return all_curves, all_neutron_numbers, energy
-
-
 if __name__ == "__main__":
-    # read the dataframe from file
-    df = pd.read_pickle(df_path)
+    df = pd.read_hdf(df_path, "computed_dipole_strengths")
 
-    # filter energy bounds
-    lower = df["energy"] >= 0.1
-    upper = df["energy"] <= 30
-    both = lower & upper
-    df2 = df[both]
+    low_energy = 0.1  # MeV
+    high_energy = 30  # MeV
+    mask = (df["energy"] >= low_energy) & (df["energy"] <= high_energy)
+    df = df[mask]
 
-    # sort by neutron number and energy
-    df3 = df2.sort_values(by=["neutron_number", "energy"], ascending=[True, True])
-    all_temperatures = np.sort(df3.temperature.unique()).tolist()
-    all_temperatures.remove(0.5)
+    chosen_temperatures = (0.0, 1.0, 2.0)
 
-    # plot
-    fig, axarr = pyplot.subplots(len(all_temperatures), 1, constrained_layout=True)
-    axes = {str(temp): ax for temp, ax in zip(np.flip(all_temperatures), axarr.flat)}
+    fig, axarr = pyplot.subplots(len(chosen_temperatures), 1, constrained_layout=True)
+    axes = {str(T): ax for T, ax in zip(np.flip(chosen_temperatures), axarr.flat)}
 
-    mappable = None
-    for temp in all_temperatures:
-        ax = axes[str(temp)]
+    for T in chosen_temperatures:
+        df_single_T = df.loc[pd.IndexSlice[:, :, T], :]
 
-        y, neutron_numbers, x = all_strength_functions_for_temperature(temp, df3)
-        nn = np.append(neutron_numbers - 1, neutron_numbers[-1] + 1)
+        isotopes = df_single_T.index.unique(level="neutron_number").values
+        y = df_single_T.loc[:, "strength_function"].values.reshape(isotopes.size, -1)
+        x = np.empty(y.shape[1])
+        x[:] = df_single_T.iloc[0 : y.shape[1], 0].values
+
+        nn_boundaries = np.append(isotopes - 1, isotopes[-1] + 1)
+
+        ax = axes[str(T)]
 
         mappable = ax.pcolormesh(
             x,
-            nn,
+            nn_boundaries,
             y,
             norm=colors.LogNorm(),
             vmin=0.05,
@@ -62,21 +42,22 @@ if __name__ == "__main__":
             cmap="turbo",
             linewidth=0,
             rasterized=True,
-        )  # norm=colors.LogNorm(vmin=0.2, vmax=5.0)
-        ax.annotate(
-            s=f"$T = {temp}$ MeV", xy=(0.70, 0.68), xycoords="axes fraction", color="b"
         )
-        for N in neutron_numbers:
+
+        ax.annotate(
+            s=f"$T = {T}$ MeV", xy=(0.70, 0.68), xycoords="axes fraction", color="b"
+        )
+
+        for N in isotopes:
             ax.annotate(
                 s=str(N), xy=(29, N - 0.9), xycoords="data", color="w", fontsize=7
             )
-
-        for N in neutron_numbers[:-1]:
-            ax.axhline(N + 1, color="w", lw=0.2)
+            if N < isotopes[-1]:
+                ax.axhline(N + 1, color="w", lw=0.2)
 
     cb = fig.colorbar(mappable, ax=axarr.flat, location="top", shrink=1.0, aspect=30)
     cb.outline.set_visible(False)
-    cb.set_label(r"$R$ [e${}^{2}$fm${}^{2}$/MeV]")
+    cb.set_label("$R$ %s" % units["strength_function"])
     cb.ax.xaxis.set_minor_locator(ticker.NullLocator())
     cb.ax.xaxis.set_minor_formatter(ticker.NullFormatter())
     cb.ax.xaxis.set_major_locator(
@@ -88,7 +69,7 @@ if __name__ == "__main__":
         ax.set_xticklabels([])
 
     for ax in axarr.flat:
-        ax.set_xlim(0.1, 30)
+        ax.set_xlim(low_energy, high_energy)
         ax.yaxis.set_minor_locator(ticker.NullLocator())
         ax.yaxis.set_minor_formatter(ticker.NullFormatter())
 
@@ -105,7 +86,7 @@ if __name__ == "__main__":
 
     #     ax.xaxis.tick_bottom()
 
-    axes["0.0"].set_xlabel(r"$E$ [MeV]", labelpad=-0.5)
+    axes["0.0"].set_xlabel("$E$ %s" % units["energy"], labelpad=-0.5)
 
     fig.set_size_inches(width, 1.4 * width)
-    fig.savefig("colormesh.pdf")  # facecolor='C7'
+    # fig.savefig("colormesh.pdf")  # facecolor='C7'

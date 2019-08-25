@@ -27,6 +27,7 @@ dependencies:
   - jinja2=2.10*
   - ffmpeg=4.1*
   - pandas
+  - pytables
   - pytest-flakes
   - sympy
   - gunicorn
