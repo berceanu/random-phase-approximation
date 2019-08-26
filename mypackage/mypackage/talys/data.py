@@ -8,8 +8,31 @@ import pandas as pd
 logger = logging.getLogger(__name__)
 
 
-def read_cross_section(fn):
-    df = pd.read_csv(fn, sep=r"\s+", header=None, comment="#", names=["energy", "xs"])
+def read_cross_section(fn, residual_production=False):
+    if residual_production:
+        df = pd.read_csv(
+            fn, sep=r"\s+", header=None, comment="#", names=["energy", "xs"]
+        )
+    else:
+        df = (
+            pd.read_csv(
+                fn,
+                sep=r"\s+",
+                header=None,
+                comment="#",
+                names=[
+                    "E",
+                    "xs",
+                    "gamma_xs",
+                    "res_prod_xs",
+                    "direct",
+                    "preequilibrium",
+                    "compound",
+                ],
+            )
+            .drop(["xs", "gamma_xs", "res_prod_xs", "direct", "preequilibrium"], axis=1)
+            .rename(columns={"E": "energy", "compound": "xs"})
+        )
     return df
 
 

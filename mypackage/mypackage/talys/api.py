@@ -71,11 +71,15 @@ class TalysAPI:
     astrorate_fn = "astrorate.tot"
     cross_section_png_fn = "xsec.png"
 
-    def cross_section_fn(self, job) -> str:
+    def cross_section_fn(self, job, residual_production=False) -> str:
         """TALYS output filename for cross section data."""
-        Z = job.sp.proton_number
-        A = Z + job.sp.neutron_number
-        return f"rp{Z:03d}{A:03d}.tot"
+        if residual_production:
+            Z = job.sp.proton_number
+            A = Z + job.sp.neutron_number
+            fname = f"rp{Z:03d}{A:03d}.tot"
+        else:
+            fname = "xs000000.tot"
+        return fname
 
     @property
     def run_command(self) -> str:
@@ -159,7 +163,7 @@ class TalysAPI:
         """Generate TALYS energy input file."""
         file_path = pathlib.Path(job.fn(self.energy_fn))
         np.savetxt(
-            file_path, energy_values(job, log=False), fmt="%.3f", newline=os.linesep
+            file_path, energy_values(job, log=True), fmt="%.3f", newline=os.linesep
         )
         logger.info("Wrote %s" % file_path)
 
