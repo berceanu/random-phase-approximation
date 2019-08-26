@@ -31,7 +31,7 @@ modules = [
     ImageViewer(name="Figures", img_globs=["*.png"]),
     StatepointList(enabled=False),
     DocumentList(max_chars=140, enabled=False),
-    FileList(enabled=False),
+    FileList(enabled=True),
     Notes(enabled=False),
 ]
 
