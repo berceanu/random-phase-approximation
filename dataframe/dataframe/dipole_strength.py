@@ -1,9 +1,11 @@
 import logging
 import pathlib
-from dataframe import df_path, model
+
 import pandas as pd
 import signac as sg
+from dataframe import df_path, proton_number
 from mypackage import code_api
+from mypackage.talys.api import u_factor
 
 pd.options.display.max_rows = 10
 
@@ -21,8 +23,8 @@ def read(file_path):
     ...                   'projects/rpa/workspace/2f20928c33ff7bdd58cb1833c1df8012/ftes_lorvec.out')
     >>> df = read(fp)
 
-            strength_function
-    energy
+            strength_function_fm
+    excitation_energy
     0.00             0.000000
     0.01             0.063958
     """
@@ -32,8 +34,8 @@ def read(file_path):
         comment="#",
         skip_blank_lines=True,
         header=None,
-        names=["energy", "strength_function"],
-    ).set_index("energy")
+        names=["excitation_energy", "strength_function_fm"],
+    ).set_index("excitation_energy")
     return df
 
 
@@ -44,16 +46,20 @@ def main():
 
     logger.info("rpa project: %s" % rpa.root_directory())
 
+    model = {"zero": "QRPA", "finite": "FTRPA"}
+
     dataframes = []
-    for job in rpa.find_jobs({"proton_number": 50}):
+    for job in rpa.find_jobs({"proton_number": proton_number}):
         temp = "finite" if job.sp.temperature > 0 else "zero"
         fname = job.fn(code.out_file(temp, "isovector", "lorentzian"))
         df = read(fname)
 
         df2 = pd.concat(
             [df],
-            keys=[(model[temp], job.sp.neutron_number, job.sp.temperature)],
-            names=["model", "neutron_number", "temperature"],
+            keys=[
+                (proton_number, job.sp.neutron_number, model[temp], job.sp.temperature)
+            ],
+            names=["proton_number", "neutron_number", "model", "temperature"],
         ).reset_index()
 
         dataframes.append(df2)
@@ -61,7 +67,11 @@ def main():
     df = (
         pd.concat(dataframes)
         .astype({"model": "category"})
-        .set_index(["model", "neutron_number", "temperature"])
+        .assign(
+            mass_number=lambda x: x.proton_number + x.neutron_number,
+            strength_function_mb=lambda x: x.strength_function_fm * u_factor,
+        )
+        .set_index(["neutron_number", "temperature"])
         .sort_index(level=["neutron_number", "temperature"])
     )
 
