@@ -39,14 +39,14 @@ def read(file_path):
     return df
 
 
-def main():
+if __name__ == "__main__":
     module_path = pathlib.Path(__file__).absolute().parent
     rpa_root = module_path / ".." / ".." / "projects" / "rpa"
     rpa = sg.get_project(root=rpa_root)
 
     logger.info("rpa project: %s" % rpa.root_directory())
 
-    model = {"zero": "QRPA", "finite": "FTRPA"}
+    model = {"zero": "RHB + QRPA", "finite": "FTRMF + FTRPA"}
 
     dataframes = []
     for job in rpa.find_jobs({"proton_number": proton_number}):
@@ -71,20 +71,27 @@ def main():
             mass_number=lambda frame: frame.proton_number + frame.neutron_number,
             strength_function_mb=lambda frame: frame.strength_function_fm * u_factor,
         )
-        .set_index(["neutron_number", "temperature"])
-        .sort_index(level=["neutron_number", "temperature"])
+        .sort_values(
+            by=[
+                "proton_number",
+                "neutron_number",
+                "mass_number",
+                "temperature",
+                "excitation_energy",
+            ]
+        )
     )
+    df = df[
+        [
+            "proton_number",
+            "neutron_number",
+            "mass_number",
+            "model",
+            "temperature",
+            "excitation_energy",
+            "strength_function_fm",
+            "strength_function_mb",
+        ]
+    ]
 
     df.to_hdf(df_path, "computed_dipole_strengths", format="table")
-
-
-if __name__ == "__main__":
-    logging.basicConfig(
-        filename="project.log",
-        format="%(asctime)s - %(name)s - %(levelname)-8s - %(message)s",
-        level=logging.INFO,
-        datefmt="%Y-%m-%d %H:%M:%S",
-    )
-    logger.info("==RUN STARTED==")
-    main()
-    logger.info("==RUN FINISHED==")
