@@ -17,13 +17,12 @@ units["temperature"] = "[MeV]"  # T/T9
 units["excitation_energy"] = "[MeV]"  # E/U
 units["neutron_energy"] = "[MeV]"  # E_n
 units["strength_function_fm"] = r"[e${}^{2}$fm${}^{2}$/MeV]"  # R
-units["strength_function_mb"] = "[mb/MeV]"  # _
-units["talys_strength_function_mb"] = "[mb/MeV]"  # fE1
+units["strength_function_mb"] = "[mb/MeV]"  # fE1
 units["cross_section"] = "[mb]"
 units["capture_rate"] = r"s${}^{-1}$cm${}^{3}$mol${}^{-1}$"  # Rate
 
 # | proton_number | neutron_number | mass_number |
 #     | model | temperature |
 #         | excitation_energy | neutron_energy |
-#             | strength_function_fm | strength_function_mb | talys_strength_function_mb |
+#             | strength_function_fm | strength_function_mb |
 #                 | cross_section | capture_rate |

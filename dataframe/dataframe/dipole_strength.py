@@ -68,8 +68,8 @@ def main():
         pd.concat(dataframes)
         .astype({"model": "category"})
         .assign(
-            mass_number=lambda x: x.proton_number + x.neutron_number,
-            strength_function_mb=lambda x: x.strength_function_fm * u_factor,
+            mass_number=lambda frame: frame.proton_number + frame.neutron_number,
+            strength_function_mb=lambda frame: frame.strength_function_fm * u_factor,
         )
         .set_index(["neutron_number", "temperature"])
         .sort_index(level=["neutron_number", "temperature"])
