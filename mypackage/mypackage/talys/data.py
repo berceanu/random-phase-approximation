@@ -37,11 +37,11 @@ def read_cross_section(fn, residual_production=False):
 
 
 def read_astrorate(fn):
-    df = pd.read_table(fn, sep=r"\s+", skiprows=2, header=None)
+    df = pd.read_csv(fn, sep=r"\s+", skiprows=2, header=None)
     # read first two lines
-    with open(fn, 'r') as f:
+    with open(fn, "r") as f:
         _, line2 = f.readline(), f.readline()
-    df.columns = line2.lstrip('#').strip().split()
+    df.columns = line2.lstrip("#").strip().split()
     return df
 
 
