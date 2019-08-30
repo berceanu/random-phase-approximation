@@ -68,7 +68,7 @@ class TalysAPI:
         )
     )
     stderr_fn = "stderr.txt"
-    astrorate_fn = "astrorate.tot"
+    astrorate_fn = "astrorate.g"
     cross_section_png_fn = "xsec.png"
 
     def cross_section_fn(self, job=None, residual_production=False) -> str:
@@ -91,10 +91,10 @@ class TalysAPI:
         )
 
     def read_neutron_capture_rate(self, job):
-        nucleus = util.get_nucleus(job.sp.proton_number, job.sp.neutron_number)
-        ng_col = f"(n,g){nucleus}"
-        astrorate_df = data.read_astrorate(job.fn(self.astrorate_fn))
-        df = astrorate_df[["T9", ng_col]]
+        df = data.read_astrorate(job.fn(self.astrorate_fn))
+        df = (df.drop(columns=["MACS"])
+                .rename(columns=dict(Rate="capture_rate", T="talys_temperature"))
+              )
         return df
 
     def database_file_path(self, job):
