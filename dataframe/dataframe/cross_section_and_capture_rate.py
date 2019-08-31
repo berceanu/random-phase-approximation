@@ -2,7 +2,7 @@ import pathlib
 import signac as sg
 import logging
 import pandas as pd
-from dataframe import proton_number
+from dataframe import proton_number, df_path
 from mypackage.talys.api import TalysAPI
 from mypackage.talys.data import read_cross_section
 
@@ -12,22 +12,16 @@ pd.options.display.max_rows = 20
 pd.options.display.max_columns = 10
 
 
-# | *proton_number | *neutron_number | *mass_number | *temperature |
-#     | **model |
-#         | *neutron_energy | **cross_section | **capture_rate |
-
-
 def get_neutron_capture_rate(*, proj, protons=proton_number, api=TalysAPI()):
     dataframes = list()
     for job in proj.find_jobs(dict(proton_number=protons, astro="y")):
         ncr = api.read_neutron_capture_rate(job)
 
-        temperature = (
-            job.sp.temperature if ("temperature" in proj.detect_schema()) else 0.0
-        )
-
-        ncr = ncr.loc[(ncr["talys_temperature"] - temperature).abs().argsort()].head(1)
-        ncr.iloc[0, 0] = temperature
+        if "temperature" in proj.detect_schema():
+            ncr = ncr.loc[
+                (ncr["talys_temperature"] - job.sp.temperature).abs().argsort()
+            ].head(1)
+            ncr.iloc[0, 0] = job.sp.temperature
 
         ncr = ncr.rename(columns={"talys_temperature": "temperature"}).set_index(
             "temperature"
@@ -76,7 +70,7 @@ def get_cross_section(*, proj, protons=proton_number, api=TalysAPI()):
     return big_df
 
 
-if __name__ == "__main__":
+def main():
     module_path = pathlib.Path(__file__).absolute().parent
 
     talys_root = module_path / ".." / ".." / "projects" / "talys"
@@ -91,33 +85,19 @@ if __name__ == "__main__":
     xs_left = get_cross_section(proj=talys)
     xs_right = get_cross_section(proj=hfb_qrpa)
 
-    xs_df = xs_left.merge(
-        xs_right,
-        left_index=True,
-        right_index=True,
-        how="left",
-        suffixes=("_yifei", "_talys"),
-    ).reset_index(level="neutron_energy")
+    right_suffix = "_talys"
+    xs_df = xs_left.join(xs_right, rsuffix=right_suffix)
 
     rate_left = get_neutron_capture_rate(proj=talys)
     rate_right = get_neutron_capture_rate(proj=hfb_qrpa)
 
-    rate_df = rate_left.merge(
-        rate_right,
-        left_index=True,
-        right_index=True,
-        how="left",
-        suffixes=("_yifei", "_talys"),
-    )
+    rate_df = rate_left.join(rate_right, rsuffix=right_suffix)
 
-    # xs_df.index
-    # names = ['proton_number', 'neutron_number', 'temperature'], length = 14696)
-    # 14696/4/11 = 334 -> length of neutron_energy
+    df = xs_df.reset_index(level="neutron_energy").join(rate_df)
 
-    df = xs_df.merge(
-        rate_df,
-        left_index=True,
-        right_index=True,
-        how="left",
-        # suffixes=("_yifei", "_talys"),
-    )
+    return df
+
+
+if __name__ == "__main__":
+    df = main()
+    df.to_hdf(df_path, "cross_section_capture_rate", format="table")

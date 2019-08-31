@@ -5,7 +5,6 @@ import pandas as pd
 import signac as sg
 from dataframe import df_path, proton_number
 from mypackage import code_api
-from mypackage.talys.api import u_factor
 
 pd.options.display.max_rows = 10
 
@@ -39,14 +38,12 @@ def read(file_path):
     return df
 
 
-if __name__ == "__main__":
+def main():
     module_path = pathlib.Path(__file__).absolute().parent
     rpa_root = module_path / ".." / ".." / "projects" / "rpa"
     rpa = sg.get_project(root=rpa_root)
 
     logger.info("rpa project: %s" % rpa.root_directory())
-
-    model = {"zero": "RHB + QRPA", "finite": "FTRMF + FTRPA"}
 
     dataframes = []
     for job in rpa.find_jobs({"proton_number": proton_number}):
@@ -56,42 +53,23 @@ if __name__ == "__main__":
 
         df2 = pd.concat(
             [df],
-            keys=[
-                (proton_number, job.sp.neutron_number, model[temp], job.sp.temperature)
-            ],
-            names=["proton_number", "neutron_number", "model", "temperature"],
+            keys=[(proton_number, job.sp.neutron_number, job.sp.temperature)],
+            names=["proton_number", "neutron_number", "temperature"],
         ).reset_index()
 
         dataframes.append(df2)
 
     df = (
         pd.concat(dataframes)
-        .astype({"model": "category"})
-        .assign(
-            mass_number=lambda frame: frame.proton_number + frame.neutron_number,
-            strength_function_mb=lambda frame: frame.strength_function_fm * u_factor,
+        .set_index(
+            ["proton_number", "neutron_number", "temperature", "excitation_energy"]
         )
-        .sort_values(
-            by=[
-                "proton_number",
-                "neutron_number",
-                "mass_number",
-                "temperature",
-                "excitation_energy",
-            ]
-        )
+        .sort_index()
     )
-    df = df[
-        [
-            "proton_number",
-            "neutron_number",
-            "mass_number",
-            "model",
-            "temperature",
-            "excitation_energy",
-            "strength_function_fm",
-            "strength_function_mb",
-        ]
-    ]
 
+    return df
+
+
+if __name__ == "__main__":
+    df = main()
     df.to_hdf(df_path, "computed_dipole_strengths", format="table")

@@ -20,8 +20,3 @@ units["strength_function_fm"] = r"[e${}^{2}$fm${}^{2}$/MeV]"  # R
 units["strength_function_mb"] = "[mb/MeV]"  # fE1
 units["cross_section"] = "[mb]"
 units["capture_rate"] = r"s${}^{-1}$cm${}^{3}$mol${}^{-1}$"  # Rate
-
-# | *proton_number | *neutron_number | *mass_number |  *temperature |
-#     | **model |
-#         | *excitation_energy | **strength_function_fm | **strength_function_mb | done
-#         |  *neutron_energy   | **cross_section        | **capture_rate         | todo
