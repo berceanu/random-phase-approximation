@@ -20,13 +20,12 @@ def main():
     # plot all isotopes
     fig, ax = pyplot.subplots()
     fig.subplots_adjust(left=0.09, bottom=0.14, right=0.97, top=0.97)
-    dy = 0
     for j, neutron_number in enumerate(df.index.unique()):
         mydf = df.loc[neutron_number, :]
         # print(mydf.energy.size)
         ax.plot(
             mydf["excitation_energy"],
-            mydf["strength_function_fm"] + j * dy,
+            mydf["strength_function_fm"],
             color=colourWheel[j % len(colourWheel)],
             linestyle="-",
             dashes=dashesStyles[j % len(dashesStyles)],
