@@ -12,7 +12,6 @@ pd.options.display.max_columns = 10
 
 def main():
     xs_rate_data = cross_section_and_capture_rate.main().reset_index()
-    xs_rate_data.to_hdf(df_path, "neutron_energy", format="table")
 
     left = dipole_strength.main().reset_index()
     right = talys_dipole_strength.main().reset_index()
@@ -32,8 +31,11 @@ def main():
         on=["proton_number", "neutron_number", "temperature", "excitation_energy"],
         how="left",
     )
-    df.to_hdf(df_path, "excitation_energy", format="table")
+
+    return df, xs_rate_data
 
 
 if __name__ == "__main__":
-    main()
+    dipole_data, rate_data = main()
+    dipole_data.to_hdf(df_path, "excitation_energy", format="table")
+    rate_data.to_hdf(df_path, "neutron_energy", format="table")

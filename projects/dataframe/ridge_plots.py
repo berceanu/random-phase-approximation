@@ -44,13 +44,27 @@ def ridge_plot(d_frame, temp):
     )
 
     # Draw the densities in a few steps
-    g.map(pyplot.plot, "energy", "strength_function", clip_on=False, alpha=1, lw=1.5)
-    g.map(pyplot.fill_between, "energy", "strength_function")
-    g.map(pyplot.plot, "energy", "strength_function", clip_on=False, color="w", lw=2)
+    g.map(
+        pyplot.plot,
+        "excitation_energy",
+        "strength_function_fm",
+        clip_on=False,
+        alpha=1,
+        lw=1.5,
+    )
+    g.map(pyplot.fill_between, "excitation_energy", "strength_function_fm")
+    g.map(
+        pyplot.plot,
+        "excitation_energy",
+        "strength_function_fm",
+        clip_on=False,
+        color="w",
+        lw=2,
+    )
     g.map(pyplot.axhline, y=0, lw=2, clip_on=False)
 
-    g.map(set_label, "energy")
-    g.set_xlabels("$E$ %s" % units["energy"])
+    g.map(set_label, "excitation_energy")
+    g.set_xlabels("$E$ %s" % units["excitation_energy"])
 
     # Set the subplots to overlap
     g.fig.subplots_adjust(hspace=-0.75)
@@ -64,14 +78,10 @@ def ridge_plot(d_frame, temp):
 
 
 if __name__ == "__main__":
-    df = pd.read_hdf(df_path, "computed_dipole_strengths")
+    df = pd.read_hdf(df_path, "excitation_energy")
 
-    for temperature in df.index.unique(level="temperature"):
+    for temperature in df["temperature"].unique():
         print(temperature)
-        df2 = (
-            df.loc[pd.IndexSlice[:, :, temperature], :]
-            .query("0.1 <= energy <= 30")
-            .reset_index()
-        )
+        df2 = df.query("temperature == %s" % temperature)
 
         ridge_plot(df2, temperature)
