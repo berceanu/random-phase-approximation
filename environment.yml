@@ -7,7 +7,7 @@ channels:
 dependencies:
   # general numerics (version controlled)
   - python=3.8*
-  - numpy=1.18*
+  - numpy=1.17*
   - scipy=1.4*
   # plotting and serialization
   - matplotlib=3.1*
