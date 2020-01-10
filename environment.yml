@@ -6,26 +6,25 @@ channels:
 
 dependencies:
   # general numerics (version controlled)
-  - python=3.7*
-  - numpy=1.16*
-  - scipy=1.2*
+  - python=3.8*
+  - numpy=1.18*
+  - scipy=1.4*
   # plotting and serialization
   - matplotlib=3.1*
   - seaborn
   - ipympl  # interactive plotting in jupyterlab
   # jupyter tools and extensions
   - jupyterlab
-  - voila=0.1.9
   - nodejs
   - jupytext
   - line_profiler
   # other
-  - unyt=2.2*
-  - signac=1.2*
+  - unyt=2.4*
+  - signac=1.3*
   - signac-dashboard=0.2*
-  - signac-flow=0.7*
+  - signac-flow=0.9*
   - jinja2=2.10*
-  - ffmpeg=4.1*
+  - ffmpeg=4.2*
   - pandas
   - pytables
   - pytest-flakes
@@ -39,4 +38,3 @@ dependencies:
   - pre_commit
   - pip:
     - matplotlib-label-lines
-
