@@ -58,7 +58,7 @@ class TalysAPI:
 
     input_fn = "input.txt"
     input_template_fn = "input.j2"
-    energy_fn = "n0-30.grid"
+    energy_fn = "n0-20.grid"
     output_fn = "output.txt"
     binary_fn = pathlib.Path.home() / "bin" / "talys"
     hfb_path = pathlib.Path.home() / "src" / "talys" / "structure" / "gamma" / "hfb"
@@ -179,7 +179,7 @@ def energy_values(job, log=False, digits=None):
         v3 = np.linspace(0.04, 0.2, 17)
         v4 = np.linspace(0.22, 0.3, 5)
         v5 = np.linspace(0.35, 0.4, 2)
-        v6 = np.linspace(0.5, 30.0, 296)
+        v6 = np.linspace(0.5, 20.0, 296)
 
         my_v = np.empty(
             v1.size + v2.size + v3.size + v4.size + v5.size + v6.size, dtype=np.float64
@@ -189,7 +189,7 @@ def energy_values(job, log=False, digits=None):
         if digits is None:
             digits = 1
 
-        my_v, step = np.linspace(0.1, 30.0, 300, retstep=True)
+        my_v, step = np.linspace(0.1, 20.0, 300, retstep=True)
         assert math.isclose(step, 0.1), f"step {step} is not 0.1!"
 
     return my_v.round(digits)
