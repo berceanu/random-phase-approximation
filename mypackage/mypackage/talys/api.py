@@ -71,15 +71,9 @@ class TalysAPI:
     astrorate_fn = "astrorate.g"
     cross_section_png_fn = "xsec.png"
 
-    def cross_section_fn(self, job=None, residual_production=False) -> str:
+    def cross_section_fn(self, job=None) -> str:
         """TALYS output filename for cross section data."""
-        if residual_production and (job is not None):
-            Z = job.sp.proton_number
-            A = Z + job.sp.neutron_number
-            fname = f"rp{Z:03d}{A:03d}.tot"
-        else:
-            fname = "xs000000.tot"
-        return fname
+        return "xs000000.tot"
 
     @property
     def run_command(self) -> str:
