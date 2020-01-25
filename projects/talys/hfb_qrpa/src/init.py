@@ -23,7 +23,7 @@ def main():
     logger.info("rpa project: %s" % rpa_proj.workspace())
 
     for rpa_job in rpa_proj.find_jobs(dict(proton_number=50, temperature=0.0)):
-        logger.info(f"Processing %s.." % rpa_job.workspace())
+        logger.info("Processing %s.." % rpa_job.workspace())
         sp = rpa_proj.open_job(id=rpa_job.id).statepoint()
 
         del sp["temperature"]
