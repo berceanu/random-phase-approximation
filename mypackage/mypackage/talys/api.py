@@ -92,9 +92,9 @@ class TalysAPI:
 
     def read_neutron_capture_rate(self, job):
         df = data.read_astrorate(job.fn(self.astrorate_fn))
-        df = (df.drop(columns=["MACS"])
-                .rename(columns=dict(Rate="capture_rate", T="talys_temperature"))
-              )
+        df = df.drop(columns=["MACS"]).rename(
+            columns=dict(Rate="capture_rate", T="talys_temperature")
+        )
         return df
 
     def database_file_path(self, job):

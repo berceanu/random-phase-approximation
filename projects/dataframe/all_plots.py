@@ -16,19 +16,19 @@ ntemp = len(temperatures)
 def main():
     ee_data = (
         pd.read_hdf(df_path, "excitation_energy")
-            .query("neutron_number in @isotopes and temperature in @temperatures")
-            .assign(
+        .query("neutron_number in @isotopes and temperature in @temperatures")
+        .assign(
             mass_number=lambda frame: frame.proton_number + frame.neutron_number,
             strength_function_mb=lambda frame: frame.strength_function_fm * u_factor,
             tabulated_strength_function_fm=lambda frame: frame.tabulated_strength_function_mb
-                                                         / u_factor,
+            / u_factor,
         )
     )
-    ne_data = (
-        pd.read_hdf(df_path, "neutron_energy")
-            .query("neutron_number in @isotopes and temperature in @temperatures")
-            .assign(mass_number=lambda frame: frame.proton_number + frame.neutron_number)
-    )
+    # ne_data = (
+    #     pd.read_hdf(df_path, "neutron_energy")
+    #     .query("neutron_number in @isotopes and temperature in @temperatures")
+    #     .assign(mass_number=lambda frame: frame.proton_number + frame.neutron_number)
+    # )
 
     df = ee_data.drop(
         columns=[
@@ -42,8 +42,12 @@ def main():
     table = pd.pivot_table(
         df,
         index=["excitation_energy"],
-        values=["strength_function_fm", "strength_function_mb", "tabulated_strength_function_fm",
-                "tabulated_strength_function_mb"],
+        values=[
+            "strength_function_fm",
+            "strength_function_mb",
+            "tabulated_strength_function_fm",
+            "tabulated_strength_function_mb",
+        ],
         columns=["temperature", "neutron_number"],
     )
 
@@ -144,7 +148,6 @@ def main():
 
         fig.set_size_inches(width, height)
         fig.savefig("T_%s_all_N_mb.pdf" % T)
-
 
     # repeat everything above, for cross_section
 
