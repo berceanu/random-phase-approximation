@@ -27,7 +27,7 @@ def main():
     ):
         for rpa_job in jobs:
             logger.info(f"Processing %s.." % rpa_job.workspace())
-            sp = rpa_proj.get_statepoint(rpa_job.get_id())
+            sp = rpa_proj.open_job(id=rpa_job.id).statepoint()
 
             for yn in "y", "n":
                 sp.update(

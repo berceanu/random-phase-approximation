@@ -1,2 +1,3 @@
-project=talys
-workspace_dir=workspace
+project = talys
+workspace_dir = workspace
+schema_version = 1
