@@ -1,13 +1,13 @@
 from setuptools import setup
 
 setup(
-    name="plotting",
+    name="figstyle",
     version="0.1.0",
     author="Andrei Berceanu",
     author_email="andrei.berceanu@eli-np.ro",
-    packages=["plotting"],
-    package_dir={"plotting": "plotting"},
-    package_data={"plotting": ["data/*.mplstyle"]},
+    packages=["figstyle"],
+    package_dir={"figstyle": "figstyle"},
+    package_data={"figstyle": ["data/*.mplstyle"]},
     license="LICENSE.txt",
     description="An awesome package that does something",
     long_description=open("README.txt").read(),

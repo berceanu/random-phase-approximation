@@ -1,7 +1,7 @@
 import pandas as pd
 
-# always import plotting first!
-from plotting import colourWheel, dashesStyles, width, height
+# always import figstyle first!
+from figstyle import colourWheel, dashesStyles, width, height
 from dataframe import df_path, units  # , model
 from matplotlib import pyplot  # , ticker
 from mypackage.talys.api import u_factor
@@ -24,11 +24,11 @@ def main():
             / u_factor,
         )
     )
-    # ne_data = (
-    #     pd.read_hdf(df_path, "neutron_energy")
-    #     .query("neutron_number in @isotopes and temperature in @temperatures")
-    #     .assign(mass_number=lambda frame: frame.proton_number + frame.neutron_number)
-    # )
+    ne_data = (
+        pd.read_hdf(df_path, "neutron_energy")
+        .query("neutron_number in @isotopes and temperature in @temperatures")
+        .assign(mass_number=lambda frame: frame.proton_number + frame.neutron_number)
+    )
 
     df = ee_data.drop(
         columns=[
@@ -150,6 +150,7 @@ def main():
         fig.savefig("T_%s_all_N_mb.pdf" % T)
 
     # repeat everything above, for cross_section
+    print(ne_data)
 
 
 if __name__ == "__main__":

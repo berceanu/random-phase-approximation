@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
 
-# always import plotting first!
-from plotting import width
+# always import figstyle first!
+from figstyle import width
 from dataframe import df_path, units
 
 from matplotlib import pyplot, ticker, colors
