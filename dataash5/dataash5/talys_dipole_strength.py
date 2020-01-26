@@ -1,4 +1,4 @@
-from dataframe import df_path, proton_number
+from dataash5 import df_path, proton_number
 from mypackage.talys.api import fn_to_dict, dict_to_df, TalysAPI
 from mypackage.util import atomic_symbol_for_z
 

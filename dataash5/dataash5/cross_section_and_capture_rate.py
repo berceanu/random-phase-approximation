@@ -2,7 +2,7 @@ import pathlib
 import signac as sg
 import logging
 import pandas as pd
-from dataframe import proton_number, df_path
+from dataash5 import proton_number, df_path
 from mypackage.talys.api import TalysAPI
 from mypackage.talys.data import read_cross_section
 

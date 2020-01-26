@@ -1,6 +1,6 @@
-from dataframe import df_path
+from dataash5 import df_path
 import pandas as pd
-from dataframe import (
+from dataash5 import (
     dipole_strength,
     talys_dipole_strength,
     cross_section_and_capture_rate,
