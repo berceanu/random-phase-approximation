@@ -16,7 +16,10 @@ units["excitation_energy"] = "[MeV]"  # E/U
 units["neutron_energy"] = "[MeV]"  # E_n
 units["strength_function_fm"] = r"[e${}^{2}$fm${}^{2}$/MeV]"  # R
 units["strength_function_mb"] = "[mb/MeV]"  # fE1
+units["tabulated_strength_function_fm"] = r"[e${}^{2}$fm${}^{2}$/MeV]"  # R
+units["tabulated_strength_function_mb"] = "[mb/MeV]"  # fE1
 units["cross_section"] = "[mb]"
+units["tabulated_cross_section"] = "[mb]"
 units["capture_rate"] = r"s${}^{-1}$cm${}^{3}$mol${}^{-1}$"  # Rate
 
 
