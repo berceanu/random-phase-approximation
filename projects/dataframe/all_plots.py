@@ -3,7 +3,7 @@ import pandas as pd
 # always import figstyle first!
 from figstyle import colourWheel, dashesStyles, width, height
 from dataash5 import df_path, units  # , model
-from matplotlib import pyplot  # , ticker
+from matplotlib import pyplot
 from mypackage.talys.api import u_factor
 
 isotopes = (76, 86, 96)
@@ -93,17 +93,15 @@ def main():
         columns=["temperature", "neutron_number"],
     )
 
-    ###
-
-    # plot_table(column="strength_function_fm", table=table, include_talys=True, plot_type="log-log")
-    # plot_table(column="strength_function_mb", table=table, include_talys=True)
+    plot_table(column="strength_function_fm", table=table, include_talys=True, plot_type="log-log")
+    plot_table(column="strength_function_mb", table=table, include_talys=True)
 
     # cross_section
     ne_data = (
         pd.read_hdf(df_path, "neutron_energy")
         .query("neutron_number in @isotopes and temperature in @temperatures")
         .assign(mass_number=lambda frame: frame.proton_number + frame.neutron_number)
-        .rename(columns={"cross_section_talys": "tabulated_cross_section"})
+        .rename(columns={"cross_section_talys": "tabulated_cross_section"})  # todo
     )
     df = ne_data.drop(
         columns=[
@@ -123,68 +121,7 @@ def main():
         columns=["temperature", "neutron_number"],
     )
 
-    # plot_table(column="cross_section", table=table, include_talys=True, plot_type="log-log")
-
-    # capture rate
-    df = ne_data.drop(
-        columns=[
-            "proton_number",
-            "cross_section",
-            "tabulated_cross_section",
-            "neutron_energy",
-        ]
-    )
-    table = pd.pivot_table(
-        df,
-        index=["neutron_number"],
-        values=[
-            "capture_rate",
-            "capture_rate_talys",
-        ],
-        columns=["temperature"]
-    )
-    print(table)
-    print(table.index)
-    print(table.columns)
-    print(table.loc[:, ("capture_rate", 0.0)])
-
-    fig, ax = pyplot.subplots()
-    fig.subplots_adjust(left=0.09, bottom=0.14, right=0.97, top=0.97)
-    for j, T in enumerate(temperatures):
-        series = table.loc[:, ("capture_rate", T)]
-
-        ax.plot(
-            series.index.values,
-            series.values,
-            color=colourWheel[j % len(colourWheel)],
-            linestyle="-",
-            dashes=dashesStyles[j % len(dashesStyles)],
-            label=str(T),
-        )
-
-    table = pd.pivot_table(
-        df,
-        index=["temperature"],
-        values=[
-            "capture_rate",
-            "capture_rate_talys",
-        ],
-        columns=["neutron_number"]
-    )
-
-    fig, ax = pyplot.subplots()
-    fig.subplots_adjust(left=0.09, bottom=0.14, right=0.97, top=0.97)
-    for j, iso in enumerate(isotopes):
-        series = table.loc[:, ("capture_rate", iso)]
-
-        ax.plot(
-            series.index.values,
-            series.values,
-            color=colourWheel[j % len(colourWheel)],
-            linestyle="-",
-            dashes=dashesStyles[j % len(dashesStyles)],
-            label=str(iso),
-        )
+    plot_table(column="cross_section", table=table, include_talys=True, plot_type="log-log")
 
 
 if __name__ == "__main__":

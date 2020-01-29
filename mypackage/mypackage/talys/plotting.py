@@ -65,14 +65,6 @@ def plot_capture_rate_vs_mass(
     ax.set(
         ylabel=r"Neutron Capture Rate [s${}^{-1}$cm${}^{3}$mol${}^{-1}$]", xlabel=r"A"
     )
-
-    # ax.ticklabel_format(
-    #     axis="y",
-    #     style="scientific",
-    #     scilimits=(0, 0),
-    #     useOffset=False,
-    #     useMathText=True,
-    # )
     ax.set_yscale("log")
     ax.xaxis.set_major_locator(MaxNLocator(integer=True))
 
