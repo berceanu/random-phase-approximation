@@ -49,7 +49,7 @@ def main():
     ax.annotate(s=model(selected_temperature), xy=(0.7, 0.5), xycoords="axes fraction")
 
     fig.set_size_inches(width, height)
-    fig.savefig("plot.pdf")  # facecolor='C7'
+    fig.savefig("all_isotopes_at_T_%s.pdf" % selected_temperature)  # facecolor='C7'
 
     # See https://tomaugspurger.github.io/method-chaining
 
