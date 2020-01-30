@@ -149,12 +149,12 @@ def main():
         ],
         columns=["temperature", "neutron_number"],
     )
-
+    #
     plot_table(
         column="strength_function_fm",
         talys_column="tabulated_strength_function_fm",
         table=table,
-        include_talys=True,
+        include_talys=False,
         plot_type="log-linear",
         energy_interval=(0, 20),
         ylabel="$R$ %s" % units["strength_function_fm"],
@@ -164,7 +164,7 @@ def main():
     #        column="strength_function_mb",
     #        talys_column="tabulated_strength_function_mb",
     #        table=table,
-    #        include_talys=True,
+    #        include_talys=False,
     #        plot_type="log-log",
     #        energy_interval=(0.1, 10),
     #        ylabel="$R$ %s" % units["strength_function_mb"],
@@ -190,7 +190,7 @@ def main():
         column="cross_section",
         talys_column="cross_section_talys",
         table=table,
-        include_talys=True,
+        include_talys=False,
         plot_type="log-log",
         energy_interval=(0, 20),
         ylabel="Cross-Section %s" % units["cross_section"],
