@@ -1,6 +1,5 @@
 import pandas as pd
 
-# always import figstyle first!
 from figstyle import colourWheel, dashesStyles, width, height
 from dataash5 import df_path, units
 from matplotlib import pyplot
@@ -20,10 +19,10 @@ def plot_series(
     neutron_number,
     counter,
     label,
-    annotation,
+    ylabel,
+    xlabel,
     plot_type="linear-linear",
     energy_interval=(0.1, 10),
-    ylabel=None,
 ):
     series = table.loc[:, (column, temperature, neutron_number)]
 
@@ -39,20 +38,21 @@ def plot_series(
     ax.set_yscale(plot_type.split("-")[0])
     ax.set_xscale(plot_type.split("-")[1])
 
-    ax.set_ylabel(ylabel, labelpad=-2)
-    ax.set_xlabel("$E$ %s" % units["excitation_energy"], labelpad=-0.5)
+    ax.set_ylabel(ylabel)
+    ax.set_xlabel(xlabel)
     ax.set_xlim(left=energy_interval[0], right=energy_interval[1])
-
-    ax.legend(loc="upper left", ncol=1, handlelength=1)
-    ax.annotate(s=annotation, xy=(0.7, 0.8), xycoords="axes fraction")
+    if column == "strength_function_fm":
+        ax.set_ylim(3e-2, 1.2e1)
+    elif column == "cross_section":
+        ax.set_ylim(1e-4, 1e3)
 
 
 def plot_table(
-    column, table, plot_type="linear-linear", energy_interval=(0.1, 10), ylabel=None,
-):  # "$R$ %s" % units[column]
+    column, table, ylabel, xlabel, plot_type="linear-linear", energy_interval=(0.1, 10),
+):
     for iso in isotopes:
         fig, ax = pyplot.subplots()
-        fig.subplots_adjust(left=0.12, bottom=0.14, right=0.97, top=0.97)
+        fig.subplots_adjust(left=0.15, bottom=0.09, right=0.97, top=0.97)
         for j, T in enumerate(temperatures):
             plot_series(
                 ax=ax,
@@ -61,37 +61,31 @@ def plot_table(
                 temperature=T,
                 neutron_number=iso,
                 counter=j,
-                label="%s MeV" % T,
-                annotation="N = %s" % iso,
+                label="T = %s MeV" % T,
                 plot_type=plot_type,
                 energy_interval=energy_interval,
                 ylabel=ylabel,
+                xlabel=xlabel,
             )
+        if column == "cross_section":
+            mass_number_target = 50 + iso - 1
+            mass_number_final = mass_number_target + 1
+            ax.annotate(
+                s=r"${}^{%s}$Sn(n,$\gamma$)${}^{%s}$Sn"
+                % (mass_number_target, mass_number_final),
+                xy=(0.6, 0.9),
+                xycoords="axes fraction",
+            )
+            ax.legend(loc="lower left")
+        else:
+            ax.annotate(s="N = %s" % iso, xy=(0.1, 0.9), xycoords="axes fraction")
+            ax.legend(loc="lower right")
         fig.set_size_inches(width, height)
         fig.savefig("N_%s_all_T_%s.pdf" % (iso, column))
 
-    for T in temperatures:
-        fig, ax = pyplot.subplots()
-        fig.subplots_adjust(left=0.12, bottom=0.14, right=0.97, top=0.97)
-        for j, iso in enumerate(isotopes):
-            plot_series(
-                ax=ax,
-                table=table,
-                column=column,
-                temperature=T,
-                neutron_number=iso,
-                counter=j,
-                label="%s" % iso,
-                annotation="T = %s MeV" % T,
-                plot_type=plot_type,
-                energy_interval=energy_interval,
-                ylabel=ylabel,
-            )
-        fig.set_size_inches(width, height)
-        fig.savefig("T_%s_all_N_%s.pdf" % (T, column))
-
 
 def main():
+    # strength function
     ee_data = pd.read_hdf(df_path, "excitation_energy").query(
         "neutron_number in @isotopes and temperature in @temperatures"
     )
@@ -102,13 +96,13 @@ def main():
         values=["strength_function_fm"],
         columns=["temperature", "neutron_number"],
     )
-    #
     plot_table(
         column="strength_function_fm",
         table=table,
         plot_type="log-linear",
         energy_interval=(0, 20),
         ylabel="$R$ %s" % units["strength_function_fm"],
+        xlabel="E %s" % units["excitation_energy"],
     )
 
     # cross_section
@@ -133,8 +127,9 @@ def main():
         column="cross_section",
         table=table,
         plot_type="log-log",
-        energy_interval=(0, 20),
+        energy_interval=(1e-3, 20),
         ylabel="Cross-Section %s" % units["cross_section"],
+        xlabel="E$_n$ %s" % units["neutron_energy"],
     )
 
 

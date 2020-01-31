@@ -1,5 +1,7 @@
-# Make some style choices for plotting
 colourWheel = [
+    "k",
+    "b",
+    "r",
     "#329932",
     "#ff6961",
     "b",
@@ -23,11 +25,12 @@ colourWheel = [
     "#2166ac",
     "#053061",
 ]
+# Make some style choices for plotting
 
-dashesStyles = [[3, 1], [1000, 1], [2, 1, 10, 1], [4, 1, 1, 1, 1, 1]]
+dashesStyles = [[1000, 1], [1, 1], [3, 3], [3, 1], [2, 1, 10, 1], [4, 1, 1, 1, 1, 1]]
 
 aps_column_width = 3.404  # inches
 golden_ratio = 1.618
 
 width = aps_column_width
-height = aps_column_width / golden_ratio
+height = aps_column_width * 115 / 97  # / golden_ratio

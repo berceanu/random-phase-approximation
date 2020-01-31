@@ -31,8 +31,9 @@ ytick.major.width       :   0.6  # default 0.8
 xtick.minor.width       :   1  # default 0.6
 ytick.minor.width       :   1  # default 0.6
 axes.linewidth          :   0.6  # default 0.8 
-lines.linewidth         :   0.6  # default 1.5 
+lines.linewidth         :   1.0  # default 1.5
 lines.markeredgewidth   :   0.6  # default 1
+lines.markersize        :   3
 
 # The magic sauce
 text.usetex             :  True
@@ -46,7 +47,6 @@ ytick.minor.pad         :   4  # default 3.5
 
 # Turn off the legend frame and reduce the space between the point and the label  
 legend.frameon          :   False
-legend.handletextpad    :   0.0
 legend.fontsize         :   8
 
 # Font size
