@@ -27,5 +27,5 @@ rule tex2pdf_without_bib:
 
 rule texclean:
     shell:
-        "rm -f  *.log *.aux *.bbl *.blg *.synctex.gz"
+        "rm -f  *.log *.aux *.bbl *.blg *.synctex.gz *Notes.bib"
 

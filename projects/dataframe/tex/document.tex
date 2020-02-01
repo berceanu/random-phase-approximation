@@ -23,8 +23,6 @@
 
 \author{Y. F. Niu}
 \affiliation{School of Nuclear Science and Technology, Lanzhou University, Lanzhou 730000, China}
-\affiliation{ELI-NP, “Horia Hulubei” National Institute for Physics and Nuclear Engineering,
-30 Reactorului Street, RO-077125, Bucharest-Magurele, Romania}
 
 \author{Y. Xu}
 \affiliation{ELI-NP, “Horia Hulubei” National Institute for Physics and Nuclear Engineering,
@@ -62,246 +60,77 @@ sections are increased several times up to the temperature of 2 MeV.
 
 \maketitle
 
+
 \section{Introduction}
-\LaTeX\ looks more difficult than it is. It is
-almost as easy as $\pi$. See how easy it is to make special
-symbols such as $\alpha$,
-$\beta$, $\gamma$,
-$\delta$, $\sin x$, $\hbar$, $\lambda$, $\ldots$\ . We also can make
-subscripts,
-$A_{x}$, $A_{xy}$, and superscripts, $e^x$, $e^{x^2}$, and
-$e^{a^b}$. We will use \LaTeX, which is based on \TeX\ and has
-many higher-level commands (macros) for formatting, making
-tables, etc.
+\label{intro}
+The origin of heavy elements from iron to uranium has been one of the long-standing open questions in physics \cite{discover}. It has been known that the rapid neutron capture process, or r-process, produces about half of these heavy elements \cite{Placeholder:01}. However, the identification of the sites for r-process is still under investigation. Recently, the observation of GW170817 neutron star mergers provides the evidence that neutron star mergers can be one of the possible sites \cite{Placeholder:02}. In principle, the different astrophysical sites should produce unique abundance pattern signatures due to distinct environmental conditions like temperature, density and neutron densities, which helps us identify the main r-process site directly\cite{Placeholder:03}.  For such a purpose, accurate nuclear physics inputs for r-process network calculation are crucial, including nuclear mass, $\beta$-decay half-lives, neutron capture rates, and so on \cite{Placeholder:04}. However, r-process involves a large amount of neutron-rich nuclei far from stability line, which are difficult to produce and measure from experiment. With the development of radioactive ion beam facilities, the measurements of nuclear mass and $\beta$-decay half-lives are approaching towards r-process path \cite{Placeholder:05}, while the measurement of neutron-capture cross section is still a big challenge \cite{Placeholder:06}. Therefore, the theoretical predictions of neutron-capture cross sections and rates are necessary for r-process study. For the study of neutron-capture process, the statistical Hauser-Feshbach \cite{Placeholder:07} model is usually adopted, which requires the electric dipole transition strength function as an important input for this model.
 
-\begin{figure}[htp]
-	\centering
-	\includegraphics[width=\linewidth]{../colormesh.pdf}
-	\caption{\label{fig:colormesh}Computed E1 dipole strengths (logarithmic scale).}
-\end{figure}
+Although the dipole strength function can be conventionally described by a phenomenological Lorentzian model or its extensions with an energy and temperature dependent width\cite{Capote2009, Nucl_Data_Sheets_110_3107}, where the parameters are mainly adjusted to data of stable nuclei, the reliable extrapolation to neutron rich nuclei requires microscopic models. It is difficult for large-scale shell model to describe the E1 transitions since E1 transition connects different major shells \cite{Placeholder:08}, so a practical choice is the quasiparticle random phase approximation (QRPA) model based on density functional theories. Large-scale QRPA calculations of E1 strength function have been performed based on zero-range Skyrme density functional, and the dipole strengths are used to estimate the radiative neutron capture cross section for all nuclei of relevance in astrophysics applications \cite{Goriely2002, Goriely2004}. Recently, based on the finite-range Gogny force, the axially symmetric deformed QRPA approach was applied to the large-scale calculation of E1 $\gamma$-ray strength function \cite{Martini2016}, and the resulted $\gamma$-ray strength functions, improved at low $\gamma$-ray energies by combining shell model results, are used to study the radioactive neutron and proton capture cross sections \cite{Goriely2018}.
+
+Compared to the non-relativistic density functional, the covariant density functional theory (CDFT) has its advantage to produce the spin-orbit splitting naturally, and has been applied very successfully to the description of a variety of nuclear structure phenomena \cite{Placeholder:09}. Based on the relativistic density functional, the self-consistent QRPA approach has been developed and applied to the study of the dipole strength function of some typical nuclei, including both the giant resonance part and low-lying strength \cite{Paar2003}. In neutron rich nuclei, the presence of pygmy dipole resonance (PDR) \cite{Paar2007} makes the conventional Lorentzian shape failing to describe the low-lying part of the dipole strength. Based on relativistic QRPA (RQRPA) approach, the properties of PDR have been investigated in detail \cite{Niu, Vretenar}. Furthermore, the influence of the enhancement in low-lying strength on neutron-capture cross sections and rates has been investigated based on the relativistic quasiparticle time blocking approximation (QTBA), where the correlations beyond QRPA approach is included, and it is concluded that the neutron-capture rates are sensitive to the fine structure of the low-lying dipole strength \cite{Litvinova_2009}.
+
+Neutron capture relevant for astrophysics processes, like r-process, happens in stellar environment with high temperature. However, the temperature effects are usually not included in the microscopic calculation of dipole strength function but included as a parameter in the Lorentzian function in a phenominological way for the calculation of neutron capture rates \cite{GorielyNPA2002, GorielyPLB1998, Goriely2019}. In this case, the fine structure modified by temperature effects or novel structure induced by temperature is missing in the calculation of neutron capture rates, which may have an important impact on the neutron capture cross sections and rates. Actually, the self-consistent finite-temperature relativistic random-phase approximation (FTRRPA) model has been developed, and it is indeed shown that low-lying dipole strengths are modified by temperature effects, including the concentration of new low-lying dipole strength for $^{60,62}$Ni, and the modification of PDR for $^{68}$Ni and $^{132}$Sn \cite{Niu_2009}. Later, based on Woods-Saxon mean field, the thermal continuum QRPA (TCQRPA) model explains the low-energy enhancement of the dipole strength functions with the inclusion of temperature effect \cite{Litvinova2013}. More recently, the self-consistent finite temperature QRPA based on Skyrme density functional was developed \cite{Yuksel2017}, and new low energy dipole excitations are discovered as well \cite{Yuksel2017, Yuksel2019}, similar as Ref. \cite{Niu_2009, Litvinova2013}.
+
+With these discoveries, it will be interesting to see what are the consequences from these modifications of low-lying dipole strength with the microscopic inclusion of temperature effects on the neutron capture cross sections and rates. Therefore, in this work, taking Sn isotopes as examples, we will calculate the electric dipole strength at finite temperature using self-consistent FTRRPA model, and correspondingly we will investigate the influences on neutron capture cross sections and rates using these dipole strength functions. The dipole strengths at zero temperature are calculated by RQRPA model with the inclusion of pairing correlations. Within the mean field approach, it exists a critical temperature above which the pairing correlations vanish \cite{Niu2013, Yuksel}, although this sharp phase transition is washed out by including thermal fluctuations beyond mean field \cite{Gambarcuta}. This tells us at relatively high temperatures, the pairing correlations are not so important any more, so we will use the FTRRPA model for the calculation of dipole strength functions at finite temperatures. The neutron capture cross sections and rates will be calculated by TALYS code.
 
 
-We just made a new paragraph. Extra lines and spaces make no
-difference. Note that all formulas are enclosed by
-\$ and occur in \textit{math mode}.
 
-The default font is Computer Modern. It includes \textit{italics},
-\textbf{boldface},
-\textsl{slanted}, and \texttt{monospaced} fonts.
 
-\section{Equations}
-Let us see how easy it is to write equations.
+
+\section{Formalism}\label{formalism}
+
+The FTRRPA model is formulated based on the single-particle states from the relativistic mean-field (RMF) model at finite temperature (FTRMF) in a self-consistent way, which means that the same relativistic density functional is used for the mean field in FTRMF and for the residual two-body interaction in FTRRPA. The density-dependent meson-nucleon couplings are used in the relativistic Lagrangian, and in our calculations we will use the parameter set DD-ME2 \cite{Lala}. The FTRRPA equation reads \cite{Niu_2009}
+
 \begin{equation}
-\Delta =\sum_{i=1}^N w_i (x_i - \bar{x})^2.
+   \left( \begin{array}{cc} A & B \\ -B^* & -A^* \end{array} \right)
+   \left( \begin{array}{c} X \\ Y \end{array} \right)
+   = \hbar\omega \left( \begin{array}{c} X \\ Y \end{array} \right) \;,
 \end{equation}
-It is a good idea to number equations, but we can have a
-equation without a number:
+where
 \begin{equation}
-P(x) = \frac{x - a}{b - a}, \nonumber
-\end{equation}
-and
+   A = \left( \begin{array}{cc} (\epsilon_m - \epsilon_i)
+   \delta_{ii'} \delta_{mm'} &  \\
+   & (\epsilon_\alpha - \epsilon_i) \delta_{\alpha \alpha'}
+   \delta_{ii'} \end{array} \right)
+   + \left( \begin{array}{cc} (n_{i'} - n_{m'})V_{mi'im'} & n_{i'} V_{mi'i\alpha'} \\
+   (n_{i'} - n_{m'})V_{\alpha i' i m'}  &n_{i'} V_{\alpha i' i \alpha'} \end{array}
+   \right) \;,
+  \end{equation}
+  and
 \begin{equation}
-g = \frac{1}{2} \sqrt{2\pi}. \nonumber
-\end{equation}
+   B =\left( \begin{array}{cc} (n_{i'} - n_{m'})V_{mm'ii'} & n_{i'}V_{m\alpha'ii'} \\
+    (n_{i'} - n_{m'})V_{\alpha m' i i'}  & n_{i'}  V_{\alpha \alpha' i i' } \end{array}
+    \right)\; .
+  \end{equation}
 
-We can give an equation a label so that we can refer to it later.
-\begin{equation}
-\label{eq:ising}
-E = -J \sum_{i=1}^N s_i s_{i+1},
-\end{equation}
-Equation~\eqref{eq:ising} expresses the energy of a configuration
-of spins in the Ising model.
+$V$ is the residual two-body interaction, derived from the relativistic Lagrangian with  density-dependent meson-nucleon couplings \cite{Niksic}. The thermal occupation factors $n_k$ denotes a Fermi-Dirac distribution for states in Fermi sea with index $m,i$, and $0$ for states in Dirac sea with index $\alpha$. Due to temperature effects, the configuration space includes not only particle-hole (ph) pairs, but also particle-particle (pp) and hole-hole (hh) pairs. The transition strength for a multipole operator $Q_J$ is
 
-We can define our own macros to save typing. For example, suppose
-that we introduce the macros:
-\begin{verbatim}
- \newcommand{\lb}{{\langle}}
- \newcommand{\rb}{{\rangle}}
-\end{verbatim}
-\newcommand{\lb}{{\langle}}
-\newcommand{\rb}{{\rangle}}
-Then we can write the average value of $x$ as
-\begin{verbatim}
 \begin{equation}
-\lb x \rb = 3
-\end{equation}
-\end{verbatim}
-The result is
-\begin{equation}
-\lb x \rb = 3.
+   B(J,E_\nu) = \left | \sum_{mi} (X^{\nu,J}_{mi} +
+   (-1)^J Y^{\nu,J}_{mi} ) \langle m || Q_J || i\rangle (n_i
+   -n_m) \right |^2.
 \end{equation}
 
-Examples of more complicated equations:
-\begin{equation}
-I = \! \int_{-\infty}^\infty f(x)\,dx \label{eq:fine}.
-\end{equation}
-We can do some fine tuning by adding small amounts of horizontal
-spacing:
-\begin{verbatim}
- \, small space       \! negative space
-\end{verbatim}
-as is done in Eq.~\eqref{eq:fine}.
-
-We also can align several equations:
-\begin{align}
-a & = b \\
-c &= d,
-\end{align}
-or number them as subequations:
-\begin{subequations}
-\begin{align}
-a & = b \\
-c &= d.
-\end{align}
-\end{subequations}
-
-We can also have different cases:
-\begin{equation}
-\label{eq:mdiv}
-m(T) =
-\begin{cases}
-0 & \text{($T > T_c$)} \\
-\big(1 - [\sinh 2 \beta J]^{-4} \big)^{\! 1/8} & \text{($T < T_c$)},
-\end{cases}
-\end{equation}
-write matrices
-\begin{align}
-\textbf{T} &=
-\begin{pmatrix}
-T_{++} \hfill & T_{+-} \\
-T_{-+} & T_{--} \hfill 
-\end{pmatrix}, \nonumber \\
-& =
-\begin{pmatrix}
-e^{\beta (J + B)} \hfill & e^{-\beta J} \hfill \\
-e^{-\beta J} \hfill & e^{\beta (J - B)} \hfill
-\end{pmatrix}.
-\end{align}
-and 
-\newcommand{\rv}{\textbf{r}}
-\begin{equation}
-\sum_i \vec A \cdot \vec B = -P\!\int\! \rv \cdot
-\hat{\mathbf{n}}\, dA = P\!\int \! {\vec \nabla} \cdot \rv\, dV.
-\end{equation}
-
-\section{Tables}
-Tables are a little more difficult. TeX
-automatically calculates the width of the columns.
+The discrete spectra are averaged with a Lorentzian distribution of an width $\Gamma = 1 $ MeV in the present calculations.
 
 
-\begin{table}[ht]
-\centering
-\begin{tabular}{|l|l|r|l|}
-\hline
-lattice & $d$ & $q$ & $T_{\rm mf}/T_c$ \\
-\hline
-square & 2 & 4 & 1.763 \\
-\hline
-triangular & 2 & 6 & 1.648 \\
-\hline
-simple cubic & 3 & 6 & 1.330 \\
-\hline
-bcc & 3 & 8 & 1.260 \\
-\hline
-fcc & 3 & 12 & 1.225 \\
-\hline
-\end{tabular}
-\caption{\label{tab:5/tc}Comparison of mean-field predictions
-for the critical temperature of the Ising model with exact results
-and the best known estimates for different dimensions 
-and lattice symmetries.}
-\end{table}
 
-\section{Lists}
+%-------------------------------------------------------------------------------
 
-Some example of formatted lists include the
-following:
+\section{Results and Discussions}
+\label{results}
 
 
-\section{Figures}
 
-We can make figures bigger or smaller by scaling them. Figure~\ref{fig:colormesh}
-has been scaled by 60\%.
-
-% \printinunitsof{in}\prntlen{\linewidth}
-
-
-\section{Literal text}
-It is desirable to print program code as it is typed in a
-monospaced font. Use \verb+\begin{verbatim}+ and
-\verb+\end{verbatim}+ as in the following example:
-\begin{verbatim}
-double y0 = 10; // example of declaration and assignment statement
-double v0 = 0;  // initial velocity
-double t = 0;   // time
-double dt = 0.01; // time step
-double y = y0;
-\end{verbatim}
-The command \verb+\verbatiminput{programs/Square.java}+ allows
-you to list the file \texttt{Square.java} in the directory
-programs.
-
-\section{Special Symbols}
-
-\subsection{Common Greek letters}
-
-These commands may be used only in math mode. Only the most common
-letters are included here.
-
-$\alpha, 
-\beta, \gamma, \Gamma,
-\delta,\Delta,
-\epsilon, \zeta, \eta, \theta, \Theta, \kappa,
-\lambda, \Lambda, \mu, \nu,
-\xi, \Xi,
-\pi, \Pi,
-\rho,
-\sigma, 
-\tau,
-\phi, \Phi,
-\chi,
-\psi, \Psi,
-\omega, \Omega$
-
-\subsection{Special symbols}
-
-The derivative is defined as
-\begin{equation}
-\frac{dy}{dx} = \lim_{\Delta x \to 0} \frac{\Delta y}
-{\Delta x}
-\end{equation}
-\begin{equation}
-f(x) \to y \quad \mbox{as} \quad x \to
-x_{0}
-\end{equation}
-\begin{equation}
-f(x) \mathop {\longrightarrow}
-\limits_{x \to x_0} y
-\end{equation}
-
-\noindent Order of magnitude:
-\begin{equation}
-\log_{10}f \simeq n
-\end{equation}
-\begin{equation}
-f(x)\sim 10^{n}
-\end{equation}
-Approximate equality:
-\begin{equation}
-f(x)\simeq g(x)
-\end{equation}
-\LaTeX\ is simple if we keep everything in proportion:
-\begin{equation}
-f(x) \propto x^3.
-\end{equation}
-
-Finally we can skip some space by using commands such as
-\begin{verbatim}
-\bigskip    \medskip    \smallskip    \vspace{1pc}
-\end{verbatim}
-The space can be negative.
+\section{Summary and Perspectives}
+\label{summary}
 
 {\center{\bf ACKNOWLEDGMENTS}}
+This work was supported by Extreme Light Infrastructure-Nuclear
+Physics Phase II, a project cofinanced by the Romanian Government
+and the European Union through the European Regional Development
+Fund and the Competitiveness Operational Program (1/07.07.2016,
+COP, ID 1334).
 
 This work was partly supported by the National Natural Science Foundation of China
 under Grants No. 11305161 and by JSPS KAKENHI Grant Numbers JP16K05367.
