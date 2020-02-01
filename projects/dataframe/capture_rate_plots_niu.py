@@ -1,6 +1,6 @@
 import pandas as pd
 
-from figstyle import colourWheel, dashesStyles, width, height
+from figstyle import colourWheel, dashesStyles, width
 from dataash5 import df_path, units
 from matplotlib import pyplot, ticker
 
@@ -49,13 +49,13 @@ def main():
     )
 
     fig, ax = pyplot.subplots()
-    fig.subplots_adjust(left=0.14, bottom=0.09, right=0.97, top=0.97)
+    fig.subplots_adjust(left=0.14, bottom=0.14, right=0.97, top=0.97)
     for j, T in enumerate(temperatures):
         plot_capture_rate_vs_n(
             ax=ax, column="capture_rate", table=table, temperature=T, counter=j
         )
     ax.annotate(s="Sn", xy=(0.1, 0.6), xycoords="axes fraction")
-    fig.set_size_inches(width, height)
+    fig.set_size_inches(width, width / 1.618)
     fig.savefig("capture_rate_vs_N.pdf")
 
 
