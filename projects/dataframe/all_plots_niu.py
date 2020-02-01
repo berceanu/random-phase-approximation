@@ -48,7 +48,7 @@ def plot_series(
 
 
 def plot_table(
-    column, table, ylabel, xlabel, plot_type="linear-linear", energy_interval=(0.1, 10),
+    column, table, ylabel, xlabel, plot_type="linear-linear", energy_interval=(0.1, 10)
 ):
     for iso in isotopes:
         fig, ax = pyplot.subplots()

@@ -45,7 +45,7 @@ def main():
         ]
     )
     table = pd.pivot_table(
-        df, index=["neutron_number"], values=["capture_rate"], columns=["temperature"],
+        df, index=["neutron_number"], values=["capture_rate"], columns=["temperature"]
     )
 
     fig, ax = pyplot.subplots()
