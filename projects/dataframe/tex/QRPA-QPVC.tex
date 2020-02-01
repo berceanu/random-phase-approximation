@@ -1,0 +1,153 @@
+%
+%                       Version
+%
+%
+\documentclass[aps,preprint,showpacs,groupedaddress,floatfix]{revtex4}
+%\documentclass[prc,twocolumn,showpacs,twoside,showpacs]{revtex4}
+
+
+\usepackage{graphicx}
+\usepackage{CJK}
+
+
+
+\begin{document}
+\begin{CJK*}{GBK}{song}
+
+
+\title{Quasi-particle random phase approximation
+with quasi-particle-vibration coupling: application to the Gamow-Teller
+response of the superfluid nucleus $^{120}$Sn}
+\author{Y. F. Niu  (Å£Ò»ì³) $^{1,2}$}
+\email{nyfster@gmail.com}
+\author{G. Col\`{o} $^{3,1}$}
+%\email{gianluca.colo@mi.infn.it}
+\author{E. Vigezzi $^{1}$}
+%\email{vigezzi@mi.infn.it}
+\author{C. L. Bai (°×´ºÁÖ) $^{4}$}
+\author{H. Sagawa $^{5,6}$}
+
+%
+%
+%
+\affiliation{$^1$ INFN, Sezione di Milano, via Celoria 16,
+I-20133 Milano, Italy}
+\affiliation{$^2$ ELI-NP, ¡°Horia Hulubei¡± National Institute for Physics and Nuclear Engineering, 30 Reactorului Street, RO-077125, Bucharest-Magurele, Romania}
+\affiliation{$^3$ Dipartimento di Fisica, Universit\`{a} degli Studi
+di Milano, via Celoria 16, I-20133 Milano, Italy}
+\affiliation{$^4$ School of Physical Science and Technology,
+Sichuan University, Chengdu 610065, China}
+\affiliation{$^5$ RIKEN, Nishina Center, Wako 351-0198, Japan}
+\affiliation{$^6$ Center for Mathematics and Physics, University of Aizu, Aizu-Wakamatsu, Fukushima 965-8580, Japan }
+
+
+
+\date{\today}
+
+\begin{abstract}
+
+
+
+\end{abstract}
+\pacs{
+ 21.60.Jz, % Nuclear Density Functional Theory and extensions (includes Hartree-Fock and random-phase approximations)
+ 23.40.Hc, % Relation with nuclear matrix elements and nuclear structure (under item 23.40.-s ¦Â decay; double ¦Âdecay; electron and muon capture  )
+ 24.30.Cz, % Giant resonances
+ 25.40.Kv  % Charge-exchange reactions
+ } \maketitle
+\date{today}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\section{Introduction}
+\label{intro}
+The origin of heavy elements from iron to uranium has been one of the long-standing open questions in physics \cite{discover}. It has been known that the rapid neutron capture process, or r-process, produces about half of these heavy elements \cite{}. However, the identification of the sites for r-process is still under investigation. Recently, the observation of GW170817 neutron star mergers provides the evidence that neutron star mergers can be one of the possible sites \cite{}. In principle, the different astrophysical sites should produce unique abundance pattern signatures due to distinct environmental conditions like temperature, density and neutron densities, which helps us identify the main r-process site directly\cite{}.  For such a purpose, accurate nuclear physics inputs for r-process network calculation are crucial, including nuclear mass, $\beta$-decay half-lives, neutron capture rates, and so on \cite{}. However, r-process involves a large amount of neutron-rich nuclei far from stability line, which are difficult to produce and measure from experiment. With the development of radioactive ion beam facilities, the measurements of nuclear mass and $\beta$-decay half-lives are approaching towards r-process path \cite{}, while the measurement of neutron-capture cross section is still a big challenge \cite{}. Therefore, the theoretical predictions of neutron-capture cross sections and rates are necessary for r-process study. For the study of neutron-capture process, the statistical Hauser-Feshbach \cite{} model is usually adopted, which requires the electric dipole transition strength function as an important input for this model.
+
+Although the dipole strength function can be conventionally described by a phenomenological Lorentzian model or its extensions with an energy and temperature dependent width\cite{Capote2009, Nucl Data Sheets 110,3107}, where the parameters are mainly adjusted to data of stable nuclei, the reliable extrapolation to neutron rich nuclei requires microscopic models. It is difficult for large-scale shell model to describe the E1 transitions since E1 transition connects different major shells \cite{}, so a practical choice is the quasiparticle random phase approximation (QRPA) model based on density functional theories. Large-scale QRPA calculations of E1 strength function have been performed based on zero-range Skyrme density functional, and the dipole strengths are used to estimate the radiative neutron capture cross section for all nuclei of relevance in astrophysics applications \cite{Goriely 2002, 2004}. Recently, based on the finite-range Gogny force, the axially symmetric deformed QRPA approach was applied to the large-scale calculation of E1 $\gamma$-ray strength function \cite{Martini2016}, and the resulted $\gamma$-ray strength functions, improved at low $\gamma$-ray energies by combining shell model results, are used to study the radioactive neutron and proton capture cross sections \cite{Goriely2018}.
+
+Compared to the non-relativistic density functional, the covariant density functional theory (CDFT) has its advantage to produce the spin-orbit splitting naturally, and has been applied very successfully to the description of a variety of nuclear structure phenomena \cite{}. Based on the relativistic density functional, the self-consistent QRPA approach has been developed and applied to the study of the dipole strength function of some typical nuclei, including both the giant resonance part and low-lying strength \cite{Paar2003}. In neutron rich nuclei, the presence of pygmy dipole resonance (PDR) \cite{Paar2007} makes the conventional Lorentzian shape failing to describe the low-lying part of the dipole strength. Based on relativistic QRPA (RQRPA) approach, the properties of PDR have been investigated in detail \cite{Niu, Vretenar}. Furthermore, the influence of the enhancement in low-lying strength on neutron-capture cross sections and rates has been investigated based on the relativistic quasiparticle time blocking approximation (QTBA), where the correlations beyond QRPA approach is included, and it is concluded that the neutron-capture rates are sensitive to the fine structure of the low-lying dipole strength \cite{Litvinova2009}.
+
+Neutron capture relevant for astrophysics processes, like r-process, happens in stellar environment with high temperature. However, the temperature effects are usually not included in the microscopic calculation of dipole strength function but included as a parameter in the Lorentzian function in a phenominological way for the calculation of neutron capture rates \cite{GorielyNPA2002, GorielyPLB1998, Goriely2019}. In this case, the fine structure modified by temperature effects or novel structure induced by temperature is missing in the calculation of neutron capture rates, which may have an important impact on the neutron capture cross sections and rates. Actually, the self-consistent finite-temperature relativistic random-phase approximation (FTRRPA) model has been developed, and it is indeed shown that low-lying dipole strengths are modified by temperature effects, including the concentration of new low-lying dipole strength for $^{60,62}$Ni, and the modification of PDR for $^{68}$Ni and $^{132}$Sn \cite{Niu2009}. Later, based on Woods-Saxon mean field, the thermal continuum QRPA (TCQRPA) model explains the low-energy enhancement of the dipole strength functions with the inclusion of temperature effect \cite{Litvinova2013}. More recently, the self-consistent finite temperature QRPA based on Skyrme density functional was developed \cite{Yuksel2017}, and new low energy dipole excitations are discovered as well \cite{Yuksel2017, Yuksel2019}, similar as Ref. \cite{Niu2009, Litvinova2013}.
+
+With these discoveries, it will be interesting to see what are the consequences from these modifications of low-lying dipole strength with the microscopic inclusion of temperature effects on the neutron capture cross sections and rates. Therefore, in this work, taking Sn isotopes as examples, we will calculate the electric dipole strength at finite temperature using self-consistent FTRRPA model, and correspondingly we will investigate the influences on neutron capture cross sections and rates using these dipole strength functions. The dipole strengths at zero temperature are calculated by RQRPA model with the inclusion of pairing correlations. Within the mean field approach, it exists a critical temperature above which the pairing correlations vanish \cite{Niu2013, Yuksel}, although this sharp phase transition is washed out by including thermal fluctuations beyond mean field \cite{Gambarcuta}. This tells us at relatively high temperatures, the pairing correlations are not so important any more, so we will use the FTRRPA model for the calculation of dipole strength functions at finite temperatures. The neutron capture cross sections and rates will be calculated by TALYS code.
+
+
+
+
+
+\section{Formalism}\label{formalism}
+
+The FTRRPA model is formulated based on the single-particle states from the relativistic mean-field (RMF) model at finite temperature (FTRMF) in a self-consistent way, which means that the same relativistic density functional is used for the mean field in FTRMF and for the residual two-body interaction in FTRRPA. The density-dependent meson-nucleon couplings are used in the relativistic Lagrangian, and in our calculations we will use the parameter set DD-ME2 \cite{Lala}. The FTRRPA equation reads \cite{Niu2009}
+
+\begin{equation}
+   \left( \begin{array}{cc} A & B \\ -B^* & -A^* \end{array} \right)
+   \left( \begin{array}{c} X \\ Y \end{array} \right)
+   = \hbar\omega \left( \begin{array}{c} X \\ Y \end{array} \right) \;,
+\end{equation}
+where
+\begin{equation}
+   A = \left( \begin{array}{cc} (\epsilon_m - \epsilon_i)
+   \delta_{ii'} \delta_{mm'} &  \\
+   & (\epsilon_\alpha - \epsilon_i) \delta_{\alpha \alpha'}
+   \delta_{ii'} \end{array} \right)
+   + \left( \begin{array}{cc} (n_{i'} - n_{m'})V_{mi'im'} & n_{i'} V_{mi'i\alpha'} \\
+   (n_{i'} - n_{m'})V_{\alpha i' i m'}  &n_{i'} V_{\alpha i' i \alpha'} \end{array}
+   \right) \;,
+  \end{equation}
+  and
+\begin{equation}
+   B =\left( \begin{array}{cc} (n_{i'} - n_{m'})V_{mm'ii'} & n_{i'}V_{m\alpha'ii'} \\
+    (n_{i'} - n_{m'})V_{\alpha m' i i'}  & n_{i'}  V_{\alpha \alpha' i i' } \end{array}
+    \right)\; .
+  \end{equation}
+
+$V$ is the residual two-body interaction, derived from the relativistic Lagrangian with  density-dependent meson-nucleon couplings \cite{Niksic}. The thermal occupation factors $n_k$ denotes a Fermi-Dirac distribution for states in Fermi sea with index $m,i$, and $0$ for states in Dirac sea with index $\alpha$. Due to temperature effects, the configuration space includes not only particle-hole (ph) pairs, but also particle-particle (pp) and hole-hole (hh) pairs. The transition strength for a multipole operator $Q_J$ is
+
+\begin{equation}
+   B(J,E_\nu) = \left | \sum_{mi} (X^{\nu,J}_{mi} +
+   (-1)^J Y^{\nu,J}_{mi} ) \langle m || Q_J || i\rangle (n_i
+   -n_m) \right |^2.
+\end{equation}
+
+The discrete spectra are averaged with a Lorentzian distribution of an width $\Gamma = 1 $ MeV in the present calculations.
+
+
+
+%-------------------------------------------------------------------------------
+
+\section{Results and Discussions}
+\label{results}
+
+
+
+\section{Summary and Perspectives}
+\label{summary}
+
+
+%=================================================================
+{\center{\bf ACKNOWLEDGMENTS}}
+
+This work was partly supported by the National Natural Science Foundation of China
+under Grants No. 11305161 and by JSPS KAKENHI Grant Numbers JP16K05367.
+Funding from the European Unions Horizon 2020 research and innovation
+programme under grant agreement No. 654002 is also
+acknowledged.
+
+%=================================================================
+
+
+
+%------------------------------------------------------------------
+
+\clearpage
+
+\bibliography{RPAPVC}
+
+
+
+
+
+
+
+\end{CJK*}
+\end{document}
