@@ -61,3 +61,4 @@ revtex.pdf
 revtex.synctex.gz
 revtexNotes.bib
 
+.snakemake/
