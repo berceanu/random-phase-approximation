@@ -174,3 +174,30 @@ Step 0 involves building the required dataframe which should hold everything nee
 - each plot should have an optional `include_talys` argument, defaulting to `False`
 - each plot should operate on (and return) `Axes` instances
 - add model to pcolormesh plot
+
+## Finalize plots
+
+- [ ] use different symbols: triangle, square etc (not just circles)
+- [ ] Q about `TALYS` result: why neutron capture rate is decreasing with increasing temperature?
+- [ ] use A instead of N for Neutron capture rate plot
+- [ ] use N = number instead of just number
+- [ ] use ${}^{A}Sn$ instead of N for legends
+- [ ] merge `df-merger` branch into `master`
+- [ ] create new branch for new neutron capture figure
+
+1.  Do the calculations of neutron capture (NC) rates at T=1, 2 MeV but with E1
+    strength function at T=0 MeV from RHB+QRPA.  Then Plot them on the same
+    figure of NC rates, and remove T=0.5 MeV result.
+
+2.  Do the analysis of ph transition components for some low-lying states of
+    N=76, 86, 96.  How to select these low-lying states:  Below E=10 MeV, find
+    one or two discrete states with highest transition strength.
+
+3.  Add the figure of E1 strength and cross section at T=0, 1 and 2 MeV.  In
+    each panel of the figure, plot 3 isotopes of N=76, 86 96.
+
+4. Improve the format of  E1 strength and cross section figure.  (1) Enlarge
+   all the writings. (2). Put nucleus symbols. (3) Adjust the height-width
+   ratio.
+
+
