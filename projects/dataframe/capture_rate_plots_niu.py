@@ -7,6 +7,7 @@ from matplotlib import pyplot, ticker
 isotopes = list(range(76, 98, 2))
 niso = len(isotopes)
 
+# TODO remove 0.5
 temperatures = (0.5, 1.0, 2.0)
 ntemp = len(temperatures)
 
@@ -48,6 +49,8 @@ def main():
         df, index=["neutron_number"], values=["capture_rate"], columns=["temperature"]
     )
 
+    # TODO use different symbols: triangle, square etc (not just circles)
+    # TODO use A instead of N for x axis label
     fig, ax = pyplot.subplots()
     fig.subplots_adjust(left=0.14, bottom=0.14, right=0.97, top=0.97)
     for j, T in enumerate(temperatures):

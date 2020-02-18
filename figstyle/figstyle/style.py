@@ -33,4 +33,4 @@ aps_column_width = 3.404  # inches
 golden_ratio = 1.618
 
 width = aps_column_width
-height = aps_column_width * 115 / 97  # / golden_ratio
+height = aps_column_width * 115 / 97  # / golden_ratio  # TODO fix height

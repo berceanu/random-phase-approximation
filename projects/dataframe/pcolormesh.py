@@ -43,6 +43,7 @@ if __name__ == "__main__":
         )
 
         for N in isotopes:
+            # TODO annotate using mass number A instead of neutron number N
             ax.annotate(
                 s=str(N), xy=(29, N - 0.9), xycoords="data", color="w", fontsize=7
             )
