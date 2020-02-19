@@ -44,5 +44,4 @@ dependencies:
     - matplotlib-label-lines
 
 #TODO update versions for python, numpy, pandas etc
-#TODO remove unused packages
-#TODO remove unused projects (aggegation stuff)
+#TODO remove unused packages https://stackoverflow.com/questions/25376213/delete-unused-packages-from-requirements-file

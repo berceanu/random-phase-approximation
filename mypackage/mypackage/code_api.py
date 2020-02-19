@@ -35,12 +35,9 @@ class NameMapping:
 
     def __init__(
         self,
-        prefix={
-            "zero": {"ground": "dish", "excited": "ztes"},
-            "finite": {"ground": "skys", "excited": "ftes"},
-        },
-        input_suffix={"ground": "_dis.dat", "excited": "_start.dat"},
-        wel_suffix={"zero": "_qrpa.wel", "finite": "_rpa.wel"},
+        prefix=None,
+        input_suffix=None,
+        wel_suffix=None,
         bins_suffix=(
             "_arpa.bin",
             "_brpa.bin",
@@ -49,12 +46,25 @@ class NameMapping:
             "_erpa.bin",
             "_c_erpa.bin",
         ),
-        out_suffix={
-            "isoscalar": {"excitation": "_excskal.out", "lorentzian": "_lorskal.out"},
-            "isovector": {"excitation": "_excvec.out", "lorentzian": "_lorvec.out"},
-        },
+        out_suffix=None,
     ):
-
+        if prefix is None:
+            prefix = {
+                "zero": {"ground": "dish", "excited": "ztes"},
+                "finite": {"ground": "skys", "excited": "ftes"},
+            }
+        if input_suffix is None:
+            input_suffix = {"ground": "_dis.dat", "excited": "_start.dat"}
+        if wel_suffix is None:
+            wel_suffix = {"zero": "_qrpa.wel", "finite": "_rpa.wel"}
+        if out_suffix is None:
+            out_suffix = {
+                "isoscalar": {
+                    "excitation": "_excskal.out",
+                    "lorentzian": "_lorskal.out",
+                },
+                "isovector": {"excitation": "_excvec.out", "lorentzian": "_lorvec.out"},
+            }
         self._prefix = prefix
         self._input_suffix = input_suffix
         self._wel_suffix = wel_suffix
@@ -156,7 +166,7 @@ class GenerateInputs:
         )
         xa = atomic_symbol + str(mass_number)
 
-        PARITY = {
+        parity_map = {
             "-": 0,
             "+": 1,
         }  # map to the parity as it is defined in the input files
@@ -168,7 +178,7 @@ class GenerateInputs:
             "xyread": int(load_matrix),
             "xyprobe": int(load_matrix),
             "j": angular_momentum,
-            "parity": PARITY[parity],
+            "parity": parity_map[parity],
             "temp": temperature,
             "XA": xa,
         }
@@ -201,7 +211,6 @@ def main():
     code = NameMapping()
     print(code.input_file(temp="zero", state="excited"))
     print(code.input_files(state="ground"))
-    print(code.isovec_file(temp="zero"))
 
     my_inputs = GenerateInputs(
         proton_number=28,

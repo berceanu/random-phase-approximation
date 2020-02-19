@@ -11,7 +11,7 @@ fpath = talys_api.backup_hfb_path / photon_strength_function_file
 
 def main():
     psf_dict = fn_to_dict(fname=fpath, proton_number=proton_number)
-    df = (
+    dataframe = (
         dict_to_df(psf_dict)
         .stack(level=[0, 1])
         .reset_index(level=0, drop=True)
@@ -35,7 +35,7 @@ def main():
         .sort_index()
     )
 
-    return df
+    return dataframe
 
 
 if __name__ == "__main__":

@@ -27,7 +27,7 @@ def read(file_path):
     0.00             0.000000
     0.01             0.063958
     """
-    df = pd.read_csv(
+    dataf = pd.read_csv(
         file_path,
         delim_whitespace=True,
         comment="#",
@@ -35,7 +35,7 @@ def read(file_path):
         header=None,
         names=["excitation_energy", "strength_function_fm"],
     ).set_index("excitation_energy")
-    return df
+    return dataf
 
 
 def main():
@@ -49,17 +49,17 @@ def main():
     for job in rpa.find_jobs({"proton_number": proton_number}):
         temp = "finite" if job.sp.temperature > 0 else "zero"
         fname = job.fn(code.out_file(temp, "isovector", "lorentzian"))
-        df = read(fname)
+        small_df = read(fname)
 
         df2 = pd.concat(
-            [df],
+            [small_df],
             keys=[(proton_number, job.sp.neutron_number, job.sp.temperature)],
             names=["proton_number", "neutron_number", "temperature"],
         ).reset_index()
 
         dataframes.append(df2)
 
-    df = (
+    big_df = (
         pd.concat(dataframes)
         .set_index(
             ["proton_number", "neutron_number", "temperature", "excitation_energy"]
@@ -67,7 +67,7 @@ def main():
         .sort_index()
     )
 
-    return df
+    return big_df
 
 
 if __name__ == "__main__":

@@ -19,6 +19,7 @@ if __name__ == "__main__":
     fig, axarr = pyplot.subplots(len(temperatures), 1, constrained_layout=True)
     axes = {str(T): ax for T, ax in zip(np.flip(temperatures), axarr.flat)}
 
+    mappable = None
     for T in temperatures:
         df_single_T = df[df["temperature"] == T]
 

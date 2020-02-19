@@ -93,9 +93,9 @@ def main():
 
     rate_df = rate_left.join(rate_right, rsuffix=right_suffix)
 
-    df = xs_df.reset_index(level="neutron_energy").join(rate_df)
+    dataframe = xs_df.reset_index(level="neutron_energy").join(rate_df)
 
-    return df
+    return dataframe
 
 
 if __name__ == "__main__":

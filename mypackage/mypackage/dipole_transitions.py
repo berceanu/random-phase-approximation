@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """Custom dashboard module for rendering a card containing dipole transition amplitudes."""
-from signac_dashboard.module import Module
-from flask import render_template
 import pandas as pd
 import re
 import logging
 
 logger = logging.getLogger(__name__)
 
+# TODO generate LaTeX table instead of HTML
 
-class DipoleTransitions(Module):
+
+class DipoleTransitions:
     def __init__(
         self,
         name="Dipole Transitions",
@@ -26,17 +26,12 @@ class DipoleTransitions(Module):
         if table is None:
             return []  # no card shown
         else:
-            return [
-                {
-                    "name": self.name,
-                    "content": render_template(self.template, table=table),
-                }
-            ]
+            return [{"name": self.name, "content": (self.template, table)}]
 
     @staticmethod
     def get_table(job):
         def match_split(orbital_frac):
-            regex = re.compile(r"(?P<orbital>\d+[a-z]+)(?P<frac>\d+\/\d+)")
+            regex = re.compile(r"(?P<orbital>\d+[a-z]+)(?P<frac>\d+/\d+)")
             m = regex.search(orbital_frac)
             return m.group("orbital"), m.group("frac")
 

@@ -147,13 +147,13 @@ def prepare_run_finite(job):
 def _run_code(
     job, temp, state, codepath="../../bin", code_mapping=code_api.NameMapping()
 ):
-    code = os.path.join(codepath, code_mapping.exec_file(temp, state))
-    assert os.path.isfile(code), f"{code} not found!"
+    code_cmd = os.path.join(codepath, code_mapping.exec_file(temp, state))
+    assert os.path.isfile(code_cmd), f"{code_cmd} not found!"
 
     stdout_file = job.fn(code_mapping.stdout_file(temp, state))
     stderr_file = job.fn(code_mapping.stderr_file(temp, state))
 
-    run_command = f"{code} {job.ws} > {stdout_file} 2> {stderr_file}"
+    run_command = f"{code_cmd} {job.ws} > {stdout_file} 2> {stderr_file}"
     command = f"echo {run_command} >> {logfname} ; {run_command}"
 
     return command
@@ -237,12 +237,21 @@ def run_finite_temp_excited_state(job):
 
 def _plot_iso(job, temp, code_mapping=code_api.NameMapping()):
     def _out_file_plot(
-        job, ax, temp, skalvec, lorexc, code_mapping=code_api.NameMapping()
+        job,
+        axis,
+        temperature,
+        isoscalar_or_isovector,
+        lorentzian_or_excitation,
+        codemapping=code_api.NameMapping(),
     ):
 
-        fn = job.fn(code_mapping.out_file(temp, skalvec, lorexc))
+        fn = job.fn(
+            codemapping.out_file(
+                temperature, isoscalar_or_isovector, lorentzian_or_excitation
+            )
+        )
 
-        df = pd.read_csv(
+        dataframe = pd.read_csv(
             fn,
             delim_whitespace=True,
             comment="#",
@@ -251,16 +260,18 @@ def _plot_iso(job, temp, code_mapping=code_api.NameMapping()):
             names=["energy", "transition_strength"],
         )
 
-        df = df[df.energy < 30]  # MeV
+        dataframe = dataframe[dataframe.energy < 30]  # MeV
 
-        if lorexc == "excitation":
-            ax.vlines(df.energy, 0.0, df.transition_strength, colors="black")
-        elif lorexc == "lorentzian":
-            ax.plot(df.energy, df.transition_strength, color="black")
+        if lorentzian_or_excitation == "excitation":
+            axis.vlines(
+                dataframe.energy, 0.0, dataframe.transition_strength, colors="black"
+            )
+        elif lorentzian_or_excitation == "lorentzian":
+            axis.plot(dataframe.energy, dataframe.transition_strength, color="black")
         else:
             raise ValueError
 
-        return df
+        return dataframe
 
     fig = Figure(figsize=(12, 6))
     canvas = FigureCanvas(fig)
@@ -279,11 +290,11 @@ def _plot_iso(job, temp, code_mapping=code_api.NameMapping()):
         for lorexc in "excitation", "lorentzian":
             df = _out_file_plot(
                 job=job,
-                ax=ax[skalvec],
-                temp=temp,
-                skalvec=skalvec,
-                lorexc=lorexc,
-                code_mapping=code_mapping,
+                axis=ax[skalvec],
+                temperature=temp,
+                isoscalar_or_isovector=skalvec,
+                lorentzian_or_excitation=lorexc,
+                codemapping=code_mapping,
             )
             if lorexc == "excitation" and job.sp.transition_energy != 0:
                 df = df[np.isclose(df.energy, job.sp.transition_energy, atol=0.01)]
