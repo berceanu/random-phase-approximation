@@ -177,13 +177,14 @@ Step 0 involves building the required dataframe which should hold everything nee
 
 ## Finalize plots
 
+1. Do the analysis of particle-hole (p-h) transition components
+   for some low-lying states of N=76,86,96.
+   How to select these low-lying states: below E=10 MeV,
+   find one or two discrete states with highest transition strength.
+
+2. Create new branch for new neutron capture (NC) figure.
+   Do the calculations of neutron capture rates at T=1,2MeV
+   but with E1 strength function at T=0MeV from RHB+QRPA.
+   Plot on the same figure with the existing NC rates.
+
 - [ ] Q about `TALYS` result: why neutron capture rate is decreasing with increasing temperature?
-
-1.  Create new branch for new neutron capture (NC) figure.
-    Do the calculations of neutron capture rates at T=1,2MeV
-    but with E1 strength function at T=0MeV from RHB+QRPA.
-    Plot on the same figure with the existing NC rates.
-
-2.  Do the analysis of ph transition components for some low-lying states of
-    N=76, 86, 96. How to select these low-lying states:  Below E=10 MeV, find
-    one or two discrete states with highest transition strength.
