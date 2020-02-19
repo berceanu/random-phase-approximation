@@ -42,3 +42,5 @@ dependencies:
   - pre_commit
   - pip:
     - matplotlib-label-lines
+
+#TODO update versions for python, numpy, pandas etc
