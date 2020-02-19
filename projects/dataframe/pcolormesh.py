@@ -8,27 +8,32 @@ from dataash5 import df_path, units
 from matplotlib import pyplot, ticker, colors
 
 if __name__ == "__main__":
-    df = pd.read_hdf(df_path, "excitation_energy")
+    temperatures = (0.0, 1.0, 2.0)  # MeV
 
-    chosen_temperatures = (0.0, 1.0, 2.0)  # MeV
+    df = (
+        pd.read_hdf(df_path, "excitation_energy")
+        .query("temperature in @temperatures")
+        .assign(mass_number=lambda frame: frame.proton_number + frame.neutron_number)
+    )
 
-    fig, axarr = pyplot.subplots(len(chosen_temperatures), 1, constrained_layout=True)
-    axes = {str(T): ax for T, ax in zip(np.flip(chosen_temperatures), axarr.flat)}
+    fig, axarr = pyplot.subplots(len(temperatures), 1, constrained_layout=True)
+    axes = {str(T): ax for T, ax in zip(np.flip(temperatures), axarr.flat)}
 
-    for T in chosen_temperatures:
+    for T in temperatures:
         df_single_T = df[df["temperature"] == T]
 
-        isotopes = df_single_T["neutron_number"].unique()
-        y = df_single_T["strength_function_fm"].values.reshape(isotopes.size, -1)
+        mass_numbers = df_single_T["mass_number"].unique()
+
+        y = df_single_T["strength_function_fm"].values.reshape(mass_numbers.size, -1)
         x = df_single_T.head(y.shape[1]).loc[:, "excitation_energy"].values
 
-        nn_boundaries = np.append(isotopes - 1, isotopes[-1] + 1)
+        mass_number_boundaries = np.append(mass_numbers - 1, mass_numbers[-1] + 1)
 
         ax = axes[str(T)]
 
         mappable = ax.pcolormesh(
             x,
-            nn_boundaries,
+            mass_number_boundaries,
             y,
             norm=colors.LogNorm(),
             vmin=0.05,
@@ -39,16 +44,15 @@ if __name__ == "__main__":
         )
 
         ax.annotate(
-            s=f"$T = {T}$ MeV", xy=(0.70, 0.68), xycoords="axes fraction", color="b"
+            s=f"$T = {T}$ MeV", xy=(0.68, 0.68), xycoords="axes fraction", color="b"
         )
 
-        for N in isotopes:
-            # TODO annotate using mass number A instead of neutron number N
+        for A in mass_numbers:
             ax.annotate(
-                s=str(N), xy=(29, N - 0.9), xycoords="data", color="w", fontsize=7
+                s=str(A), xy=(28, A - 0.9), xycoords="data", color="w", fontsize=7
             )
-            if N < isotopes[-1]:
-                ax.axhline(N + 1, color="w", lw=0.2)
+            if A < mass_numbers[-1]:
+                ax.axhline(A + 1, color="w", lw=0.2)
 
     cb = fig.colorbar(mappable, ax=axarr.flat, location="top", shrink=1.0, aspect=30)
     cb.outline.set_visible(False)
@@ -79,9 +83,9 @@ if __name__ == "__main__":
         ax.spines["top"].set_visible(False)
         ax.spines["bottom"].set_visible(False)
 
-    #     ax.xaxis.tick_bottom()
+    #   ax.xaxis.tick_bottom()
 
     axes["0.0"].set_xlabel("$E$ %s" % units["excitation_energy"], labelpad=-0.5)
 
     fig.set_size_inches(width, 1.4 * width)
-    fig.savefig("colormesh.pdf")  # facecolor='C7'
+    fig.savefig("colormesh")  # facecolor='C7'
