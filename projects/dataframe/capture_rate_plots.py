@@ -11,6 +11,8 @@ niso = len(isotopes)
 temperatures = (0.0, 0.5, 1.0, 2.0)
 ntemp = len(temperatures)
 
+# TODO remove file
+
 
 def plot_capture_rate_vs_n(ax, column, table, temperature, counter):
     series = table.loc[:, (column, temperature)]

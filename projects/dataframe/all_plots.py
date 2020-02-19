@@ -12,6 +12,8 @@ niso = len(isotopes)
 temperatures = (0.0, 1.0, 2.0)
 ntemp = len(temperatures)
 
+# TODO remove file
+
 
 def plot_series(
     ax,
