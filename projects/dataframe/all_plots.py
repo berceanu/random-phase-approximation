@@ -1,7 +1,7 @@
 import pandas as pd
 
 # always import figstyle first!
-from figstyle import colourWheel, dashesStyles, width, height
+from figstyle import colourWheel, dashesStyles, width, golden_ratio
 from dataash5 import df_path, units  # , model
 from matplotlib import pyplot
 from mypackage.talys.api import u_factor
@@ -90,7 +90,7 @@ def plot_table(
                     energy_interval=energy_interval,
                     ylabel=ylabel,
                 )
-        fig.set_size_inches(width, height)
+        fig.set_size_inches(width, width / golden_ratio)
         fig.savefig("N_%s_all_T_%s.pdf" % (iso, column))
 
     for T in temperatures:
@@ -124,7 +124,7 @@ def plot_table(
                     energy_interval=energy_interval,
                     ylabel=ylabel,
                 )
-        fig.set_size_inches(width, height)
+        fig.set_size_inches(width, width / golden_ratio)
         fig.savefig("T_%s_all_N_%s.pdf" % (T, column))
 
 

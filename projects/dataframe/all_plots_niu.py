@@ -1,6 +1,6 @@
 import pandas as pd
 
-from figstyle import colourWheel, dashesStyles, width, height
+from figstyle import colourWheel, dashesStyles, width, golden_ratio
 from dataash5 import df_path, units
 from matplotlib import pyplot
 
@@ -81,7 +81,7 @@ def plot_table(
             # TODO replace "N=.." with nucleus symbol ${}^{A}Sn$
             ax.annotate(s="N = %s" % iso, xy=(0.1, 0.9), xycoords="axes fraction")
             ax.legend(loc="lower right")
-        fig.set_size_inches(width, height)  # TODO make subplots shorter
+        fig.set_size_inches(width, width / golden_ratio)  # TODO make subplots shorter
         fig.savefig("N_%s_all_T_%s.pdf" % (iso, column))
 
 

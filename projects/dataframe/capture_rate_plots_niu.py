@@ -1,6 +1,6 @@
 import pandas as pd
 
-from figstyle import colourWheel, dashesStyles, width
+from figstyle import colourWheel, dashesStyles, width, golden_ratio
 from dataash5 import df_path, units
 from matplotlib import pyplot, ticker
 
@@ -58,8 +58,8 @@ def main():
             ax=ax, column="capture_rate", table=table, temperature=T, counter=j
         )
     ax.annotate(s="Sn", xy=(0.1, 0.6), xycoords="axes fraction")
-    fig.set_size_inches(width, width / 1.618)
-    fig.savefig("capture_rate_vs_N.pdf")
+    fig.set_size_inches(width, width / golden_ratio)
+    fig.savefig("capture_rate_vs_N")
 
 
 if __name__ == "__main__":
