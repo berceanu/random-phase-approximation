@@ -1,6 +1,6 @@
 # https://turnermoni.ca/python3.html
 
-# Increase the default DPI, and change the file type from png to pdf 
+# Increase the default DPI, and change the file type from png to pdf
 savefig.dpi             :   1200
 savefig.format          :   pdf
 
@@ -36,10 +36,12 @@ lines.markeredgewidth   :   0.6  # default 1
 lines.markersize        :   3
 
 # The magic sauce
-text.usetex             :  True
+text.usetex             :   True
+pgf.texsystem           :   pdflatex
+pgf.preamble            :   \usepackage[utf8x]{inputenc} \usepackage[T1]{fontenc} \usepackage{cmbright}
 
 # Increase the padding between the ticklabels and the axes, to prevent 
-# overlap in the lower lefthand corner
+# overlap in the lower left-hand corner
 xtick.major.pad         :   4  # default 3.5
 ytick.major.pad         :   4  # default 3.5 
 xtick.minor.pad         :   4  # default 3.5 
@@ -47,12 +49,10 @@ ytick.minor.pad         :   4  # default 3.5
 
 # Turn off the legend frame and reduce the space between the point and the label  
 legend.frameon          :   False
-legend.fontsize         :   8
 
 # Font size
-xtick.labelsize: 8
-ytick.labelsize: 8
-axes.labelsize : 8
-font.size: 8
-
-# TODO Enlarge all font sizes
+legend.fontsize         :   10
+xtick.labelsize         :   10
+ytick.labelsize         :   10
+axes.labelsize          :   10
+font.size               :   10
