@@ -78,19 +78,23 @@ def plot_table(
             )
             ax.legend(loc="lower left")
         else:
-            # TODO replace "N=.." with nucleus symbol ${}^{A}Sn$
-            ax.annotate(s="N = %s" % iso, xy=(0.1, 0.9), xycoords="axes fraction")
+            mass_number_final = 50 + iso
+            ax.annotate(
+                s=r"${}^{%s}$Sn" % mass_number_final,
+                xy=(0.1, 0.9),
+                xycoords="axes fraction",
+            )
             ax.legend(loc="lower right")
-        fig.set_size_inches(width, width / golden_ratio)  # TODO make subplots shorter
-        fig.savefig("N_%s_all_T_%s.pdf" % (iso, column))
+        fig.set_size_inches(width, width / golden_ratio)
+        fig.savefig("N_%s_all_T_%s" % (iso, column))
 
 
 # TODO add new set of figures savefig("T_%s_all_N_%s.pdf" % (T, column)), see all_plots.py
-# TODO label the 3 curves by nucleus symbol ${}^{A}Sn$ in legend
+# TODO label the 3 curves by nucleus symbol ${}^{A}$Sn in legend
 # TODO use E_n instead of E for cross section x axis label
-# TODO use same axes ranges as in "N_%s_all_T_%s.pdf"
+# TODO use same axes ranges as in "N_%s_all_T_%s"
 # TODO move "T=.." annotations to area with no curves
-# TODO use dual GridSpec to produce the final figure directly
+# TODO use GridSpec to produce the final figure
 
 
 def main():
