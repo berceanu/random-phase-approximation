@@ -29,8 +29,5 @@ colourWheel = [
 
 dashesStyles = [[1000, 1], [1, 1], [3, 3], [3, 1], [2, 1, 10, 1], [4, 1, 1, 1, 1, 1]]
 
-aps_column_width = 3.404  # inches
+width = aps_column_width = 3.404  # inches
 golden_ratio = 1.618
-
-width = aps_column_width
-height = aps_column_width * 115 / 97  # / golden_ratio  # TODO fix height
