@@ -51,8 +51,8 @@ ytick.minor.pad         :   4  # default 3.5
 legend.frameon          :   False
 
 # Font size
-legend.fontsize         :   10
-xtick.labelsize         :   10
-ytick.labelsize         :   10
-axes.labelsize          :   10
-font.size               :   10
+legend.fontsize         :   8
+xtick.labelsize         :   6
+ytick.labelsize         :   6
+axes.labelsize          :   8
+font.size               :   6
