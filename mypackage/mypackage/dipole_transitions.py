@@ -3,10 +3,13 @@
 import pandas as pd
 import re
 import logging
+from flask import render_template
 
 logger = logging.getLogger(__name__)
 
 # TODO generate LaTeX table instead of HTML
+
+# Google: jinja latex table pandas
 
 
 class DipoleTransitions:
@@ -14,7 +17,6 @@ class DipoleTransitions:
         self,
         name="Dipole Transitions",
         context="JobContext",
-        # ~/anaconda3/lib/python3.6/site-packages/signac_dashboard/templates/cards/
         template="cards/dipole_transitions.j2",
         **kwargs,
     ):
@@ -26,7 +28,12 @@ class DipoleTransitions:
         if table is None:
             return []  # no card shown
         else:
-            return [{"name": self.name, "content": (self.template, table)}]
+            return [
+                {
+                    "name": self.name,
+                    "content": render_template(self.template, table=table),
+                }
+            ]
 
     @staticmethod
     def get_table(job):
