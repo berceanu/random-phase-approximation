@@ -14,35 +14,44 @@ temperatures = (0.0, 1.0, 2.0)
 ntemp = len(temperatures)
 
 
-@dataclass
+@dataclass(frozen=True)
+class Annotation:
+    s: str
+    xy: Tuple[float, float]
+    xycoords: str = "axes fraction"
+
+
+@dataclass(frozen=True)
 class AxesParameters:
     ylabel: str
     xlabel: str
     xscale: str
-    yscale: str
     xlim: Tuple[float, float]
     ylim: Tuple[float, float]
+    legend_loc: str
+    ann: Annotation
+    yscale: str = "log"
+    line_label: str = "T = %s MeV"
 
 
 sfunc_prm = AxesParameters(
     ylabel="$R$ [e${}^{2}$fm${}^{2}$/MeV]",
     xlabel="E [MeV]",
     xscale="linear",
-    yscale="log",
     xlim=(0.0, 20.0),
     ylim=(3e-2, 1.2e1),
+    legend_loc="lower right",
+    ann=Annotation(s=r"${}^{%s}$Sn", xy=(0.1, 0.9)),
 )
 xsec_prm = AxesParameters(
     ylabel="Cross-Section [mb]",
     xlabel="E$_n$ [MeV]",
     xscale="log",
-    yscale="log",
     xlim=(1e-3, 20.0),
     ylim=(1e-4, 1e3),
+    legend_loc="lower left",
+    ann=Annotation(s=r"${}^{%s}$Sn(n,$\gamma$)${}^{%s}$Sn", xy=(0.6, 0.9)),
 )
-
-# TODO Axes label for the 3 curves, annotation, legend position
-# TODO Axes annotation
 
 
 def plot_series(
