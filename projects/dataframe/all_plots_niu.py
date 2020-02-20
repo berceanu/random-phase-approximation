@@ -36,13 +36,6 @@ class AxesParameters:
     line_label: str = "T = %s MeV"
 
 
-def annotate_axes(figr: Figure):
-    """Takes a figure and puts an 'axN' label in the center of each Axes"""
-    for i, axis in enumerate(figr.axes):
-        axis.text(0.5, 0.5, f"ax{i + 1:d}", va="center", ha="center")
-        axis.tick_params(labelbottom=False, labelleft=False)
-
-
 def plot_series(
     ax,
     table,
@@ -159,10 +152,14 @@ def main():
         height_ratios=[1.0, 1.0, 1.0],
         width_ratios=[1.0, 1.0],
     )
-    for g in gs:
+    for i, g in enumerate(gs[:, 0]):
         ax = fig.add_subplot(g)
+        ax.text(0.5, 0.5, f"ax{i + 1:d}", va="center", ha="center")
         print(ax)
-    annotate_axes(fig)
+
+    # for i, ax in enumerate(fig.axes):  # same axes order as above
+    #     ax.text(0.5, 0.5, f"ax{i + 1:d}", va="center", ha="center")
+
     fig.set_size_inches(width, width * golden_ratio)
     fig.savefig("grid_spec")
 
