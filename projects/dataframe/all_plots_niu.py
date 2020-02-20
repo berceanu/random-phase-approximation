@@ -1,3 +1,6 @@
+from dataclasses import dataclass
+from typing import Tuple
+
 import pandas as pd
 
 from figstyle import colourWheel, dashesStyles, width, golden_ratio
@@ -9,6 +12,37 @@ niso = len(isotopes)
 
 temperatures = (0.0, 1.0, 2.0)
 ntemp = len(temperatures)
+
+
+@dataclass
+class AxesParameters:
+    ylabel: str
+    xlabel: str
+    xscale: str
+    yscale: str
+    xlim: Tuple[float, float]
+    ylim: Tuple[float, float]
+
+
+sfunc_prm = AxesParameters(
+    ylabel="$R$ [e${}^{2}$fm${}^{2}$/MeV]",
+    xlabel="E [MeV]",
+    xscale="linear",
+    yscale="log",
+    xlim=(0.0, 20.0),
+    ylim=(3e-2, 1.2e1),
+)
+xsec_prm = AxesParameters(
+    ylabel="Cross-Section [mb]",
+    xlabel="E$_n$ [MeV]",
+    xscale="log",
+    yscale="log",
+    xlim=(1e-3, 20.0),
+    ylim=(1e-4, 1e3),
+)
+
+# TODO Axes label for the 3 curves, annotation, legend position
+# TODO Axes annotation
 
 
 def plot_series(
