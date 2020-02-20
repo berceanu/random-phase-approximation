@@ -6,6 +6,8 @@ import pandas as pd
 from figstyle import colourWheel, dashesStyles, width, golden_ratio
 from dataash5 import df_path, units
 from matplotlib import pyplot
+from matplotlib.figure import Figure
+from matplotlib.gridspec import GridSpec
 
 isotopes = (76, 86, 96)
 niso = len(isotopes)
@@ -34,24 +36,11 @@ class AxesParameters:
     line_label: str = "T = %s MeV"
 
 
-sfunc_prm = AxesParameters(
-    ylabel="$R$ [e${}^{2}$fm${}^{2}$/MeV]",
-    xlabel="E [MeV]",
-    xscale="linear",
-    xlim=(0.0, 20.0),
-    ylim=(3e-2, 1.2e1),
-    legend_loc="lower right",
-    ann=Annotation(s=r"${}^{%s}$Sn", xy=(0.1, 0.9)),
-)
-xsec_prm = AxesParameters(
-    ylabel="Cross-Section [mb]",
-    xlabel="E$_n$ [MeV]",
-    xscale="log",
-    xlim=(1e-3, 20.0),
-    ylim=(1e-4, 1e3),
-    legend_loc="lower left",
-    ann=Annotation(s=r"${}^{%s}$Sn(n,$\gamma$)${}^{%s}$Sn", xy=(0.6, 0.9)),
-)
+def annotate_axes(figr: Figure):
+    """Takes a figure and puts an 'axN' label in the center of each Axes"""
+    for i, axis in enumerate(figr.axes):
+        axis.text(0.5, 0.5, f"ax{i + 1:d}", va="center", ha="center")
+        axis.tick_params(labelbottom=False, labelleft=False)
 
 
 def plot_series(
@@ -141,6 +130,42 @@ def plot_table(
 
 
 def main():
+    sfunc_prm = AxesParameters(
+        ylabel="$R$ %s" % units["strength_function_fm"],
+        xlabel="E %s" % units["excitation_energy"],
+        xscale="linear",
+        xlim=(0.0, 20.0),
+        ylim=(3e-2, 1.2e1),
+        legend_loc="lower right",
+        ann=Annotation(s=r"${}^{%s}$Sn", xy=(0.1, 0.9)),
+    )
+    xsec_prm = AxesParameters(
+        ylabel="Cross-Section %s" % units["cross_section"],
+        xlabel="E$_n$ %s" % units["neutron_energy"],
+        xscale="log",
+        xlim=(1e-3, 20.0),
+        ylim=(1e-4, 1e3),
+        legend_loc="lower left",
+        ann=Annotation(s=r"${}^{%s}$Sn(n,$\gamma$)${}^{%s}$Sn", xy=(0.6, 0.9)),
+    )
+    print(sfunc_prm)
+    print(xsec_prm)
+
+    fig = Figure(constrained_layout=True)
+    gs = GridSpec(
+        nrows=3,
+        ncols=2,
+        figure=fig,
+        height_ratios=[1.0, 1.0, 1.0],
+        width_ratios=[1.0, 1.0],
+    )
+    for g in gs:
+        ax = fig.add_subplot(g)
+        print(ax)
+    annotate_axes(fig)
+    fig.set_size_inches(width, width * golden_ratio)
+    fig.savefig("grid_spec")
+
     # strength function
     ee_data = pd.read_hdf(df_path, "excitation_energy").query(
         "neutron_number in @isotopes and temperature in @temperatures"
