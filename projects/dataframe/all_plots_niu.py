@@ -100,64 +100,46 @@ def main():
         height_ratios=[1.0, 1.0, 1.0],
         width_ratios=[1.0, 1.0],
     )
-    gs.update(wspace=0.4, hspace=0.05, bottom=0.06, left=0.0, right=1.02)
+    gs.update(wspace=0.4, hspace=0.05, bottom=0.06, left=0.06, right=0.97, top=0.95)
     for row in range(nrows):
         # strength function
         ax_left = fig.add_subplot(gs[row, 0])
+        # cross section
+        ax_right = fig.add_subplot(gs[row, 1])
 
         for line in range(nlines):
-            series = sfunc_table.loc[
+            sfunc_series = sfunc_table.loc[
                 :, ("strength_function_fm", temperatures[line], isotopes[row])
             ]
-            ax_left.plot(
-                series.index.values,
-                series.values,
-                color=colourWheel[line % len(colourWheel)],
-                linestyle="-",
-                dashes=dashesStyles[line % len(dashesStyles)],
-                label=sfunc_prm.line_label % temperatures[line],
-            )
-        ax_left.set_ylabel(sfunc_prm.ylabel)
-        ax_left.set_xlabel(sfunc_prm.xlabel)
+            xsec_series = xsec_table.loc[
+                :, ("cross_section", temperatures[line], isotopes[row])
+            ]
 
-        ax_left.set_ylim(sfunc_prm.ylim)
-        ax_left.set_xlim(sfunc_prm.xlim)
-        ax_left.set_yscale(sfunc_prm.yscale)
-        ax_left.set_xscale(sfunc_prm.xscale)
+            for ax, series, param in zip(
+                (ax_left, ax_right), (sfunc_series, xsec_series), (sfunc_prm, xsec_prm)
+            ):
+                ax.plot(
+                    series.index.values,
+                    series.values,
+                    color=colourWheel[line % len(colourWheel)],
+                    linestyle="-",
+                    dashes=dashesStyles[line % len(dashesStyles)],
+                    label=param.line_label % temperatures[line],
+                )
+
+        for ax, param in zip((ax_left, ax_right), (sfunc_prm, xsec_prm)):
+            ax.set_ylabel(param.ylabel)
+            ax.set_xlabel(param.xlabel)
+            ax.set_ylim(param.ylim)
+            ax.set_xlim(param.xlim)
+            ax.set_yscale(param.yscale)
+            ax.set_xscale(param.xscale)
 
         ax_left.annotate(
             s=sfunc_prm.ann.s % (50 + isotopes[row]),
             xy=sfunc_prm.ann.xy,
             xycoords=sfunc_prm.ann.xycoords,
         )
-
-        if row != nrows - 1:  # all but the bottom panel
-            ax_left.xaxis.set_major_formatter(ticker.NullFormatter())
-            ax_left.xaxis.label.set_visible(False)
-
-        # cross section
-        ax_right = fig.add_subplot(gs[row, 1])
-
-        for line in range(nlines):
-            series = xsec_table.loc[
-                :, ("cross_section", temperatures[line], isotopes[row])
-            ]
-            ax_right.plot(
-                series.index.values,
-                series.values,
-                color=colourWheel[line % len(colourWheel)],
-                linestyle="-",
-                dashes=dashesStyles[line % len(dashesStyles)],
-                label=xsec_prm.line_label % temperatures[line],
-            )
-        ax_right.set_ylabel(xsec_prm.ylabel)
-        ax_right.set_xlabel(xsec_prm.xlabel)
-
-        ax_right.set_ylim(xsec_prm.ylim)
-        ax_right.set_xlim(xsec_prm.xlim)
-        ax_right.set_yscale(xsec_prm.yscale)
-        ax_right.set_xscale(xsec_prm.xscale)
-
         ax_right.annotate(
             s=xsec_prm.ann.s % ((50 + isotopes[row] - 1), (50 + isotopes[row])),
             xy=xsec_prm.ann.xy,
@@ -165,66 +147,21 @@ def main():
         )
 
         if row != nrows - 1:  # all but the bottom panel
-            ax_right.xaxis.set_major_formatter(ticker.NullFormatter())
-            ax_right.xaxis.label.set_visible(False)
+            for ax in (ax_left, ax_right):
+                ax.xaxis.set_major_formatter(ticker.NullFormatter())
+                ax.xaxis.label.set_visible(False)
 
     handles, labels = fig.axes[-1].get_legend_handles_labels()
-    fig.legend(handles, labels, loc="upper center")
+    fig.legend(handles, labels, loc="upper center", ncol=nlines)
 
     fig.savefig("grid_spec")
 
-    # # strength function
-    # for iso in isotopes:
-    #     for counter, T in enumerate(temperatures):
-    #         series = table.loc[:, ("strength_function_fm", T, iso)]
-    #         ax.plot(
-    #             series.index.values,
-    #             series.values,
-    #             color=colourWheel[counter % len(colourWheel)],
-    #             linestyle="-",
-    #             dashes=dashesStyles[counter % len(dashesStyles)],
-    #             label=("T = %s MeV" % T),
-    #         )
-    #         ax.set_yscale("log")
-    #         ax.set_xscale("linear")
-    #         ax.set_ylabel("$R$ %s" % units["strength_function_fm"])
-    #         ax.set_xlabel("E %s" % units["excitation_energy"])
-    #         ax.set_xlim(left=0, right=20)
-    #         ax.set_ylim(3e-2, 1.2e1)
-    #     ax.annotate(
-    #         s=r"${}^{%s}$Sn" % (50 + iso),
-    #         xy=(0.1, 0.9),
-    #         xycoords="axes fraction",
-    #     )
-    #     ax.legend(loc="lower right")
-
-    # # cross section
-    # for o in isotopes:
-    #     fig2, ax1 = pyplot.subplots()
-    #     fig2.subplots_adjust(left=0.15, bottom=0.09, right=0.97, top=0.97)
-    #     for j1, t in enumerate(temperatures):
-    #         series1 = table.loc[:, ("cross_section", t, o)]
-    #         ax1.plot(
-    #             series1.index.values,
-    #             series1.values,
-    #             color=colourWheel[j1 % len(colourWheel)],
-    #             linestyle="-",
-    #             dashes=dashesStyles[j1 % len(dashesStyles)],
-    #             label=("T = %s MeV" % t),
-    #         )
-    #         ax1.set_yscale("log")
-    #         ax1.set_xscale("log")
-    #         ax1.set_ylabel("Cross-Section %s" % units["cross_section"])
-    #         ax1.set_xlabel("E$_n$ %s" % units["neutron_energy"])
-    #         ax1.set_xlim(left=1e-3, right=20)
-    #         ax1.set_ylim(1e-4, 1e3)
-    #     ax1.annotate(
-    #         s=r"${}^{%s}$Sn(n,$\gamma$)${}^{%s}$Sn"
-    #           % ((50 + o - 1), (50 + o)),
-    #         xy=(0.6, 0.9),
-    #         xycoords="axes fraction",
-    #     )
-    #     ax1.legend(loc="lower left")
+    # cb.ax.xaxis.set_minor_locator(ticker.NullLocator())
+    # cb.ax.xaxis.set_minor_formatter(ticker.NullFormatter())
+    # cb.ax.xaxis.set_major_locator(
+    #     ticker.FixedLocator([0.1, 0.2, 0.4, 0.6, 1.0, 2.0, 4.0])
+    # )  # np.around(np.logspace(-1.30103, 0.60206, 10), decimals=1)
+    # cb.ax.xaxis.set_major_formatter(ticker.ScalarFormatter())
 
 
 if __name__ == "__main__":
