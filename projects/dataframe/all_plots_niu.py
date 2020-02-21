@@ -140,11 +140,9 @@ def grid_figure(
             ax.set_xlim(param.xlim)
             ax.set_yscale(param.yscale)
             ax.set_xscale(param.xscale)
-
-            if ax is ax_left:
-                ax.annotate(
-                    s=labels.ann.s, xy=labels.ann.xy, xycoords=labels.ann.xycoords,
-                )
+            ax.annotate(
+                s=labels.ann.s, xy=labels.ann.xy, xycoords=labels.ann.xycoords,
+            )
 
         if row != nrows - 1:  # all but the bottom panel
             for ax in (ax_left, ax_right):
@@ -161,14 +159,6 @@ def grid_figure(
     for ax in fig.axes[1::2]:  # right column
         ax.yaxis.set_major_locator(ticker.LogLocator(numticks=4))
 
-    fig.axes[-3].legend(
-        *fig.axes[-1].get_legend_handles_labels(),
-        loc="lower left",
-        handlelength=1.5,
-        handletextpad=0.1,
-        fontsize=7,
-    )  # ncol=1, handlelength=1
-
     fig.axes[-4].legend(
         *fig.axes[-2].get_legend_handles_labels(),
         loc="lower right",
@@ -176,6 +166,15 @@ def grid_figure(
         handletextpad=0.1,
         fontsize=7,
     )  # ncol=1, handlelength=1
+
+    if aggregate_by == "temperature":
+        fig.axes[-3].legend(
+            *fig.axes[-1].get_legend_handles_labels(),
+            loc="lower left",
+            handlelength=1.5,
+            handletextpad=0.1,
+            fontsize=7,
+        )  # ncol=1, handlelength=1
 
     fig.text(
         0.03, 0.57, param_left.ylabel, ha="center", va="center", rotation="vertical"
