@@ -52,7 +52,7 @@ legend.frameon          :   False
 
 # Font size
 legend.fontsize         :   8
-xtick.labelsize         :   6
-ytick.labelsize         :   6
+xtick.labelsize         :   8
+ytick.labelsize         :   8
 axes.labelsize          :   8
-font.size               :   6
+font.size               :   8
