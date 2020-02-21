@@ -125,7 +125,7 @@ def main():
                 )
 
         for ax, param in zip((ax_left, ax_right), (sfunc_prm, xsec_prm)):
-            ax.set_xlabel(param.xlabel)
+            ax.set_xlabel(param.xlabel)  # labelpad=-0.5
             ax.set_ylim(param.ylim)
             ax.set_xlim(param.xlim)
             ax.set_yscale(param.yscale)
@@ -158,7 +158,7 @@ def main():
         ax.yaxis.set_major_locator(ticker.LogLocator(numticks=4))
 
     handles, labels = fig.axes[-1].get_legend_handles_labels()
-    fig.axes[-2].legend(handles, labels, loc="lower right")
+    fig.axes[-2].legend(handles, labels, loc="lower right")  # ncol=1, handlelength=1
 
     fig.text(
         0.03, 0.57, sfunc_prm.ylabel, ha="center", va="center", rotation="vertical"
