@@ -60,6 +60,8 @@ def main():
             mass_numbers=massnum,
         )
     ax.annotate(s="Sn", xy=(0.1, 0.6), xycoords="axes fraction")
+    ax.xaxis.set_minor_locator(ticker.NullLocator())
+
     fig.set_size_inches(width, width / golden_ratio)
     fig.savefig("capture_rate_vs_N")
 
