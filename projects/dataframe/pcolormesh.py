@@ -86,7 +86,7 @@ if __name__ == "__main__":
 
     #   ax.xaxis.tick_bottom()
 
-    axes["0.0"].set_xlabel("$E$ %s" % units["excitation_energy"], labelpad=-0.5)
+    axes["0.0"].set_xlabel("$E$ %s" % units["excitation_energy"])
 
     fig.set_size_inches(width, 1.4 * width)
     fig.savefig("colormesh")  # facecolor='C7'
