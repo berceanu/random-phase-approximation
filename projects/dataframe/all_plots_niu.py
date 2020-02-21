@@ -21,12 +21,12 @@ class Annotation:
 class AxesParameters:
     ylabel: str
     xlabel: str
+    line_label: str
     xscale: str
     xlim: Tuple[float, float]
     ylim: Tuple[float, float]
     ann: Annotation
     yscale: str = "log"
-    line_label: str = "T = %s MeV"
 
 
 # TODO add new set of figures savefig("T_%s_all_N_%s.pdf" % (T, column)), see all_plots.py
@@ -54,10 +54,11 @@ def main():
     sfunc_prm = AxesParameters(
         ylabel="$R$ %s" % units["strength_function_fm"],
         xlabel="E %s" % units["excitation_energy"],
+        line_label=r"${}^{%s}$Sn",
         xscale="linear",
         xlim=(0.0, 20.0),
         ylim=(3e-2, 1.2e1),
-        ann=Annotation(s=r"${}^{%s}$Sn", xy=(0.1, 0.9)),
+        ann=Annotation(s="T = %s MeV", xy=(0.07, 0.95)),
     )
 
     # cross section
@@ -81,15 +82,16 @@ def main():
     xsec_prm = AxesParameters(
         ylabel="Cross-Section %s" % units["cross_section"],
         xlabel="E$_n$ %s" % units["neutron_energy"],
+        line_label=r"${}^{%s}$Sn(n,$\gamma$)${}^{%s}$Sn",
         xscale="log",
         xlim=(1e-3, 20.0),
         ylim=(1e-4, 1e3),
-        ann=Annotation(s=r"${}^{%s}$Sn(n,$\gamma$)${}^{%s}$Sn", xy=(0.1, 0.2)),
+        ann=Annotation(s="T = %s MeV", xy=(0.07, 0.95)),
     )
 
     # GridSpec Figure
-    nrows = len(isotopes)
-    nlines = len(temperatures)
+    nrows = len(temperatures)
+    nlines = len(isotopes)
 
     fig = Figure(figsize=(width, width * 1.4))  # constrained_layout=True
     gs = GridSpec(
@@ -106,14 +108,18 @@ def main():
 
         for line in range(nlines):
             sfunc_series = sfunc_table.loc[
-                :, ("strength_function_fm", temperatures[line], isotopes[row])
+                :, ("strength_function_fm", temperatures[row], isotopes[line])
             ]
             xsec_series = xsec_table.loc[
-                :, ("cross_section", temperatures[line], isotopes[row])
+                :, ("cross_section", temperatures[row], isotopes[line])
             ]
 
-            for ax, series, param in zip(
-                (ax_left, ax_right), (sfunc_series, xsec_series), (sfunc_prm, xsec_prm)
+            mass_number = 50 + isotopes[line]
+            for ax, series, param, interpolant in zip(
+                (ax_left, ax_right),
+                (sfunc_series, xsec_series),
+                (sfunc_prm, xsec_prm),
+                (mass_number, ((mass_number - 1), mass_number)),
             ):
                 ax.plot(
                     series.index.values,
@@ -121,7 +127,7 @@ def main():
                     color=colourWheel[line % len(colourWheel)],
                     linestyle="-",
                     dashes=dashesStyles[line % len(dashesStyles)],
-                    label=param.line_label % temperatures[line],
+                    label=param.line_label % interpolant,
                 )
 
         for ax, param in zip((ax_left, ax_right), (sfunc_prm, xsec_prm)):
@@ -132,14 +138,9 @@ def main():
             ax.set_xscale(param.xscale)
 
         ax_left.annotate(
-            s=sfunc_prm.ann.s % (50 + isotopes[row]),
+            s=sfunc_prm.ann.s % temperatures[row],
             xy=sfunc_prm.ann.xy,
             xycoords=sfunc_prm.ann.xycoords,
-        )
-        ax_right.annotate(
-            s=xsec_prm.ann.s % ((50 + isotopes[row] - 1), (50 + isotopes[row])),
-            xy=xsec_prm.ann.xy,
-            xycoords=xsec_prm.ann.xycoords,
         )
 
         if row != nrows - 1:  # all but the bottom panel
@@ -158,14 +159,32 @@ def main():
         ax.yaxis.set_major_locator(ticker.LogLocator(numticks=4))
 
     handles, labels = fig.axes[-1].get_legend_handles_labels()
-    fig.axes[-2].legend(handles, labels, loc="lower right")  # ncol=1, handlelength=1
+    fig.axes[-3].legend(
+        handles,
+        labels,
+        loc="lower left",
+        handlelength=1.5,
+        handletextpad=0.1,
+        fontsize=6,
+    )  # ncol=1, handlelength=1
+
+    handles, labels = fig.axes[-2].get_legend_handles_labels()
+    fig.axes[-4].legend(
+        handles,
+        labels,
+        loc="lower right",
+        handlelength=1.5,
+        handletextpad=0.1,
+        fontsize=6,
+    )  # ncol=1, handlelength=1
 
     fig.text(
         0.03, 0.57, sfunc_prm.ylabel, ha="center", va="center", rotation="vertical"
     )
     fig.text(0.52, 0.57, xsec_prm.ylabel, ha="center", va="center", rotation="vertical")
 
-    fig.savefig("strength_cross_section")
+    fig.savefig("strength_cross_section_T")
+    # End GridSpec figure
 
 
 if __name__ == "__main__":
