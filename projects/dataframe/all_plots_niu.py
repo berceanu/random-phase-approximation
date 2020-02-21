@@ -3,7 +3,7 @@ from typing import Tuple
 
 import pandas as pd
 
-from figstyle import colourWheel, dashesStyles, width, golden_ratio
+from figstyle import colourWheel, dashesStyles, width
 from dataash5 import df_path, units
 from matplotlib.figure import Figure
 from matplotlib.gridspec import GridSpec
@@ -34,7 +34,6 @@ class AxesParameters:
 # TODO use E_n instead of E for cross section x axis label
 # TODO use same axes ranges as in "N_%s_all_T_%s"
 # TODO move "T=.." annotations to area with no curves
-# TODO use GridSpec to produce the final figure
 
 
 def main():
@@ -58,7 +57,7 @@ def main():
         xscale="linear",
         xlim=(0.0, 20.0),
         ylim=(3e-2, 1.2e1),
-        ann=Annotation(s=r"${}^{%s}$Sn", xy=(0.5, 0.2)),
+        ann=Annotation(s=r"${}^{%s}$Sn", xy=(0.1, 0.9)),
     )
 
     # cross section
@@ -92,7 +91,7 @@ def main():
     nrows = len(isotopes)
     nlines = len(temperatures)
 
-    fig = Figure(figsize=(width, width * golden_ratio))  # constrained_layout=True
+    fig = Figure(figsize=(width, width * 1.4))  # constrained_layout=True
     gs = GridSpec(
         nrows=nrows,
         ncols=2,
@@ -100,12 +99,10 @@ def main():
         height_ratios=[1.0, 1.0, 1.0],
         width_ratios=[1.0, 1.0],
     )
-    gs.update(wspace=0.4, hspace=0.05, bottom=0.06, left=0.06, right=0.97, top=0.95)
+    gs.update(wspace=0.28, hspace=0.03, bottom=0.06, left=0.11, right=0.99, top=0.99)
     for row in range(nrows):
-        # strength function
-        ax_left = fig.add_subplot(gs[row, 0])
-        # cross section
-        ax_right = fig.add_subplot(gs[row, 1])
+        ax_left = fig.add_subplot(gs[row, 0])  # strength function
+        ax_right = fig.add_subplot(gs[row, 1])  # cross section
 
         for line in range(nlines):
             sfunc_series = sfunc_table.loc[
@@ -128,7 +125,6 @@ def main():
                 )
 
         for ax, param in zip((ax_left, ax_right), (sfunc_prm, xsec_prm)):
-            ax.set_ylabel(param.ylabel)
             ax.set_xlabel(param.xlabel)
             ax.set_ylim(param.ylim)
             ax.set_xlim(param.xlim)
@@ -151,17 +147,25 @@ def main():
                 ax.xaxis.set_major_formatter(ticker.NullFormatter())
                 ax.xaxis.label.set_visible(False)
 
+    for ax in fig.axes:
+        ax.tick_params(axis="both", which="major", labelsize=6)
+        ax.yaxis.set_ticks_position("left")
+        ax.xaxis.set_ticks_position("bottom")
+        ax.spines["right"].set_visible(False)
+        ax.spines["top"].set_visible(False)
+
+    for ax in fig.axes[1::2]:  # right column
+        ax.yaxis.set_major_locator(ticker.LogLocator(numticks=4))
+
     handles, labels = fig.axes[-1].get_legend_handles_labels()
-    fig.legend(handles, labels, loc="upper center", ncol=nlines)
+    fig.axes[-2].legend(handles, labels, loc="lower right")
 
-    fig.savefig("grid_spec")
+    fig.text(
+        0.03, 0.57, sfunc_prm.ylabel, ha="center", va="center", rotation="vertical"
+    )
+    fig.text(0.52, 0.57, xsec_prm.ylabel, ha="center", va="center", rotation="vertical")
 
-    # cb.ax.xaxis.set_minor_locator(ticker.NullLocator())
-    # cb.ax.xaxis.set_minor_formatter(ticker.NullFormatter())
-    # cb.ax.xaxis.set_major_locator(
-    #     ticker.FixedLocator([0.1, 0.2, 0.4, 0.6, 1.0, 2.0, 4.0])
-    # )  # np.around(np.logspace(-1.30103, 0.60206, 10), decimals=1)
-    # cb.ax.xaxis.set_major_formatter(ticker.ScalarFormatter())
+    fig.savefig("strength_cross_section")
 
 
 if __name__ == "__main__":
