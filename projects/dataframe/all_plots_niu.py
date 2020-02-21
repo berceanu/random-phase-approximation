@@ -29,13 +29,6 @@ class AxesParameters:
     yscale: str = "log"
 
 
-# TODO add new set of figures savefig("T_%s_all_N_%s.pdf" % (T, column)), see all_plots.py
-# TODO label the 3 curves by nucleus symbol ${}^{A}$Sn in legend
-# TODO use E_n instead of E for cross section x axis label
-# TODO use same axes ranges as in "N_%s_all_T_%s"
-# TODO move "T=.." annotations to area with no curves
-
-
 def main():
     isotopes = (76, 86, 96)
     temperatures = (0.0, 1.0, 2.0)
@@ -86,7 +79,7 @@ def main():
         xscale="log",
         xlim=(1e-3, 20.0),
         ylim=(1e-4, 1e3),
-        ann=Annotation(s="T = %s MeV", xy=(0.07, 0.95)),
+        ann=Annotation(s="T = %s MeV", xy=(0.45, 0.95)),
     )
 
     # GridSpec Figure
@@ -137,11 +130,12 @@ def main():
             ax.set_yscale(param.yscale)
             ax.set_xscale(param.xscale)
 
-        ax_left.annotate(
-            s=sfunc_prm.ann.s % temperatures[row],
-            xy=sfunc_prm.ann.xy,
-            xycoords=sfunc_prm.ann.xycoords,
-        )
+            if ax is ax_left:
+                ax.annotate(
+                    s=param.ann.s % temperatures[row],
+                    xy=param.ann.xy,
+                    xycoords=param.ann.xycoords,
+                )
 
         if row != nrows - 1:  # all but the bottom panel
             for ax in (ax_left, ax_right):
@@ -165,7 +159,7 @@ def main():
         loc="lower left",
         handlelength=1.5,
         handletextpad=0.1,
-        fontsize=6,
+        fontsize=7,
     )  # ncol=1, handlelength=1
 
     handles, labels = fig.axes[-2].get_legend_handles_labels()
@@ -175,7 +169,7 @@ def main():
         loc="lower right",
         handlelength=1.5,
         handletextpad=0.1,
-        fontsize=6,
+        fontsize=7,
     )  # ncol=1, handlelength=1
 
     fig.text(
