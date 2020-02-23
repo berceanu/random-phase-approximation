@@ -1,201 +1,261 @@
+from dataclasses import dataclass
+from typing import Tuple
+
 import pandas as pd
-
-# always import figstyle first!
-from figstyle import colourWheel, dashesStyles, width, golden_ratio
-from dataash5 import df_path, units  # , model
-from matplotlib import pyplot
-from mypackage.talys.api import u_factor
-
-isotopes = (76, 86, 96)
-niso = len(isotopes)
-
-temperatures = (0.0, 1.0, 2.0)
-ntemp = len(temperatures)
-
-# TODO remove file
+from dataash5 import df_path, units
+from figstyle import colourWheel, dashesStyles, width
+from matplotlib import ticker
+from matplotlib.figure import Figure
+from matplotlib.gridspec import GridSpec
+from pandas.core.frame import DataFrame
 
 
-def plot_series(
-    ax,
-    table,
-    column,
-    temperature,
-    neutron_number,
-    counter,
-    label,
-    annotation,
-    plot_type="linear-linear",
-    energy_interval=(0.1, 10),
-    ylabel=None,
-):  # "$R$ %s" % units[column]
-    series = table.loc[:, (column, temperature, neutron_number)]
+@dataclass(frozen=True)
+class Annotation:
+    s: str
+    xy: Tuple[float, float]
+    xycoords: str = "axes fraction"
 
-    ax.plot(
-        series.index.values,
-        series.values,
-        color=colourWheel[counter % len(colourWheel)],
-        linestyle="-",
-        dashes=dashesStyles[counter % len(dashesStyles)],
-        label=label,
+
+@dataclass(frozen=True)
+class Column:
+    name: str
+    data: DataFrame
+
+
+@dataclass(frozen=True)
+class AxesParameters:
+    ylabel: str
+    xlabel: str
+    xscale: str
+    xlim: Tuple[float, float]
+    ylim: Tuple[float, float]
+    yscale: str = "log"
+
+
+def get_col_line_labels_by_temperature(mass_number):
+    left_line_label = r"${}^{%s}$Sn" % mass_number
+    right_line_label = r"${}^{%s}$Sn(n,$\gamma$)${}^{%s}$Sn" % (
+        (mass_number - 1),
+        mass_number,
     )
-
-    ax.set_yscale(plot_type.split("-")[0])
-    ax.set_xscale(plot_type.split("-")[1])
-
-    ax.set_ylabel(ylabel, labelpad=-2)
-    ax.set_xlabel("$E$ %s" % units["excitation_energy"], labelpad=-0.5)
-    ax.set_xlim(left=energy_interval[0], right=energy_interval[1])
-
-    ax.legend(loc="upper left", ncol=1, handlelength=1)
-    ax.annotate(s=annotation, xy=(0.7, 0.8), xycoords="axes fraction")
+    return left_line_label, right_line_label
 
 
-def plot_table(
-    column,
-    table,
-    include_talys=False,
-    talys_column=None,
-    plot_type="linear-linear",
-    energy_interval=(0.1, 10),
-    ylabel=None,
-):  # "$R$ %s" % units[column]
-    for iso in isotopes:
-        fig, ax = pyplot.subplots()
-        fig.subplots_adjust(left=0.12, bottom=0.14, right=0.97, top=0.97)
-        for j, T in enumerate(temperatures):
-            plot_series(
-                ax=ax,
-                table=table,
-                column=column,
-                temperature=T,
-                neutron_number=iso,
-                counter=j,
-                label="%s MeV" % T,
-                annotation="N = %s" % iso,
-                plot_type=plot_type,
-                energy_interval=energy_interval,
-                ylabel=ylabel,
-            )
-            if T == 0 and include_talys:
-                plot_series(
-                    ax=ax,
-                    table=table,
-                    column=talys_column,
-                    temperature=T,
-                    neutron_number=iso,
-                    counter=niso + j,
-                    label="TALYS %s MeV" % T,
-                    annotation="N = %s" % iso,
-                    plot_type=plot_type,
-                    energy_interval=energy_interval,
-                    ylabel=ylabel,
+def get_col_line_labels_by_isotope(temp):
+    left_line_label = "T = %s MeV" % temp
+    right_line_label = "T = %s MeV" % temp
+    return left_line_label, right_line_label
+
+
+def get_col_annotations_by_temperature(temp):
+    left_annotations = Annotation(s="T = %s MeV" % temp, xy=(0.07, 0.95))
+    right_annotations = Annotation(s="T = %s MeV" % temp, xy=(0.45, 0.95))
+    return left_annotations, right_annotations
+
+
+def get_col_annotations_by_isotope(mass_number):
+    left_annotations = Annotation(s=r"${}^{%s}$Sn" % mass_number, xy=(0.1, 0.95))
+    right_annotations = Annotation(
+        s=r"${}^{%s}$Sn(n,$\gamma$)${}^{%s}$Sn" % ((mass_number - 1), mass_number),
+        xy=(0.35, 0.95),
+    )
+    return left_annotations, right_annotations
+
+
+def grid_figure(
+    temperatures,
+    isotopes,
+    column_left,
+    column_right,
+    ax_param_left,
+    ax_param_right,
+    aggregate_by,
+    figname,
+):
+    if aggregate_by == "temperature":
+        nrows = len(temperatures)
+        nlines = len(isotopes)
+    elif aggregate_by == "isotope":
+        nrows = len(isotopes)
+        nlines = len(temperatures)
+    else:
+        raise ValueError
+
+    fig = Figure(figsize=(width, width * 1.4))  # constrained_layout=True
+    gs = GridSpec(
+        nrows=nrows,
+        ncols=2,
+        figure=fig,
+        height_ratios=[1.0, 1.0, 1.0],
+        width_ratios=[1.0, 1.0],
+    )
+    gs.update(wspace=0.28, hspace=0.03, bottom=0.06, left=0.11, right=0.99, top=0.99)
+
+    for row in range(nrows):
+        ax_left = fig.add_subplot(gs[row, 0])  # strength function
+        ax_right = fig.add_subplot(gs[row, 1])  # cross section
+
+        for line in range(nlines):
+            if aggregate_by == "temperature":
+                temp = temperatures[row]
+                iso = isotopes[line]
+                mass_number = 50 + iso
+                (
+                    line_label_col_left,
+                    line_label_col_right,
+                ) = get_col_line_labels_by_temperature(mass_number)
+            elif aggregate_by == "isotope":
+                iso = isotopes[row]
+                temp = temperatures[line]
+                (
+                    line_label_col_left,
+                    line_label_col_right,
+                ) = get_col_line_labels_by_isotope(temp)
+            else:
+                raise ValueError
+
+            for ax, column, line_label_col in zip(
+                (ax_left, ax_right),
+                (column_left, column_right),
+                (line_label_col_left, line_label_col_right),
+            ):
+                series = column.data.loc[:, (column.name, temp, iso)]
+                ax.plot(
+                    series.index.values,
+                    series.values,
+                    color=colourWheel[line % len(colourWheel)],
+                    linestyle="-",
+                    dashes=dashesStyles[line % len(dashesStyles)],
+                    label=line_label_col,
                 )
-        fig.set_size_inches(width, width / golden_ratio)
-        fig.savefig("N_%s_all_T_%s.pdf" % (iso, column))
 
-    for T in temperatures:
-        fig, ax = pyplot.subplots()
-        fig.subplots_adjust(left=0.12, bottom=0.14, right=0.97, top=0.97)
-        for j, iso in enumerate(isotopes):
-            plot_series(
-                ax=ax,
-                table=table,
-                column=column,
-                temperature=T,
-                neutron_number=iso,
-                counter=j,
-                label="%s" % iso,
-                annotation="T = %s MeV" % T,
-                plot_type=plot_type,
-                energy_interval=energy_interval,
-                ylabel=ylabel,
+        if aggregate_by == "temperature":
+            temp = temperatures[row]
+            ann_col_left, ann_col_right = get_col_annotations_by_temperature(temp)
+        elif aggregate_by == "isotope":
+            iso = isotopes[row]
+            mass_number = 50 + iso
+            ann_col_left, ann_col_right = get_col_annotations_by_isotope(mass_number)
+        else:
+            raise ValueError
+
+        for ax, ax_param, ann_col in zip(
+            (ax_left, ax_right),
+            (ax_param_left, ax_param_right),
+            (ann_col_left, ann_col_right),
+        ):
+            ax.set_xlabel(ax_param.xlabel)  # labelpad=-0.5
+            ax.set_ylim(ax_param.ylim)
+            ax.set_xlim(ax_param.xlim)
+            ax.set_yscale(ax_param.yscale)
+            ax.set_xscale(ax_param.xscale)
+            ax.annotate(
+                s=ann_col.s, xy=ann_col.xy, xycoords=ann_col.xycoords,
             )
-            if T == 0 and include_talys:
-                plot_series(
-                    ax=ax,
-                    table=table,
-                    column=talys_column,
-                    temperature=T,
-                    neutron_number=iso,
-                    counter=niso + j,
-                    label="TALYS %s" % iso,
-                    annotation="T = %s MeV" % T,
-                    plot_type=plot_type,
-                    energy_interval=energy_interval,
-                    ylabel=ylabel,
-                )
-        fig.set_size_inches(width, width / golden_ratio)
-        fig.savefig("T_%s_all_N_%s.pdf" % (T, column))
+
+    for ax in fig.axes[:-2]:  # all rows except bottom one
+        ax.xaxis.set_major_formatter(ticker.NullFormatter())
+        ax.xaxis.label.set_visible(False)
+
+    for ax in fig.axes:
+        ax.tick_params(axis="both", which="major", labelsize=6)
+        ax.yaxis.set_ticks_position("left")
+        ax.xaxis.set_ticks_position("bottom")
+        ax.spines["right"].set_visible(False)
+        ax.spines["top"].set_visible(False)
+
+    for ax in fig.axes[1::2]:  # right column
+        ax.yaxis.set_major_locator(ticker.LogLocator(numticks=4))
+
+    for x, ax_param in zip((0.03, 0.52), (ax_param_left, ax_param_right)):
+        fig.text(
+            x, 0.57, ax_param.ylabel, ha="center", va="center", rotation="vertical"
+        )
+
+    for ax_index, loc in zip((2, 3), ("lower right", "lower left")):
+        fig.axes[ax_index].legend(
+            *fig.axes[ax_index - 2].get_legend_handles_labels(),
+            loc=loc,
+            handlelength=1.5,
+            handletextpad=0.1,
+            fontsize=7,
+        )  # ncol=1
+
+    fig.savefig(figname)
 
 
 def main():
-    ee_data = (
-        pd.read_hdf(df_path, "excitation_energy")
-        .query("neutron_number in @isotopes and temperature in @temperatures")
-        .assign(
-            mass_number=lambda frame: frame.proton_number + frame.neutron_number,
-            strength_function_mb=lambda frame: frame.strength_function_fm * u_factor,
-            tabulated_strength_function_fm=lambda frame: frame.tabulated_strength_function_mb
-            / u_factor,
-        )
+    isotopes = (76, 86, 96)
+    temperatures = (0.0, 1.0, 2.0)
+
+    # strength function
+    ee_data = pd.read_hdf(df_path, "excitation_energy").query(
+        "neutron_number in @isotopes and temperature in @temperatures"
     )
-    df = ee_data.drop(columns=["mass_number", "proton_number"])
-    table = pd.pivot_table(
+    df = ee_data.drop(columns=["proton_number", "tabulated_strength_function_mb"])
+    sfunc_table = pd.pivot_table(
         df,
         index=["excitation_energy"],
-        values=[
-            "strength_function_fm",
-            "strength_function_mb",
-            "tabulated_strength_function_fm",
-            "tabulated_strength_function_mb",
-        ],
+        values=["strength_function_fm"],
         columns=["temperature", "neutron_number"],
     )
-    #
-    plot_table(
-        column="strength_function_fm",
-        talys_column="tabulated_strength_function_fm",
-        table=table,
-        include_talys=False,
-        plot_type="log-linear",
-        energy_interval=(0, 20),
+    sfunc_col = Column(name="strength_function_fm", data=sfunc_table)
+    sfunc_ax_prm = AxesParameters(
         ylabel="$R$ %s" % units["strength_function_fm"],
-    )
-    #
-    #    plot_table(
-    #        column="strength_function_mb",
-    #        talys_column="tabulated_strength_function_mb",
-    #        table=table,
-    #        include_talys=False,
-    #        plot_type="log-log",
-    #        energy_interval=(0.1, 10),
-    #        ylabel="$R$ %s" % units["strength_function_mb"],
-    #    )
-    #
-    # cross_section
-    ne_data = (
-        pd.read_hdf(df_path, "neutron_energy")
-        .query("neutron_number in @isotopes and temperature in @temperatures")
-        .assign(mass_number=lambda frame: frame.proton_number + frame.neutron_number)
-    )
-    df = ne_data.drop(
-        columns=["mass_number", "proton_number", "capture_rate", "capture_rate_talys"]
-    )
-    table = pd.pivot_table(
-        df,
-        index=["neutron_energy"],
-        values=["cross_section", "cross_section_talys"],
-        columns=["temperature", "neutron_number"],
+        xlabel="E %s" % units["excitation_energy"],
+        xscale="linear",
+        xlim=(0.0, 20.0),
+        ylim=(3e-2, 1.2e1),
     )
 
-    plot_table(
-        column="cross_section",
-        talys_column="cross_section_talys",
-        table=table,
-        include_talys=False,
-        plot_type="log-log",
-        energy_interval=(0, 20),
+    # cross section
+    ne_data = pd.read_hdf(df_path, "neutron_energy").query(
+        "neutron_number in @isotopes and temperature in @temperatures"
+    )
+    df = ne_data.drop(
+        columns=[
+            "proton_number",
+            "capture_rate",
+            "capture_rate_talys",
+            "cross_section_talys",
+        ]
+    )
+    xsec_table = pd.pivot_table(
+        df,
+        index=["neutron_energy"],
+        values=["cross_section"],
+        columns=["temperature", "neutron_number"],
+    )
+    xsec_col = Column(name="cross_section", data=xsec_table)
+    xsec_ax_prm = AxesParameters(
         ylabel="Cross-Section %s" % units["cross_section"],
+        xlabel="E$_n$ %s" % units["neutron_energy"],
+        xscale="log",
+        xlim=(1e-3, 20.0),
+        ylim=(1e-4, 1e3),
+    )
+
+    grid_figure(
+        temperatures,
+        isotopes,
+        column_left=sfunc_col,
+        column_right=xsec_col,
+        ax_param_left=sfunc_ax_prm,
+        ax_param_right=xsec_ax_prm,
+        aggregate_by="temperature",
+        figname="strength_cross_section_T",
+    )
+
+    grid_figure(
+        temperatures,
+        isotopes,
+        column_left=sfunc_col,
+        column_right=xsec_col,
+        ax_param_left=sfunc_ax_prm,
+        ax_param_right=xsec_ax_prm,
+        aggregate_by="isotope",
+        figname="strength_cross_section_N",
     )
 
 
