@@ -96,18 +96,9 @@ def grid_figure(
         ax_left = fig.add_subplot(gs[row, 0])  # strength function
         ax_right = fig.add_subplot(gs[row, 1])  # cross section
 
-        if aggregate_by == "temperature":
-            temp = temperatures[row]
-            ann_col_left, ann_col_right = get_col_annotations_by_temperature(temp)
-        elif aggregate_by == "isotope":
-            iso = isotopes[row]
-            mass_number = 50 + iso
-            ann_col_left, ann_col_right = get_col_annotations_by_isotope(mass_number)
-        else:
-            raise ValueError
-
         for line in range(nlines):
             if aggregate_by == "temperature":
+                temp = temperatures[row]
                 iso = isotopes[line]
                 mass_number = 50 + iso
                 (
@@ -115,6 +106,7 @@ def grid_figure(
                     line_label_col_right,
                 ) = get_col_line_labels_by_temperature(mass_number)
             elif aggregate_by == "isotope":
+                iso = isotopes[row]
                 temp = temperatures[line]
                 (
                     line_label_col_left,
@@ -137,6 +129,16 @@ def grid_figure(
                     dashes=dashesStyles[line % len(dashesStyles)],
                     label=line_label_col,
                 )
+
+        if aggregate_by == "temperature":
+            temp = temperatures[row]
+            ann_col_left, ann_col_right = get_col_annotations_by_temperature(temp)
+        elif aggregate_by == "isotope":
+            iso = isotopes[row]
+            mass_number = 50 + iso
+            ann_col_left, ann_col_right = get_col_annotations_by_isotope(mass_number)
+        else:
+            raise ValueError
 
         for ax, ax_param, ann_col in zip(
             (ax_left, ax_right),
@@ -178,7 +180,7 @@ def grid_figure(
             handlelength=1.5,
             handletextpad=0.1,
             fontsize=7,
-        )  # ncol=1, handlelength=1
+        )  # ncol=1
 
     fig.savefig(figname)
 
@@ -242,7 +244,7 @@ def main():
         ax_param_left=sfunc_ax_prm,
         ax_param_right=xsec_ax_prm,
         aggregate_by="temperature",
-        figname="strength_cross_section_T_trial",
+        figname="strength_cross_section_T",
     )
 
     grid_figure(
@@ -253,7 +255,7 @@ def main():
         ax_param_left=sfunc_ax_prm,
         ax_param_right=xsec_ax_prm,
         aggregate_by="isotope",
-        figname="strength_cross_section_N_trial",
+        figname="strength_cross_section_N",
     )
 
 
