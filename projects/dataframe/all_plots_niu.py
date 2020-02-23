@@ -24,12 +24,6 @@ class Column:
 
 
 @dataclass(frozen=True)
-class TextLabels:
-    line_label: str
-    ann: Annotation
-
-
-@dataclass(frozen=True)
 class AxesParameters:
     ylabel: str
     xlabel: str
@@ -39,32 +33,34 @@ class AxesParameters:
     yscale: str = "log"
 
 
-def grid_labels_agg_by_temperature(temp, mass_number):
-    left_labels = TextLabels(
-        line_label=r"${}^{%s}$Sn" % mass_number,
-        ann=Annotation(s="T = %s MeV" % temp, xy=(0.07, 0.95)),
+def get_col_line_labels_by_temperature(mass_number):
+    left_line_label = r"${}^{%s}$Sn" % mass_number
+    right_line_label = r"${}^{%s}$Sn(n,$\gamma$)${}^{%s}$Sn" % (
+        (mass_number - 1),
+        mass_number,
     )
-    right_labels = TextLabels(
-        line_label=r"${}^{%s}$Sn(n,$\gamma$)${}^{%s}$Sn"
-        % ((mass_number - 1), mass_number),
-        ann=Annotation(s="T = %s MeV" % temp, xy=(0.45, 0.95)),
-    )
-    return left_labels, right_labels
+    return left_line_label, right_line_label
 
 
-def grid_labels_agg_by_isotope(temp, mass_number):
-    left_labels = TextLabels(
-        line_label="T = %s MeV" % temp,
-        ann=Annotation(s=r"${}^{%s}$Sn" % mass_number, xy=(0.1, 0.9)),
+def get_col_line_labels_by_isotope(temp):
+    left_line_label = "T = %s MeV" % temp
+    right_line_label = "T = %s MeV" % temp
+    return left_line_label, right_line_label
+
+
+def get_col_annotations_by_temperature(temp):
+    left_annotations = Annotation(s="T = %s MeV" % temp, xy=(0.07, 0.95))
+    right_annotations = Annotation(s="T = %s MeV" % temp, xy=(0.45, 0.95))
+    return left_annotations, right_annotations
+
+
+def get_col_annotations_by_isotope(mass_number):
+    left_annotations = Annotation(s=r"${}^{%s}$Sn" % mass_number, xy=(0.1, 0.95))
+    right_annotations = Annotation(
+        s=r"${}^{%s}$Sn(n,$\gamma$)${}^{%s}$Sn" % ((mass_number - 1), mass_number),
+        xy=(0.35, 0.95),
     )
-    right_labels = TextLabels(
-        line_label="T = %s MeV" % temp,
-        ann=Annotation(
-            s=r"${}^{%s}$Sn(n,$\gamma$)${}^{%s}$Sn" % ((mass_number - 1), mass_number),
-            xy=(0.1, 0.2),
-        ),
-    )
-    return left_labels, right_labels
+    return left_annotations, right_annotations
 
 
 def grid_figure(
@@ -72,8 +68,8 @@ def grid_figure(
     isotopes,
     column_left,
     column_right,
-    param_left,
-    param_right,
+    ax_param_left,
+    ax_param_right,
     aggregate_by,
     figname,
 ):
@@ -84,7 +80,7 @@ def grid_figure(
         nrows = len(isotopes)
         nlines = len(temperatures)
     else:
-        raise ValueError("Invalid aggregation")
+        raise ValueError
 
     fig = Figure(figsize=(width, width * 1.4))  # constrained_layout=True
     gs = GridSpec(
@@ -100,54 +96,65 @@ def grid_figure(
         ax_left = fig.add_subplot(gs[row, 0])  # strength function
         ax_right = fig.add_subplot(gs[row, 1])  # cross section
 
+        if aggregate_by == "temperature":
+            temp = temperatures[row]
+            ann_col_left, ann_col_right = get_col_annotations_by_temperature(temp)
+        elif aggregate_by == "isotope":
+            iso = isotopes[row]
+            mass_number = 50 + iso
+            ann_col_left, ann_col_right = get_col_annotations_by_isotope(mass_number)
+        else:
+            raise ValueError
+
         for line in range(nlines):
             if aggregate_by == "temperature":
-                temp = temperatures[row]
                 iso = isotopes[line]
                 mass_number = 50 + iso
-                labels_left, labels_right = grid_labels_agg_by_temperature(
-                    temp, mass_number
-                )
+                (
+                    line_label_col_left,
+                    line_label_col_right,
+                ) = get_col_line_labels_by_temperature(mass_number)
             elif aggregate_by == "isotope":
                 temp = temperatures[line]
-                iso = isotopes[row]
-                mass_number = 50 + iso
-                labels_left, labels_right = grid_labels_agg_by_isotope(
-                    temp, mass_number
-                )
+                (
+                    line_label_col_left,
+                    line_label_col_right,
+                ) = get_col_line_labels_by_isotope(temp)
+            else:
+                raise ValueError
 
-            series_left = column_left.data.loc[:, (column_left.name, temp, iso)]
-            series_right = column_right.data.loc[:, (column_right.name, temp, iso)]
-            for ax, series, labels in zip(
+            for ax, column, line_label_col in zip(
                 (ax_left, ax_right),
-                (series_left, series_right),
-                (labels_left, labels_right),
+                (column_left, column_right),
+                (line_label_col_left, line_label_col_right),
             ):
+                series = column.data.loc[:, (column.name, temp, iso)]
                 ax.plot(
                     series.index.values,
                     series.values,
                     color=colourWheel[line % len(colourWheel)],
                     linestyle="-",
                     dashes=dashesStyles[line % len(dashesStyles)],
-                    label=labels.line_label,
+                    label=line_label_col,
                 )
 
-        for ax, param, labels in zip(
-            (ax_left, ax_right), (param_left, param_right), (labels_left, labels_right)
+        for ax, ax_param, ann_col in zip(
+            (ax_left, ax_right),
+            (ax_param_left, ax_param_right),
+            (ann_col_left, ann_col_right),
         ):
-            ax.set_xlabel(param.xlabel)  # labelpad=-0.5
-            ax.set_ylim(param.ylim)
-            ax.set_xlim(param.xlim)
-            ax.set_yscale(param.yscale)
-            ax.set_xscale(param.xscale)
+            ax.set_xlabel(ax_param.xlabel)  # labelpad=-0.5
+            ax.set_ylim(ax_param.ylim)
+            ax.set_xlim(ax_param.xlim)
+            ax.set_yscale(ax_param.yscale)
+            ax.set_xscale(ax_param.xscale)
             ax.annotate(
-                s=labels.ann.s, xy=labels.ann.xy, xycoords=labels.ann.xycoords,
+                s=ann_col.s, xy=ann_col.xy, xycoords=ann_col.xycoords,
             )
 
-        if row != nrows - 1:  # all but the bottom panel
-            for ax in (ax_left, ax_right):
-                ax.xaxis.set_major_formatter(ticker.NullFormatter())
-                ax.xaxis.label.set_visible(False)
+    for ax in fig.axes[:-2]:  # all rows except bottom one
+        ax.xaxis.set_major_formatter(ticker.NullFormatter())
+        ax.xaxis.label.set_visible(False)
 
     for ax in fig.axes:
         ax.tick_params(axis="both", which="major", labelsize=6)
@@ -159,29 +166,19 @@ def grid_figure(
     for ax in fig.axes[1::2]:  # right column
         ax.yaxis.set_major_locator(ticker.LogLocator(numticks=4))
 
-    fig.axes[-4].legend(
-        *fig.axes[-2].get_legend_handles_labels(),
-        loc="lower right",
-        handlelength=1.5,
-        handletextpad=0.1,
-        fontsize=7,
-    )  # ncol=1, handlelength=1
+    for x, ax_param in zip((0.03, 0.52), (ax_param_left, ax_param_right)):
+        fig.text(
+            x, 0.57, ax_param.ylabel, ha="center", va="center", rotation="vertical"
+        )
 
-    if aggregate_by == "temperature":
-        fig.axes[-3].legend(
-            *fig.axes[-1].get_legend_handles_labels(),
-            loc="lower left",
+    for ax_index, loc in zip((2, 3), ("lower right", "lower left")):
+        fig.axes[ax_index].legend(
+            *fig.axes[ax_index - 2].get_legend_handles_labels(),
+            loc=loc,
             handlelength=1.5,
             handletextpad=0.1,
             fontsize=7,
         )  # ncol=1, handlelength=1
-
-    fig.text(
-        0.03, 0.57, param_left.ylabel, ha="center", va="center", rotation="vertical"
-    )
-    fig.text(
-        0.52, 0.57, param_right.ylabel, ha="center", va="center", rotation="vertical"
-    )
 
     fig.savefig(figname)
 
@@ -202,7 +199,7 @@ def main():
         columns=["temperature", "neutron_number"],
     )
     sfunc_col = Column(name="strength_function_fm", data=sfunc_table)
-    sfunc_prm = AxesParameters(
+    sfunc_ax_prm = AxesParameters(
         ylabel="$R$ %s" % units["strength_function_fm"],
         xlabel="E %s" % units["excitation_energy"],
         xscale="linear",
@@ -229,7 +226,7 @@ def main():
         columns=["temperature", "neutron_number"],
     )
     xsec_col = Column(name="cross_section", data=xsec_table)
-    xsec_prm = AxesParameters(
+    xsec_ax_prm = AxesParameters(
         ylabel="Cross-Section %s" % units["cross_section"],
         xlabel="E$_n$ %s" % units["neutron_energy"],
         xscale="log",
@@ -242,8 +239,8 @@ def main():
         isotopes,
         column_left=sfunc_col,
         column_right=xsec_col,
-        param_left=sfunc_prm,
-        param_right=xsec_prm,
+        ax_param_left=sfunc_ax_prm,
+        ax_param_right=xsec_ax_prm,
         aggregate_by="temperature",
         figname="strength_cross_section_T_trial",
     )
@@ -253,8 +250,8 @@ def main():
         isotopes,
         column_left=sfunc_col,
         column_right=xsec_col,
-        param_left=sfunc_prm,
-        param_right=xsec_prm,
+        ax_param_left=sfunc_ax_prm,
+        ax_param_right=xsec_ax_prm,
         aggregate_by="isotope",
         figname="strength_cross_section_N_trial",
     )
