@@ -11,6 +11,7 @@ See also: $ python src/project.py --help
 import logging
 import os
 import random
+import re
 import shutil
 
 import numpy as np
@@ -333,6 +334,72 @@ def plot_finite(job):
 ####################################
 # EXTRACT DIPOLE TRANSITIONS TABLE #
 ####################################
+# TODO generate LaTeX table instead of HTML
+# Google: jinja latex table pandas
+
+
+def get_table(job):
+    def match_split(orbital_frac):
+        regex = re.compile(r"(?P<orbital>\d+[a-z]+)(?P<frac>\d+/\d+)")
+        m = regex.search(orbital_frac)
+        return m.group("orbital"), m.group("frac")
+
+    def frac_to_html(frac):
+        numerator, denominator = frac.split("/")
+        return f"<sub>{numerator}&frasl;{denominator}</sub>"
+
+    dip_conf_fn = "dipole_transitions.txt"
+    if not job.isfile(dip_conf_fn):
+        return None
+    else:
+        dip_conf = pd.read_csv(
+            job.fn(dip_conf_fn),
+            sep=r"\s+",
+            header=None,
+            usecols=[0, 1, 3, 4, 6, 7],
+            names=[
+                "n_or_p",
+                "hole_energy",
+                "particle_energy",
+                "from_state",
+                "to_state",
+                "transition_amplitude",
+            ],
+        )
+        with pd.option_context("mode.use_inf_as_null", True):
+            dip_conf = dip_conf.dropna()  # drop inf values
+
+        filtered_conf = dip_conf[dip_conf.transition_amplitude > 1]
+        df = filtered_conf.sort_values(
+            by=["n_or_p", "transition_amplitude"], ascending=[False, False]
+        )
+
+        table = []
+        for idx in df.index:
+            np_mapping = {1: "&nu;", 2: "&pi;"}
+            neutron_proton = np_mapping[df.loc[idx, "n_or_p"]]
+
+            from_state = df.loc[idx, "from_state"]
+            from_state_orbital, from_state_frac = match_split(from_state)
+            from_state_frac_html = frac_to_html(from_state_frac)
+
+            to_state = df.loc[idx, "to_state"]
+            to_state_orbital, to_state_frac = match_split(to_state)
+            to_state_frac_html = frac_to_html(to_state_frac)
+
+            transition_amplitude = df.loc[idx, "transition_amplitude"]
+
+            row = {
+                "transition": (
+                    f"{neutron_proton}{from_state_orbital}{from_state_frac_html}&rarr;"
+                    f"{neutron_proton}{to_state_orbital}{to_state_frac_html}"
+                ),
+                "amplitude": f"{transition_amplitude:.2f}",
+            }
+            table.append(row)
+
+        return table  # or None if dipole_transitions.txt not found
+    # flask.render_template("cards/dipole_transitions.j2", table=get_table(job))
 
 
 def _extract_transitions(job, temp, code_mapping=code_api.NameMapping()):
