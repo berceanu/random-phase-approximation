@@ -334,6 +334,70 @@ def plot_finite(job):
 ####################################
 # EXTRACT DIPOLE TRANSITIONS TABLE #
 ####################################
+# import jinja2
+# import os
+#
+#
+# def get_template(template_file):
+#     """Get a jinja template with latex tags.
+#
+#     modified from http://eosrei.net/articles/2015/11/latex-templates-python-and-jinja2-generate-pdfs
+#     """
+#     latex_jinja_env = jinja2.Environment(
+#         block_start_string="\BLOCK{",
+#         block_end_string="}",
+#         variable_start_string="\VAR{",
+#         variable_end_string="}",
+#         comment_start_string="\#{",
+#         comment_end_string="}",
+#         line_statement_prefix="%%",
+#         line_comment_prefix="%#",
+#         trim_blocks=True,
+#         autoescape=False,
+#         loader=jinja2.FileSystemLoader(os.path.abspath("/")),
+#     )
+#     template = latex_jinja_env.get_template(os.path.realpath(template_file))
+#     return template
+#
+#
+# def compile_pdf_from_template(template, insert_variables):
+#     """Render a template file and compile it to pdf"""
+#
+#     rendered_template = template.render(**insert_variables)
+#
+#
+# template = get_template("jinja-test.tex")
+# compile_pdf_from_template(template, dict(section1="Long Form", section2="Short Form"))
+
+# really commented
+# %% if graphicspath
+# \graphicspath{{\VAR{graphicspath}}}
+# %% endif
+#
+# \section{\VAR{obj.name|title}}
+# \BLOCK{for item in items}
+#     \paragraph{\VAR{item.name|title}}
+#     \VAR{item.description}
+# \BLOCK{endfor}
+
+# % This is a regular LaTeX comment
+# \section{\VAR{section1}}
+# \#{This is a long-form Jinja comment}
+# \begin{itemize}
+# \BLOCK{ for x in range(0,3)}
+#     \item Counting: \VAR{x}
+# \BLOCK{ endfor }
+# \end{itemize}
+#
+# \section{\VAR{section2}}
+# %# This is a short-form Jinja comment
+# \begin{itemize}
+# %% for x in range(0,3)
+#     \item Counting: \VAR{x}
+# %% endfor
+# \end{itemize}
+
+
 # TODO generate LaTeX table instead of HTML
 # Google: jinja latex table pandas
 
