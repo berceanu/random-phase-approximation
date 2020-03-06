@@ -14,25 +14,23 @@ import random
 import re
 import shutil
 
+import jinja2
+import mypackage.code_api as code_api
+import mypackage.talys.api as talys
+import mypackage.util as util
 import numpy as np
 import pandas as pd
 from flow import FlowProject, cmd
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 from matplotlib.gridspec import GridSpec
-from signac import get_project
-
-import mypackage.code_api as code_api
-import mypackage.util as util
-import mypackage.talys.api as talys
 from mypackage.util import arefiles, file_contains, read_last_line, isemptyfile
+from signac import get_project
 
 logger = logging.getLogger(__name__)
 logfname = "project.log"
 
-
 PNG_FILE = "iso_all.png"
-
 
 code = code_api.NameMapping()
 talys_api = talys.TalysAPI()
@@ -334,74 +332,48 @@ def plot_finite(job):
 ####################################
 # EXTRACT DIPOLE TRANSITIONS TABLE #
 ####################################
-# import jinja2
-# import os
-#
-#
-# def get_template(template_file):
-#     """Get a jinja template with latex tags.
-#
-#     modified from http://eosrei.net/articles/2015/11/latex-templates-python-and-jinja2-generate-pdfs
-#     """
-#     latex_jinja_env = jinja2.Environment(
-#         block_start_string="\BLOCK{",
-#         block_end_string="}",
-#         variable_start_string="\VAR{",
-#         variable_end_string="}",
-#         comment_start_string="\#{",
-#         comment_end_string="}",
-#         line_statement_prefix="%%",
-#         line_comment_prefix="%#",
-#         trim_blocks=True,
-#         autoescape=False,
-#         loader=jinja2.FileSystemLoader(os.path.abspath("/")),
-#     )
-#     template = latex_jinja_env.get_template(os.path.realpath(template_file))
-#     return template
-#
-#
-# def compile_pdf_from_template(template, insert_variables):
-#     """Render a template file and compile it to pdf"""
-#
-#     rendered_template = template.render(**insert_variables)
-#
-#
+
+
+def get_template(template_file):
+    """Get a jinja template with latex tags.
+
+    modified from http://eosrei.net/articles/2015/11/latex-templates-python-and-jinja2-generate-pdfs
+    """
+    latex_jinja_env = jinja2.Environment(
+        block_start_string=r"\BLOCK{",
+        block_end_string=r"}",
+        variable_start_string=r"\VAR{",
+        variable_end_string=r"}",
+        comment_start_string=r"\#{",
+        comment_end_string=r"}",
+        line_statement_prefix=r"%%",
+        line_comment_prefix=r"%#",
+        trim_blocks=True,
+        autoescape=False,
+        loader=jinja2.FileSystemLoader(os.path.abspath("/")),
+    )
+    template = latex_jinja_env.get_template(os.path.realpath(template_file))
+    return template
+
+
+def compile_pdf_from_template(template, insert_variables):
+    """Render a template file and compile it to pdf"""
+
+    rendered_template = template.render(**insert_variables)
+    return rendered_template
+
+
 # template = get_template("jinja-test.tex")
 # compile_pdf_from_template(template, dict(section1="Long Form", section2="Short Form"))
-
-# really commented
-# %% if graphicspath
-# \graphicspath{{\VAR{graphicspath}}}
-# %% endif
-#
-# \section{\VAR{obj.name|title}}
-# \BLOCK{for item in items}
-#     \paragraph{\VAR{item.name|title}}
-#     \VAR{item.description}
-# \BLOCK{endfor}
-
-# % This is a regular LaTeX comment
-# \section{\VAR{section1}}
-# \#{This is a long-form Jinja comment}
-# \begin{itemize}
-# \BLOCK{ for x in range(0,3)}
-#     \item Counting: \VAR{x}
-# \BLOCK{ endfor }
-# \end{itemize}
-#
-# \section{\VAR{section2}}
-# %# This is a short-form Jinja comment
-# \begin{itemize}
-# %% for x in range(0,3)
-#     \item Counting: \VAR{x}
-# %% endfor
-# \end{itemize}
 
 
 # TODO generate LaTeX table instead of HTML
 # Google: jinja latex table pandas
 
 
+@Project.operation
+@Project.pre.isfile("dipole_transitions.txt")
+@Project.post.isfile("dipole_transitions.html")
 def get_table(job):
     def match_split(orbital_frac):
         regex = re.compile(r"(?P<orbital>\d+[a-z]+)(?P<frac>\d+/\d+)")
@@ -413,57 +385,64 @@ def get_table(job):
         return f"<sub>{numerator}&frasl;{denominator}</sub>"
 
     dip_conf_fn = "dipole_transitions.txt"
-    if not job.isfile(dip_conf_fn):
-        return None
-    else:
-        dip_conf = pd.read_csv(
-            job.fn(dip_conf_fn),
-            sep=r"\s+",
-            header=None,
-            usecols=[0, 1, 3, 4, 6, 7],
-            names=[
-                "n_or_p",
-                "hole_energy",
-                "particle_energy",
-                "from_state",
-                "to_state",
-                "transition_amplitude",
-            ],
-        )
-        with pd.option_context("mode.use_inf_as_null", True):
-            dip_conf = dip_conf.dropna()  # drop inf values
+    dip_conf = pd.read_csv(
+        job.fn(dip_conf_fn),
+        sep=r"\s+",
+        header=None,
+        usecols=[0, 1, 3, 4, 6, 7],
+        names=[
+            "n_or_p",
+            "hole_energy",
+            "particle_energy",
+            "from_state",
+            "to_state",
+            "transition_amplitude",
+        ],
+    )
+    with pd.option_context("mode.use_inf_as_null", True):
+        dip_conf = dip_conf.dropna()  # drop inf values
 
-        filtered_conf = dip_conf[dip_conf.transition_amplitude > 1]
-        df = filtered_conf.sort_values(
-            by=["n_or_p", "transition_amplitude"], ascending=[False, False]
-        )
+    filtered_conf = dip_conf[dip_conf.transition_amplitude > 1]
+    df = filtered_conf.sort_values(
+        by=["n_or_p", "transition_amplitude"], ascending=[False, False]
+    )
 
-        table = []
-        for idx in df.index:
-            np_mapping = {1: "&nu;", 2: "&pi;"}
-            neutron_proton = np_mapping[df.loc[idx, "n_or_p"]]
+    table = []
+    for idx in df.index:
+        np_mapping = {1: "&nu;", 2: "&pi;"}
+        neutron_proton = np_mapping[df.loc[idx, "n_or_p"]]
 
-            from_state = df.loc[idx, "from_state"]
-            from_state_orbital, from_state_frac = match_split(from_state)
-            from_state_frac_html = frac_to_html(from_state_frac)
+        from_state = df.loc[idx, "from_state"]
+        from_state_orbital, from_state_frac = match_split(from_state)
+        from_state_frac_html = frac_to_html(from_state_frac)
 
-            to_state = df.loc[idx, "to_state"]
-            to_state_orbital, to_state_frac = match_split(to_state)
-            to_state_frac_html = frac_to_html(to_state_frac)
+        to_state = df.loc[idx, "to_state"]
+        to_state_orbital, to_state_frac = match_split(to_state)
+        to_state_frac_html = frac_to_html(to_state_frac)
 
-            transition_amplitude = df.loc[idx, "transition_amplitude"]
+        transition_amplitude = df.loc[idx, "transition_amplitude"]
 
-            row = {
-                "transition": (
-                    f"{neutron_proton}{from_state_orbital}{from_state_frac_html}&rarr;"
-                    f"{neutron_proton}{to_state_orbital}{to_state_frac_html}"
-                ),
-                "amplitude": f"{transition_amplitude:.2f}",
-            }
-            table.append(row)
+        row = {
+            "transition": (
+                f"{neutron_proton}{from_state_orbital}{from_state_frac_html}&rarr;"
+                f"{neutron_proton}{to_state_orbital}{to_state_frac_html}"
+            ),
+            "amplitude": f"{transition_amplitude:.2f}",
+        }
+        table.append(row)
 
-        return table  # or None if dipole_transitions.txt not found
-    # flask.render_template("cards/dipole_transitions.j2", table=get_table(job))
+    latex_jinja_env = jinja2.Environment(
+        trim_blocks=True,
+        autoescape=False,
+        loader=jinja2.FileSystemLoader(os.path.abspath("/")),
+    )
+    template = latex_jinja_env.get_template(
+        os.path.realpath("cards/dipole_transitions.j2")
+    )
+    rendered_template = template.render(dict(table=table))
+
+    with open("dipole_transitions.html", "w") as outfile:
+        outfile.write(rendered_template)
 
 
 def _extract_transitions(job, temp, code_mapping=code_api.NameMapping()):
