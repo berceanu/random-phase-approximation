@@ -384,9 +384,8 @@ def get_table(job):
         numerator, denominator = frac.split("/")
         return f"<sub>{numerator}&frasl;{denominator}</sub>"
 
-    dip_conf_fn = "dipole_transitions.txt"
     dip_conf = pd.read_csv(
-        job.fn(dip_conf_fn),
+        job.fn("dipole_transitions.txt"),
         sep=r"\s+",
         header=None,
         usecols=[0, 1, 3, 4, 6, 7],
@@ -437,11 +436,11 @@ def get_table(job):
         loader=jinja2.FileSystemLoader(os.path.abspath("/")),
     )
     template = latex_jinja_env.get_template(
-        os.path.realpath("cards/dipole_transitions.j2")
-    )
+        os.path.realpath("src/templates/cards/dipole_transitions.j2")
+    )  # working directory must be ~/Development/random-phase-approximation/projects/rpa
     rendered_template = template.render(dict(table=table))
 
-    with open("dipole_transitions.html", "w") as outfile:
+    with open(job.fn("dipole_transitions.html"), "w") as outfile:
         outfile.write(rendered_template)
 
 
