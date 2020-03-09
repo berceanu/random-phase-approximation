@@ -113,7 +113,7 @@ def _prepare_run(job, temp, code_mapping=code_api.NameMapping()):
     else:  # prepare restart
         logger.info("Restart possible.")
         code_input = code_api.GenerateInputs(
-            **job.sp, out_path=job.ws, mapping=code_mapping, load_matrix=True
+            out_path=job.ws, mapping=code_mapping, **dict(job.sp), load_matrix=True
         )
         code_input.write_param_files(temp, state="excited")
         dotwelfn = code_mapping.wel_file(temp)
@@ -227,6 +227,53 @@ def run_finite_temp_ground_state(job):
 @Project.post(isemptyfile(code.stderr_file(temp="finite", state="excited")))
 def run_finite_temp_excited_state(job):
     return _run_code(job, temp="finite", state="excited", code_mapping=code)
+
+
+###########################
+# TOP TRANSITION ENERGIES #
+###########################
+
+
+def out_file_to_df(
+    job, temp, code_mapping=code_api.NameMapping(),
+):
+    fn = job.fn(code_mapping.out_file(temp, "isovector", "excitation"))
+    dataframe = pd.read_csv(
+        fn,
+        delim_whitespace=True,
+        comment="#",
+        skip_blank_lines=True,
+        header=None,
+        names=["energy", "transition_strength"],
+    )
+    return dataframe
+
+
+def nlargest_to_file(df, max_energy=10, n=5, fn="transerg.dat"):
+    df = df[df.energy < max_energy]  # MeV
+    top_n = df.nlargest(n, "transition_strength")
+    top_n.to_csv(fn, float_format="%.6e", index_label="index", encoding="utf-8")
+
+
+def _out_file_to_transerg(
+    job, temp, code_mapping=code_api.NameMapping(),
+):
+    df = out_file_to_df(job, temp, code_mapping)
+    nlargest_to_file(df, fn="transerg.dat")
+
+
+@Project.operation
+@Project.pre(arefiles(code.out_files(temp="zero")))
+@Project.post.isfile("transerg.dat")
+def out_file_to_transerg_zero(job):
+    _out_file_to_transerg(job, temp="zero", code_mapping=code)
+
+
+@Project.operation
+@Project.pre(arefiles(code.out_files(temp="finite")))
+@Project.post.isfile("transerg.dat")
+def out_file_to_transerg_finite(job):
+    _out_file_to_transerg(job, temp="finite", code_mapping=code)
 
 
 ############
