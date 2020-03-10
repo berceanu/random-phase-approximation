@@ -252,7 +252,7 @@ def out_file_to_df(
 def nlargest_to_file(df, max_energy=10, n=5, fn="transerg.dat"):
     df = df[df.energy < max_energy]  # MeV
     top_n = df.nlargest(n, columns="transition_strength")
-    top_n.to_csv(fn, float_format="%.6e", index_label="index", encoding="utf-8")
+    top_n.to_csv(fn, float_format="%.6e", index_label="old_index", encoding="utf-8")
 
 
 def _out_file_to_transerg(
