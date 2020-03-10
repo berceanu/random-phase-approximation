@@ -251,7 +251,7 @@ def out_file_to_df(
 
 def nlargest_to_file(df, max_energy=10, n=5, fn="transerg.dat"):
     df = df[df.energy < max_energy]  # MeV
-    top_n = df.nlargest(n, "transition_strength")
+    top_n = df.nlargest(n, columns="transition_strength")
     top_n.to_csv(fn, float_format="%.6e", index_label="index", encoding="utf-8")
 
 
@@ -259,7 +259,7 @@ def _out_file_to_transerg(
     job, temp, code_mapping=code_api.NameMapping(),
 ):
     df = out_file_to_df(job, temp, code_mapping)
-    nlargest_to_file(df, fn="transerg.dat")
+    nlargest_to_file(df, fn=job.fn("transerg.dat"))
 
 
 @Project.operation
