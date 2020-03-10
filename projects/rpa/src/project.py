@@ -120,7 +120,7 @@ def _prepare_run(job, temp, code_mapping=code_api.NameMapping()):
         shutil.copy(job_for_restart.fn(dotwelfn), job.fn(dotwelfn))
         for fn in code_mapping.bin_files(temp):
             shutil.copy(job_for_restart.fn(fn), job.fn(fn))
-        job.doc["restarted_from"] = job_for_restart.get_id()
+        job.doc["restarted_from"] = job_for_restart.id
         # job.doc[f'run_{temp}_temp_ground_state'] = False
 
 

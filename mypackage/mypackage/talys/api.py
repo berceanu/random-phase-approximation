@@ -99,7 +99,7 @@ class TalysAPI:
 
     def database_file_backup_path(self, job):
         db_fn_path = self.database_file_path(job)
-        path = db_fn_path.parent / (db_fn_path.stem + "_%s.bck" % job.get_id())
+        path = db_fn_path.parent / (db_fn_path.stem + "_%s.bck" % job.id)
         return path
 
     def template_photon_strength_function_path(self, job):
