@@ -120,6 +120,12 @@ def _prepare_run(job, temp, code_mapping=code_api.NameMapping()):
         shutil.copy(job_for_restart.fn(dotwelfn), job.fn(dotwelfn))
         for fn in code_mapping.bin_files(temp):
             shutil.copy(job_for_restart.fn(fn), job.fn(fn))
+
+        stderr_file = code_mapping.stderr_file(temp, state="ground")
+        shutil.copy(job_for_restart.fn(stderr_file), job.fn(stderr_file))
+        stdout_file = code_mapping.stdout_file(temp, state="ground")
+        shutil.copy(job_for_restart.fn(stdout_file), job.fn(stdout_file))
+
         job.doc["restarted_from"] = job_for_restart.id
         # job.doc[f'run_{temp}_temp_ground_state'] = False
 
@@ -249,7 +255,7 @@ def out_file_to_df(
     return dataframe
 
 
-def nlargest_to_file(df, max_energy=10, n=5, fn="transerg.dat"):
+def nlargest_to_file(df, max_energy=10, n=3, fn="transerg.dat"):
     df = df[df.energy < max_energy]  # MeV
     top_n = df.nlargest(n, columns="transition_strength")
     top_n.to_csv(fn, float_format="%.6e", index_label="old_index", encoding="utf-8")
