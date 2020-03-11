@@ -7,6 +7,7 @@ import logging
 
 import pandas as pd
 import signac
+import mypackage.util as util
 
 
 def top_transition_energies(fname):
@@ -26,6 +27,14 @@ def main():
                 statepoint = sp_dict.copy()  # shallow copy!
                 statepoint.update({"transition_energy": energy})
                 project.open_job(statepoint).init()
+
+    for job in project:
+        job.doc.setdefault(
+            "nucleus",
+            util.get_nucleus(
+                proton_number=job.sp.proton_number, neutron_number=job.sp.neutron_number
+            ),
+        )
 
 
 if __name__ == "__main__":
