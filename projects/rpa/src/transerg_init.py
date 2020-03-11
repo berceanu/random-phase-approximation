@@ -18,7 +18,6 @@ def top_transition_energies(fname):
 
 def main():
     project = signac.get_project(search=False)
-    print(project)
 
     for job in project:
         if (job.sp.transition_energy == 0.42) and (job.isfile("transerg.dat")):

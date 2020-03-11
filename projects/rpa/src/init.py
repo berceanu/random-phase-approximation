@@ -31,10 +31,12 @@ def main():
             project.open_job(statepoint).init()
 
     for job in project:
-        nprot = job.sp.proton_number
-        nneutr = job.sp.neutron_number
-        nucleus = util.get_nucleus(proton_number=nprot, neutron_number=nneutr)
-        job.doc.setdefault("nucleus", nucleus)
+        job.doc.setdefault(
+            "nucleus",
+            util.get_nucleus(
+                proton_number=job.sp.proton_number, neutron_number=job.sp.neutron_number
+            ),
+        )
 
 
 if __name__ == "__main__":
