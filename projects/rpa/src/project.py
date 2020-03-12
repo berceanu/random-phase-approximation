@@ -241,9 +241,12 @@ def run_finite_temp_excited_state(job):
 
 
 def out_file_to_df(
-    job, temp, code_mapping=code_api.NameMapping(),
+    job,
+    temp,
+    code_mapping=code_api.NameMapping(),
+    lorentzian_or_excitation="excitation",
 ):
-    fn = job.fn(code_mapping.out_file(temp, "isovector", "excitation"))
+    fn = job.fn(code_mapping.out_file(temp, "isovector", lorentzian_or_excitation))
     dataframe = pd.read_csv(
         fn,
         delim_whitespace=True,
@@ -285,6 +288,57 @@ def out_file_to_transerg_finite(job):
 ############
 # PLOTTING #
 ############
+def _plot_inset(job, temp, code_mapping=code_api.NameMapping()):
+    fig = Figure(figsize=(12, 6))
+    canvas = FigureCanvas(fig)
+    gs = GridSpec(1, 1)
+    ax = fig.add_subplot(gs[0, 0])
+
+    for lorexc in "excitation", "lorentzian":
+        df = out_file_to_df(job, temp, code_mapping, lorentzian_or_excitation=lorexc)
+        df = df[(df.energy >= 0.0) & (df.energy <= 10.0)]  # MeV
+        if lorexc == "excitation":
+            ax.vlines(df.energy, 0.0, df.transition_strength, colors="black")
+            if job.sp.transition_energy != 0.42:
+                df = df[np.isclose(df.energy, job.sp.transition_energy, atol=0.01)]
+                ax.vlines(df.energy, 0.0, df.transition_strength, colors="red")
+        elif lorexc == "lorentzian":
+            ax.plot(df.energy, df.transition_strength, color="black")
+
+    ax.set_title("isovector")
+    ax.set(
+        ylabel=r"$R \; (e^2fm^2/MeV)$",
+        xlabel="E (MeV)",
+        ylim=[0.0, None],
+        xlim=[0.0, 10.0],
+    )  # None -> 13.
+    for sp in "top", "right":
+        ax.spines[sp].set_visible(False)
+
+    atomic_symbol, mass_number = util.get_nucleus(
+        job.sp.proton_number, job.sp.neutron_number, joined=False
+    )
+    fig.suptitle(
+        (
+            fr"Transition strength distribution of ${{}}^{{{mass_number}}} {atomic_symbol} \; "
+            fr"{job.sp.angular_momentum}^{{{job.sp.parity}}}$ at T = {job.sp.temperature} MeV"
+        )
+    )
+    canvas.print_png(job.fn("inset.png"))
+
+
+@Project.operation
+@Project.pre(arefiles(code.out_files(temp="zero")))
+@Project.post.isfile("inset.png")
+def plot_inset_zero(job):
+    _plot_inset(job, temp="zero", code_mapping=code)
+
+
+@Project.operation
+@Project.pre(arefiles(code.out_files(temp="finite")))
+@Project.post.isfile("inset.png")
+def plot_inset_finite(job):
+    _plot_inset(job, temp="finite", code_mapping=code)
 
 
 def _plot_iso(job, temp, code_mapping=code_api.NameMapping()):
@@ -348,7 +402,7 @@ def _plot_iso(job, temp, code_mapping=code_api.NameMapping()):
                 lorentzian_or_excitation=lorexc,
                 codemapping=code_mapping,
             )
-            if lorexc == "excitation" and job.sp.transition_energy != 0:
+            if lorexc == "excitation" and job.sp.transition_energy != 0.42:
                 df = df[np.isclose(df.energy, job.sp.transition_energy, atol=0.01)]
                 ax[skalvec].vlines(df.energy, 0.0, df.transition_strength, colors="red")
 
