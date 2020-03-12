@@ -288,8 +288,10 @@ def out_file_to_transerg_finite(job):
 ############
 # PLOTTING #
 ############
+
+
 def _plot_inset(job, temp, code_mapping=code_api.NameMapping()):
-    fig = Figure(figsize=(12, 6))
+    fig = Figure(figsize=(12, 4))
     canvas = FigureCanvas(fig)
     gs = GridSpec(1, 1)
     ax = fig.add_subplot(gs[0, 0])
