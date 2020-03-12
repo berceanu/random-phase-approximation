@@ -179,9 +179,13 @@ Step 0 involves building the required dataframe which should hold everything nee
 
 1. Do the analysis of particle-hole (p-h) transition components
    for some low-lying states of N=76,86,96.
-   How to select these low-lying states:
-    below E=10 MeV, find one or two discrete states
-     with highest transition strength.
+   
+```python
+for N in (76, 86, 96):  # isotopes
+    for T in (0, 1, 2):  # MeV
+        for transition_energies in (6.03, 7.97, 8.27):  # n=3, MeV
+            # get amplitude table and corresponding inset image with red line                                                       
+```    
 
 2. Create new branch for new neutron capture (NC) figure.
    Do the calculations of neutron capture rates at T=1&2MeV
