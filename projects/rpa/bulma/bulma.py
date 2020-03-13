@@ -1,6 +1,6 @@
 import logging
 import pathlib
-
+import shutil
 import signac
 
 logger = logging.getLogger(__name__)
@@ -15,7 +15,10 @@ def main():
 
     for job in rpa:
         if job.sp.transition_energy != 0.42:
-            print(job.id)
+            fname = "inset.png"
+            local_fname = f"{job.id}_{fname}"
+            shutil.copy(job.fn(fname), local_fname)
+            print(f"{local_fname}: {job.sp.temperature}, {job.sp.transition_energy}")
 
 
 if __name__ == "__main__":

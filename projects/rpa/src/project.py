@@ -291,6 +291,8 @@ def out_file_to_transerg_finite(job):
 
 
 def _plot_inset(job, temp, code_mapping=code_api.NameMapping()):
+    from matplotlib.ticker import MultipleLocator
+
     fig = Figure(figsize=(12, 4))
     canvas = FigureCanvas(fig)
     gs = GridSpec(1, 1)
@@ -311,9 +313,12 @@ def _plot_inset(job, temp, code_mapping=code_api.NameMapping()):
     ax.set(
         ylabel=r"$R \; (e^2fm^2/MeV)$",
         xlabel="E (MeV)",
-        ylim=[0.0, None],
+        ylim=[-0.1, 3.0],
         xlim=[0.0, 10.0],
-    )  # None -> 13.
+    )
+    ax.xaxis.set_major_locator(MultipleLocator(1))
+    ax.xaxis.set_minor_locator(MultipleLocator(0.25))
+
     for sp in "top", "right":
         ax.spines[sp].set_visible(False)
 
