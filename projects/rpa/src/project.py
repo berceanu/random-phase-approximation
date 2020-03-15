@@ -550,7 +550,7 @@ def get_table(job):
         loader=jinja2.FileSystemLoader(os.path.abspath("/")),
     )
     template = latex_jinja_env.get_template(
-        os.path.realpath("src/templates/cards/dipole_transitions.j2")
+        os.path.realpath("src/templates/dipole_transitions.j2")
     )  # working directory must be ~/Development/random-phase-approximation/projects/rpa
     rendered_template = template.render(dict(table=table))
 
