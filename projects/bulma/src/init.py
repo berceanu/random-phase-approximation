@@ -9,9 +9,19 @@ import pathlib
 import shutil
 
 import signac
+from mypackage import util
 
 logger = logging.getLogger(__name__)
 logfname = "project.log"
+
+
+def prepend_id(id, fname):
+    return f"{id}_{fname}"
+
+
+def copy_file(fname, from_job, to_job):
+    local_fname = prepend_id(from_job.id, fname)
+    shutil.copy(from_job.fn(fname), to_job.fn(local_fname))
 
 
 def main():
@@ -24,14 +34,41 @@ def main():
     logger.info("bulma project: %s" % bulma_proj.workspace())
     logger.info("rpa project: %s" % rpa_proj.workspace())
 
-    for rpa_job in rpa_proj:
-        if rpa_job.sp.transition_energy != 0.42:
-            fname = "inset.png"
-            local_fname = f"{rpa_job.id}_{fname}"
-            shutil.copy(rpa_job.fn(fname), local_fname)
-            print(
-                f"{local_fname}: {rpa_job.sp.temperature}, {rpa_job.sp.transition_energy}"
-            )
+    statepoint = dict(
+        # atomic number Z
+        proton_number=50,  # fixed atomic number
+        # nucleus angular momentum
+        angular_momentum=1,  #
+        # nucleus parity
+        parity="-",  #
+    )
+    inset_fname = "inset.png"
+    transitions_fname = "dipole_transitions.txt"
+
+    for nn, rpa_jobs in rpa_proj.find_jobs(statepoint).groupby("neutron_number"):
+        sp = statepoint.copy()
+        sp.update(dict(neutron_number=nn))
+        bulma_job = bulma_proj.open_job(sp).init()
+        bulma_job.doc.setdefault(
+            "nucleus",
+            util.get_nucleus(
+                proton_number=bulma_job.sp.proton_number,
+                neutron_number=bulma_job.sp.neutron_number,
+            ),
+        )
+        logger.info(f"Neutron number: {nn}")
+        d = dict()
+
+        for rpa_job in rpa_jobs:
+            if rpa_job.sp.transition_energy != 0.42:
+                logger.info("Processing %s.." % rpa_job.workspace())
+                d[rpa_job.id] = dict(
+                    temperature=rpa_job.sp.temperature,
+                    transition_energy=rpa_job.sp.transition_energy,
+                )
+                for fname in (inset_fname, transitions_fname):
+                    copy_file(fname, rpa_job, bulma_job)
+        bulma_job.doc.setdefault("rpa_jobs", d)
 
 
 if __name__ == "__main__":
