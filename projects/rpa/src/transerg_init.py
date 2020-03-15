@@ -11,9 +11,9 @@ import mypackage.util as util
 
 
 def top_transition_energies(fname):
-    series = pd.read_csv(fname, usecols=["energy"], squeeze=True,)
-    for energy in series:
-        yield energy
+    df = pd.read_csv(fname, usecols=["energy", "transition_strength"])
+    for row in df.itertuples(name="Row", index=False):
+        yield row.energy, row.transition_strength
 
 
 def main():
@@ -22,9 +22,13 @@ def main():
     for job in project:
         if (job.sp.transition_energy == 0.42) and (job.isfile("transerg.dat")):
             sp_dict = job.statepoint()
-            for energy in top_transition_energies(job.fn("transerg.dat")):  # n values
+            for energy, strength in top_transition_energies(
+                job.fn("transerg.dat")
+            ):  # n values
                 statepoint = sp_dict.copy()  # shallow copy!
-                statepoint.update({"transition_energy": energy})
+                statepoint.update(
+                    {"transition_energy": energy, "transition_strength": strength}
+                )
                 project.open_job(statepoint).init()
 
     for job in project:

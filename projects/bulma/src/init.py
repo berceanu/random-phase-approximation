@@ -65,6 +65,7 @@ def main():
                 d[rpa_job.id] = dict(
                     temperature=rpa_job.sp.temperature,
                     transition_energy=rpa_job.sp.transition_energy,
+                    transition_strength=rpa_job.sp.transition_strength,
                 )
                 for fname in (inset_fname, transitions_fname):
                     copy_file(fname, rpa_job, bulma_job)
