@@ -11,7 +11,6 @@ See also: $ python src/project.py --help
 import logging
 import os
 import random
-import re
 import shutil
 
 import jinja2
@@ -493,14 +492,7 @@ def extract_transitions_finite(job):
 @Project.pre.isfile("dipole_transitions.txt")
 @Project.post.isfile("dipole_transitions.html")
 def get_table(job):
-    def match_split(orbital_frac):
-        regex = re.compile(r"(?P<orbital>\d+[a-z]+)(?P<frac>\d+/\d+)")
-        m = regex.search(orbital_frac)
-        return m.group("orbital"), m.group("frac")
-
-    def frac_to_html(frac):
-        numerator, denominator = frac.split("/")
-        return f"<sub>{numerator}&frasl;{denominator}</sub>"
+    from mypackage.util import match_split, frac_to_html
 
     dip_conf = pd.read_csv(
         job.fn("dipole_transitions.txt"),

@@ -1,9 +1,21 @@
 import logging
 import os
 import pathlib
+import re
 import subprocess
 
 logger = logging.getLogger(__name__)
+
+
+def match_split(orbital_frac):
+    regex = re.compile(r"(?P<orbital>\d+[a-z]+)(?P<frac>\d+/\d+)")
+    m = regex.search(orbital_frac)
+    return m.group("orbital"), m.group("frac")
+
+
+def frac_to_html(frac):
+    numerator, denominator = frac.split("/")
+    return f"<sub>{numerator}&frasl;{denominator}</sub>"
 
 
 def atomic_symbol_for_z(atomic_number):

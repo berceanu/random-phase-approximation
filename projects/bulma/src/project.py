@@ -10,7 +10,6 @@ See also: $ python src/project.py --help
 """
 import logging
 import os
-import re
 
 import jinja2
 import pandas as pd
@@ -37,14 +36,8 @@ def get_template(template_file):
     modified from http://eosrei.net/articles/2015/11/latex-templates-python-and-jinja2-generate-pdfs
     """
     latex_jinja_env = jinja2.Environment(
-        block_start_string=r"\BLOCK{",
-        block_end_string=r"}",
-        variable_start_string=r"\VAR{",
-        variable_end_string=r"}",
-        comment_start_string=r"\#{",
-        comment_end_string=r"}",
-        line_statement_prefix=r"%%",
-        line_comment_prefix=r"%#",
+        line_statement_prefix="#",
+        line_comment_prefix="##",
         trim_blocks=True,
         autoescape=False,
         loader=jinja2.FileSystemLoader(os.path.abspath("/")),
@@ -53,29 +46,11 @@ def get_template(template_file):
     return template
 
 
-def compile_pdf_from_template(template, insert_variables):
-    """Render a template file and compile it to pdf"""
-
-    rendered_template = template.render(**insert_variables)
-    return rendered_template
-
-
-# template = get_template("jinja-test.tex")
-# compile_pdf_from_template(template, dict(section1="Long Form", section2="Short Form"))
-
-
 @Project.operation
 @Project.pre.isfile("dipole_transitions.txt")
 @Project.post.isfile("dipole_transitions.html")
 def get_table(job):
-    def match_split(orbital_frac):
-        regex = re.compile(r"(?P<orbital>\d+[a-z]+)(?P<frac>\d+/\d+)")
-        m = regex.search(orbital_frac)
-        return m.group("orbital"), m.group("frac")
-
-    def frac_to_html(frac):
-        numerator, denominator = frac.split("/")
-        return f"<sub>{numerator}&frasl;{denominator}</sub>"
+    from mypackage.util import match_split, frac_to_html
 
     dip_conf = pd.read_csv(
         job.fn("dipole_transitions.txt"),
@@ -123,14 +98,8 @@ def get_table(job):
         }
         table.append(row)
 
-    latex_jinja_env = jinja2.Environment(
-        trim_blocks=True,
-        autoescape=False,
-        loader=jinja2.FileSystemLoader(os.path.abspath("/")),
-    )
-    template = latex_jinja_env.get_template(
-        os.path.realpath("src/templates/dipole_transitions.j2")
-    )  # working directory must be ~/Development/random-phase-approximation/projects/rpa
+    # working directory must be ~/Development/random-phase-approximation/projects/rpa
+    template = get_template("src/templates/dipole_transitions.j2")
     rendered_template = template.render(dict(table=table))
 
     with open(job.fn("dipole_transitions.html"), "w") as outfile:
