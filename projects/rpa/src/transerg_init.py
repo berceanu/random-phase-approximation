@@ -26,10 +26,9 @@ def main():
                 job.fn("transerg.dat")
             ):  # n values
                 statepoint = sp_dict.copy()  # shallow copy!
-                statepoint.update(
-                    {"transition_energy": energy, "transition_strength": strength}
-                )
-                project.open_job(statepoint).init()
+                statepoint.update(dict(transition_energy=energy))
+                new_job = project.open_job(statepoint).init()
+                new_job.doc.setdefault("transition_strength", strength)
 
     for job in project:
         job.doc.setdefault(
