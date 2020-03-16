@@ -24,6 +24,10 @@ def copy_file(fname, from_job, to_job):
     shutil.copy(from_job.fn(fname), to_job.fn(local_fname))
 
 
+INSET_FNAME = "inset.png"
+TRANSITIONS_FNAME = "dipole_transitions.txt"
+
+
 def main():
     bulma_proj = signac.init_project("bulma", workspace="workspace")
 
@@ -42,8 +46,6 @@ def main():
         # nucleus parity
         parity="-",  #
     )
-    inset_fname = "inset.png"
-    transitions_fname = "dipole_transitions.txt"
 
     for nn, rpa_jobs in rpa_proj.find_jobs(statepoint).groupby("neutron_number"):
         sp = statepoint.copy()
@@ -57,19 +59,19 @@ def main():
             ),
         )
         logger.info(f"Neutron number: {nn}")
-        d = dict()
+        rpa_jobs_json = dict()
 
         for rpa_job in rpa_jobs:
             if rpa_job.sp.transition_energy != 0.42:
                 logger.info("Processing %s.." % rpa_job.workspace())
-                d[rpa_job.id] = dict(
+                rpa_jobs_json[rpa_job.id] = dict(
                     temperature=rpa_job.sp.temperature,
                     transition_energy=rpa_job.sp.transition_energy,
                     transition_strength=rpa_job.doc.transition_strength,
                 )
-                for fname in (inset_fname, transitions_fname):
+                for fname in (INSET_FNAME, TRANSITIONS_FNAME):
                     copy_file(fname, rpa_job, bulma_job)
-        bulma_job.doc.setdefault("rpa_jobs", d)
+        bulma_job.doc.setdefault("rpa_jobs", rpa_jobs_json)
 
 
 if __name__ == "__main__":

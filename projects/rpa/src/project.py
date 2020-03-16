@@ -127,7 +127,6 @@ def _prepare_run(job, temp, code_mapping=code_api.NameMapping()):
         shutil.copy(job_for_restart.fn(stdout_file), job.fn(stdout_file))
 
         job.doc["restarted_from"] = job_for_restart.id
-        # job.doc[f'run_{temp}_temp_ground_state'] = False
 
 
 @Project.operation
@@ -448,41 +447,46 @@ def plot_finite(job):
 ####################################
 
 
-def get_template(template_file):
-    """Get a jinja template with latex tags.
+def _extract_transitions(job, temp, code_mapping=code_api.NameMapping()):
+    first_marker = "1=n/2=p       E/hole      E/particle  XX-YY/%"
+    last_marker = "Sum XX-YY after normalization *"
+    #
+    infn = job.fn(code_mapping.stdout_file(temp, state="excited"))
+    outfn = job.fn("dipole_transitions.txt")
+    #
+    with open(infn, "r") as infile, open(outfn, "w") as outfile:
+        copy = False
+        for line in infile:
+            if first_marker in line.strip():
+                copy = True
+            elif last_marker in line.strip():
+                copy = False
+            elif copy:
+                outfile.write(line)
 
-    modified from http://eosrei.net/articles/2015/11/latex-templates-python-and-jinja2-generate-pdfs
-    """
-    latex_jinja_env = jinja2.Environment(
-        block_start_string=r"\BLOCK{",
-        block_end_string=r"}",
-        variable_start_string=r"\VAR{",
-        variable_end_string=r"}",
-        comment_start_string=r"\#{",
-        comment_end_string=r"}",
-        line_statement_prefix=r"%%",
-        line_comment_prefix=r"%#",
-        trim_blocks=True,
-        autoescape=False,
-        loader=jinja2.FileSystemLoader(os.path.abspath("/")),
+
+@Project.operation
+@Project.pre(
+    file_contains(
+        code.stdout_file(temp="zero", state="excited"),
+        "1=n/2=p       E/hole      E/particle  XX-YY/%",
     )
-    template = latex_jinja_env.get_template(os.path.realpath(template_file))
-    return template
+)
+@Project.post.isfile("dipole_transitions.txt")
+def extract_transitions_zero(job):
+    _extract_transitions(job, temp="zero", code_mapping=code)
 
 
-def compile_pdf_from_template(template, insert_variables):
-    """Render a template file and compile it to pdf"""
-
-    rendered_template = template.render(**insert_variables)
-    return rendered_template
-
-
-# template = get_template("jinja-test.tex")
-# compile_pdf_from_template(template, dict(section1="Long Form", section2="Short Form"))
-
-
-# TODO generate LaTeX table instead of HTML
-# Google: jinja latex table pandas
+@Project.operation
+@Project.pre(
+    file_contains(
+        code.stdout_file(temp="finite", state="excited"),
+        "1=n/2=p       E/hole      E/particle  XX-YY/%",
+    )
+)
+@Project.post.isfile("dipole_transitions.txt")
+def extract_transitions_finite(job):
+    _extract_transitions(job, temp="finite", code_mapping=code)
 
 
 @Project.operation
@@ -556,48 +560,6 @@ def get_table(job):
 
     with open(job.fn("dipole_transitions.html"), "w") as outfile:
         outfile.write(rendered_template)
-
-
-def _extract_transitions(job, temp, code_mapping=code_api.NameMapping()):
-    first_marker = "1=n/2=p       E/hole      E/particle  XX-YY/%"
-    last_marker = "Sum XX-YY after normalization *"
-    #
-    infn = job.fn(code_mapping.stdout_file(temp, state="excited"))
-    outfn = job.fn("dipole_transitions.txt")
-    #
-    with open(infn, "r") as infile, open(outfn, "w") as outfile:
-        copy = False
-        for line in infile:
-            if first_marker in line.strip():
-                copy = True
-            elif last_marker in line.strip():
-                copy = False
-            elif copy:
-                outfile.write(line)
-
-
-@Project.operation
-@Project.pre(
-    file_contains(
-        code.stdout_file(temp="zero", state="excited"),
-        "1=n/2=p       E/hole      E/particle  XX-YY/%",
-    )
-)
-@Project.post.isfile("dipole_transitions.txt")
-def dipole_trans_zero(job):
-    _extract_transitions(job, temp="zero", code_mapping=code)
-
-
-@Project.operation
-@Project.pre(
-    file_contains(
-        code.stdout_file(temp="finite", state="excited"),
-        "1=n/2=p       E/hole      E/particle  XX-YY/%",
-    )
-)
-@Project.post.isfile("dipole_transitions.txt")
-def dipole_trans_finite(job):
-    _extract_transitions(job, temp="finite", code_mapping=code)
 
 
 #################################
