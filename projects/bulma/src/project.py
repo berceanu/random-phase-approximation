@@ -104,3 +104,61 @@ def get_table(job):
 
     with open(job.fn("dipole_transitions.html"), "w") as outfile:
         outfile.write(rendered_template)
+
+
+# def _plot_inset(job, temp, code_mapping=code_api.NameMapping()):
+#     from matplotlib.ticker import MultipleLocator
+#
+#     fig = Figure(figsize=(12, 4))
+#     canvas = FigureCanvas(fig)
+#     gs = GridSpec(1, 1)
+#     ax = fig.add_subplot(gs[0, 0])
+#
+#     for lorexc in "excitation", "lorentzian":
+#         df = out_file_to_df(job, temp, code_mapping, lorentzian_or_excitation=lorexc)
+#         df = df[(df.energy >= 0.0) & (df.energy <= 10.0)]  # MeV
+#         if lorexc == "excitation":
+#             ax.vlines(df.energy, 0.0, df.transition_strength, colors="black")
+#             if job.sp.transition_energy != 0.42:
+#                 df = df[np.isclose(df.energy, job.sp.transition_energy, atol=0.01)]
+#                 ax.vlines(df.energy, 0.0, df.transition_strength, colors="red")
+#         elif lorexc == "lorentzian":
+#             ax.plot(df.energy, df.transition_strength, color="black")
+#
+#     ax.set_title("isovector")
+#     ax.set(
+#         ylabel=r"$R \; (e^2fm^2/MeV)$",
+#         xlabel="E (MeV)",
+#         ylim=[-0.1, 3.0],
+#         xlim=[0.0, 10.0],
+#     )
+#     ax.xaxis.set_major_locator(MultipleLocator(1))
+#     ax.xaxis.set_minor_locator(MultipleLocator(0.25))
+#
+#     for sp in "top", "right":
+#         ax.spines[sp].set_visible(False)
+#
+#     atomic_symbol, mass_number = util.get_nucleus(
+#         job.sp.proton_number, job.sp.neutron_number, joined=False
+#     )
+#     fig.suptitle(
+#         (
+#             fr"Transition strength distribution of ${{}}^{{{mass_number}}} {atomic_symbol} \; "
+#             fr"{job.sp.angular_momentum}^{{{job.sp.parity}}}$ at T = {job.sp.temperature} MeV"
+#         )
+#     )
+#     canvas.print_png(job.fn("inset.png"))
+#
+#
+# @Project.operation
+# @Project.pre(arefiles(code.out_files(temp="zero")))
+# @Project.post.isfile("inset.png")
+# def plot_inset_zero(job):
+#     _plot_inset(job, temp="zero", code_mapping=code)
+#
+#
+# @Project.operation
+# @Project.pre(arefiles(code.out_files(temp="finite")))
+# @Project.post.isfile("inset.png")
+# def plot_inset_finite(job):
+#     _plot_inset(job, temp="finite", code_mapping=code)
