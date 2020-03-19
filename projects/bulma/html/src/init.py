@@ -37,7 +37,9 @@ def main():
         html_job = html_proj.open_job(sp).init()
 
         bulma_jobs_json = dict()
-        for bulma_job in bulma_jobs:
+        for bulma_job in sorted(
+            bulma_jobs, key=lambda bulma_job: bulma_job.sp.temperature
+        ):
             logger.info("Processing %s.." % bulma_job.workspace())
             bulma_jobs_json[bulma_job.id] = dict(temperature=bulma_job.sp.temperature,)
             for fname in ("inset.png", "dipole_transitions.h5"):
