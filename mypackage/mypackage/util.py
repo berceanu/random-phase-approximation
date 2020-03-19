@@ -2,6 +2,7 @@ import logging
 import os
 import pathlib
 import re
+import shutil
 import subprocess
 
 logger = logging.getLogger(__name__)
@@ -90,6 +91,15 @@ def areidentical(f1, f2):
         return False
 
     return cmp(f1, f2)
+
+
+def prepend_id(id, fname):
+    return f"{id}_{fname}"
+
+
+def copy_file_with_id(fname, from_job, to_job):
+    local_fname = prepend_id(from_job.id, fname)
+    shutil.copy(from_job.fn(fname), to_job.fn(local_fname))
 
 
 def copy_file(source, destination, exist_ok=False):

@@ -14,17 +14,6 @@ from mypackage import util, code_api
 logger = logging.getLogger(__name__)
 logfname = "project.log"
 
-
-def prepend_id(id, fname):
-    return f"{id}_{fname}"
-
-
-def copy_file(fname, from_job, to_job):
-    local_fname = prepend_id(from_job.id, fname)
-    shutil.copy(from_job.fn(fname), to_job.fn(local_fname))
-
-
-TRANSITIONS_FNAME = "dipole_transitions.txt"
 CODE = code_api.NameMapping()
 
 
@@ -53,13 +42,7 @@ def main():
         sp = statepoint.copy()
         sp.update(dict(neutron_number=nn_temp[0], temperature=nn_temp[1]))
         bulma_job = bulma_proj.open_job(sp).init()
-        bulma_job.doc.setdefault(
-            "nucleus",
-            util.get_nucleus(
-                proton_number=bulma_job.sp.proton_number,
-                neutron_number=bulma_job.sp.neutron_number,
-            ),
-        )
+
         rpa_jobs_json = dict()
         temp = "finite" if bulma_job.sp.temperature > 0 else "zero"
 
@@ -72,12 +55,13 @@ def main():
                         rpa_job.fn(CODE.out_file(temp, "isovector", lorexc)),
                         bulma_job.fn(f"{lorexc}.out"),
                     )
-            if rpa_job.sp.transition_energy != 0.42:
+            else:
                 rpa_jobs_json[rpa_job.id] = dict(
                     transition_energy=rpa_job.sp.transition_energy,
                     transition_strength=rpa_job.doc.transition_strength,
                 )
-                copy_file(TRANSITIONS_FNAME, rpa_job, bulma_job)
+                util.copy_file_with_id("dipole_transitions.txt", rpa_job, bulma_job)
+
         bulma_job.doc.setdefault("rpa_jobs", rpa_jobs_json)
 
 
