@@ -9,7 +9,7 @@ import pathlib
 import shutil
 
 import signac
-from mypackage import util
+from mypackage import util, code_api
 
 logger = logging.getLogger(__name__)
 logfname = "project.log"
@@ -24,8 +24,8 @@ def copy_file(fname, from_job, to_job):
     shutil.copy(from_job.fn(fname), to_job.fn(local_fname))
 
 
-INSET_FNAME = "inset.png"
 TRANSITIONS_FNAME = "dipole_transitions.txt"
+CODE = code_api.NameMapping()
 
 
 def main():
@@ -47,9 +47,11 @@ def main():
         parity="-",  #
     )
 
-    for nn, rpa_jobs in rpa_proj.find_jobs(statepoint).groupby("neutron_number"):
+    for nn_temp, rpa_jobs in rpa_proj.find_jobs(statepoint).groupby(
+        ("neutron_number", "temperature")
+    ):
         sp = statepoint.copy()
-        sp.update(dict(neutron_number=nn))
+        sp.update(dict(neutron_number=nn_temp[0], temperature=nn_temp[1]))
         bulma_job = bulma_proj.open_job(sp).init()
         bulma_job.doc.setdefault(
             "nucleus",
@@ -58,19 +60,24 @@ def main():
                 neutron_number=bulma_job.sp.neutron_number,
             ),
         )
-        logger.info(f"Neutron number: {nn}")
         rpa_jobs_json = dict()
+        temp = "finite" if bulma_job.sp.temperature > 0 else "zero"
 
         for rpa_job in rpa_jobs:
+            logger.info("Processing %s.." % rpa_job.workspace())
+            if rpa_job.sp.transition_energy == 0.42:
+                bulma_job.doc.setdefault("restarted_from", rpa_job.id)
+                for lorexc in ("lorentzian", "excitation"):
+                    shutil.copy(
+                        rpa_job.fn(CODE.out_file(temp, "isovector", lorexc)),
+                        bulma_job.fn(f"{lorexc}.out"),
+                    )
             if rpa_job.sp.transition_energy != 0.42:
-                logger.info("Processing %s.." % rpa_job.workspace())
                 rpa_jobs_json[rpa_job.id] = dict(
-                    temperature=rpa_job.sp.temperature,
                     transition_energy=rpa_job.sp.transition_energy,
                     transition_strength=rpa_job.doc.transition_strength,
                 )
-                for fname in (INSET_FNAME, TRANSITIONS_FNAME):
-                    copy_file(fname, rpa_job, bulma_job)
+                copy_file(TRANSITIONS_FNAME, rpa_job, bulma_job)
         bulma_job.doc.setdefault("rpa_jobs", rpa_jobs_json)
 
 

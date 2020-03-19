@@ -9,51 +9,38 @@ line with
 See also: $ python src/project.py --help
 """
 import logging
-import os
 
-import jinja2
 import pandas as pd
 from flow import FlowProject
+from mypackage.util import arefiles, match_split, frac_to_html
 
 logger = logging.getLogger(__name__)
 logfname = "project.log"
 
 
-class Project(FlowProject):
-    pass
+def np_to_html(n_or_p):
+    np_mapping = {1: "&nu;", 2: "&pi;"}
+    return np_mapping[n_or_p]
 
 
-@Project.operation
-@Project.pre(lambda job: job.sp.temperature == 0)
-@Project.post.isfile("bla.txt")
-def prepare_run_zero(job):
-    pass
+def state_to_html(state):
+    state_orbital, state_frac = match_split(state)
+    state_frac_html = frac_to_html(state_frac)
+    return state_orbital + state_frac_html
 
 
-def get_template(template_file):
-    """Get a jinja template with latex tags.
+def row_to_html(row):
+    np_html = np_to_html(row["n_or_p"])
 
-    modified from http://eosrei.net/articles/2015/11/latex-templates-python-and-jinja2-generate-pdfs
-    """
-    latex_jinja_env = jinja2.Environment(
-        line_statement_prefix="#",
-        line_comment_prefix="##",
-        trim_blocks=True,
-        autoescape=False,
-        loader=jinja2.FileSystemLoader(os.path.abspath("/")),
-    )
-    template = latex_jinja_env.get_template(os.path.realpath(template_file))
-    return template
+    from_state_html = state_to_html(row["from_state"])
+    to_state_html = state_to_html(row["to_state"])
+
+    return f"{np_html}{from_state_html}&rarr;{np_html}{to_state_html}"
 
 
-@Project.operation
-@Project.pre.isfile("dipole_transitions.txt")
-@Project.post.isfile("dipole_transitions.html")
-def get_table(job):
-    from mypackage.util import match_split, frac_to_html
-
+def transitions_table(fname):
     dip_conf = pd.read_csv(
-        job.fn("dipole_transitions.txt"),
+        fname,
         sep=r"\s+",
         header=None,
         usecols=[0, 1, 3, 4, 6, 7],
@@ -63,102 +50,108 @@ def get_table(job):
             "particle_energy",
             "from_state",
             "to_state",
-            "transition_amplitude",
+            "amplitude",
         ],
-    )
-    with pd.option_context("mode.use_inf_as_null", True):
-        dip_conf = dip_conf.dropna()  # drop inf values
-
-    filtered_conf = dip_conf[dip_conf.transition_amplitude > 1]
-    df = filtered_conf.sort_values(
-        by=["n_or_p", "transition_amplitude"], ascending=[False, False]
+        dtype={
+            "n_or_p": pd.Int64Dtype()
+        },  # TODO pandas 1.0 , "from_state": pd.StringDtype(), "to_state": pd.StringDtype()}
     )
 
-    table = []
-    for idx in df.index:
-        np_mapping = {1: "&nu;", 2: "&pi;"}
-        neutron_proton = np_mapping[df.loc[idx, "n_or_p"]]
+    filtered_conf = dip_conf[dip_conf.amplitude > 1]
 
-        from_state = df.loc[idx, "from_state"]
-        from_state_orbital, from_state_frac = match_split(from_state)
-        from_state_frac_html = frac_to_html(from_state_frac)
+    df = filtered_conf.sort_values(by=["n_or_p", "amplitude"], ascending=[False, False])
 
-        to_state = df.loc[idx, "to_state"]
-        to_state_orbital, to_state_frac = match_split(to_state)
-        to_state_frac_html = frac_to_html(to_state_frac)
+    df["transition"] = df.apply(row_to_html, axis=1)
 
-        transition_amplitude = df.loc[idx, "transition_amplitude"]
-
-        row = {
-            "transition": (
-                f"{neutron_proton}{from_state_orbital}{from_state_frac_html}&rarr;"
-                f"{neutron_proton}{to_state_orbital}{to_state_frac_html}"
-            ),
-            "amplitude": f"{transition_amplitude:.2f}",
-        }
-        table.append(row)
-
-    # working directory must be ~/Development/random-phase-approximation/projects/rpa
-    template = get_template("src/templates/dipole_transitions.j2")
-    rendered_template = template.render(dict(table=table))
-
-    with open(job.fn("dipole_transitions.html"), "w") as outfile:
-        outfile.write(rendered_template)
+    return df.loc[:, ["transition", "amplitude"]]
 
 
-# def _plot_inset(job, temp, code_mapping=code_api.NameMapping()):
-#     from matplotlib.ticker import MultipleLocator
-#
-#     fig = Figure(figsize=(12, 4))
-#     canvas = FigureCanvas(fig)
-#     gs = GridSpec(1, 1)
-#     ax = fig.add_subplot(gs[0, 0])
-#
-#     for lorexc in "excitation", "lorentzian":
-#         df = out_file_to_df(job, temp, code_mapping, lorentzian_or_excitation=lorexc)
-#         df = df[(df.energy >= 0.0) & (df.energy <= 10.0)]  # MeV
-#         if lorexc == "excitation":
-#             ax.vlines(df.energy, 0.0, df.transition_strength, colors="black")
-#             if job.sp.transition_energy != 0.42:
-#                 df = df[np.isclose(df.energy, job.sp.transition_energy, atol=0.01)]
-#                 ax.vlines(df.energy, 0.0, df.transition_strength, colors="red")
-#         elif lorexc == "lorentzian":
-#             ax.plot(df.energy, df.transition_strength, color="black")
-#
-#     ax.set_title("isovector")
-#     ax.set(
-#         ylabel=r"$R \; (e^2fm^2/MeV)$",
-#         xlabel="E (MeV)",
-#         ylim=[-0.1, 3.0],
-#         xlim=[0.0, 10.0],
-#     )
-#     ax.xaxis.set_major_locator(MultipleLocator(1))
-#     ax.xaxis.set_minor_locator(MultipleLocator(0.25))
-#
-#     for sp in "top", "right":
-#         ax.spines[sp].set_visible(False)
-#
-#     atomic_symbol, mass_number = util.get_nucleus(
-#         job.sp.proton_number, job.sp.neutron_number, joined=False
-#     )
-#     fig.suptitle(
-#         (
-#             fr"Transition strength distribution of ${{}}^{{{mass_number}}} {atomic_symbol} \; "
-#             fr"{job.sp.angular_momentum}^{{{job.sp.parity}}}$ at T = {job.sp.temperature} MeV"
-#         )
-#     )
-#     canvas.print_png(job.fn("inset.png"))
-#
-#
-# @Project.operation
-# @Project.pre(arefiles(code.out_files(temp="zero")))
-# @Project.post.isfile("inset.png")
-# def plot_inset_zero(job):
-#     _plot_inset(job, temp="zero", code_mapping=code)
-#
-#
-# @Project.operation
-# @Project.pre(arefiles(code.out_files(temp="finite")))
-# @Project.post.isfile("inset.png")
-# def plot_inset_finite(job):
-#     _plot_inset(job, temp="finite", code_mapping=code)
+class Project(FlowProject):
+    pass
+
+
+@Project.operation
+@Project.pre(
+    lambda job: all(
+        job.isfile(fn)
+        for fn in [
+            rpa_id + "_dipole_transitions.txt" for rpa_id in job.doc.rpa_jobs.keys()
+        ]
+    )
+)
+@Project.post.isfile("dipole_transitions.h5")
+def h5_transitions(job):
+    appended_data = []
+
+    for rpa_id, d in job.doc.rpa_jobs.items():
+        fname = rpa_id + "_dipole_transitions.txt"
+        transition_energy = d["transition_energy"]
+
+        df = transitions_table(job.fn(fname)).set_index("transition")
+        df2 = pd.concat([df], keys=[transition_energy], names=["transition_energy"])
+        appended_data.append(df2)
+
+    full_df = pd.concat(appended_data)
+    full_df.to_hdf(job.fn("dipole_transitions.h5"), key="dipole_transitions")
+
+
+@Project.operation
+@Project.pre(arefiles(("excitation.out", "lorentzian.out")))
+@Project.post.isfile("inset.png")
+def plot_inset(job):
+    import numpy as np
+    from matplotlib.ticker import MultipleLocator
+    from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+    from matplotlib.figure import Figure
+    from matplotlib.gridspec import GridSpec
+
+    fig = Figure(figsize=(12, 4))
+    canvas = FigureCanvas(fig)
+    gs = GridSpec(1, 1)
+    ax = fig.add_subplot(gs[0, 0])
+
+    for lorexc in "excitation", "lorentzian":
+        df = pd.read_csv(
+            job.fn(f"{lorexc}.out"),
+            delim_whitespace=True,
+            comment="#",
+            skip_blank_lines=True,
+            header=None,
+            names=["energy", "transition_strength"],
+        )
+        df = df[(df.energy >= 0.0) & (df.energy <= 10.0)]  # MeV
+        if lorexc == "excitation":
+            ax.vlines(df.energy, 0.0, df.transition_strength, colors="black")
+            for v in job.doc.rpa_jobs.values():
+                df_close = df[np.isclose(df.energy, v["transition_energy"], atol=0.01)]
+                ax.vlines(
+                    df_close.energy, 0.0, df_close.transition_strength, colors="red"
+                )
+        elif lorexc == "lorentzian":
+            ax.plot(df.energy, df.transition_strength, color="black")
+
+    ax.set(
+        ylabel=r"$R \; (e^2fm^2/MeV)$",
+        xlabel="E (MeV)",
+        ylim=[-0.1, 3.0],
+        xlim=[0.0, 10.0],
+    )
+    ax.xaxis.set_major_locator(MultipleLocator(1))
+    ax.xaxis.set_minor_locator(MultipleLocator(0.25))
+
+    for sp in "top", "right":
+        ax.spines[sp].set_visible(False)
+
+    canvas.print_png(job.fn("inset.png"))
+
+
+if __name__ == "__main__":
+    logging.basicConfig(
+        filename=logfname,
+        format="%(asctime)s - %(name)s - %(levelname)-8s - %(message)s",
+        level=logging.INFO,
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+    logger.info("==RUN STARTED==")
+    Project().main()
+    logger.info("==RUN FINISHED==")
