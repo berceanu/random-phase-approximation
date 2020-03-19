@@ -1,3 +1,50 @@
+#!/usr/bin/env python3
+"""This module contains the operation functions for this project.
+
+The workflow defined in this file can be executed from the command
+line with
+
+    $ python src/project.py run [job_id [job_id ...]]
+
+See also: $ python src/project.py --help
+"""
+import logging
+
+from flow import FlowProject
+
+logger = logging.getLogger(__name__)
+logfname = "project.log"
+
+
+class Project(FlowProject):
+    pass
+
+
+@Project.operation
+@Project.pre(
+    lambda job: all(
+        job.isfile(fn)
+        for fn in [
+            bulma_id + "_dipole_transitions.h5"
+            for bulma_id in job.doc.bulma_jobs.keys()
+        ]
+    )
+)
+@Project.pre(
+    lambda job: all(
+        job.isfile(fn)
+        for fn in [bulma_id + "_inset.png" for bulma_id in job.doc.bulma_jobs.keys()]
+    )
+)
+@Project.post.isfile("index.html")
+def create_webpage(job):
+    for bulma_id, d in job.doc.bulma_jobs.items():
+        dipole_transitions = bulma_id + "_dipole_transitions.h5"
+        inset = bulma_id + "_inset.png"
+        temperature = d["temperature"]
+        print(dipole_transitions, inset, temperature)
+
+
 # def get_template(template_file):
 #     """Get a jinja template with latex tags.
 #
@@ -74,3 +121,15 @@
 #
 #     with open(job.fn("dipole_transitions.html"), "w") as outfile:
 #         outfile.write(rendered_template)
+
+
+if __name__ == "__main__":
+    logging.basicConfig(
+        filename=logfname,
+        format="%(asctime)s - %(name)s - %(levelname)-8s - %(message)s",
+        level=logging.INFO,
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+    logger.info("==RUN STARTED==")
+    Project().main()
+    logger.info("==RUN FINISHED==")
