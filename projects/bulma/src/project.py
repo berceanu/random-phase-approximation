@@ -133,7 +133,7 @@ def plot_inset(job):
     ax.set(
         ylabel=r"$R \; (e^2fm^2/MeV)$",
         xlabel="E (MeV)",
-        ylim=[-0.1, 3.0],
+        ylim=[-0.1, 4.0],
         xlim=[0.0, 10.0],
     )
     ax.xaxis.set_major_locator(MultipleLocator(1))

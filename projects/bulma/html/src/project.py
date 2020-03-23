@@ -10,13 +10,26 @@ See also: $ python src/project.py --help
 """
 import logging
 import os
+from dataclasses import dataclass
 
 import jinja2
 import pandas as pd
 from flow import FlowProject
+from mypackage import util
 
 logger = logging.getLogger(__name__)
 logfname = "project.log"
+
+
+class Project(FlowProject):
+    pass
+
+
+@dataclass(frozen=True)
+class Section:
+    temperature: float
+    inset: str
+    table: str
 
 
 def get_template(template_file):
@@ -33,10 +46,6 @@ def get_template(template_file):
     )
     template = latex_jinja_env.get_template(os.path.realpath(template_file))
     return template
-
-
-class Project(FlowProject):
-    pass
 
 
 @Project.operation
@@ -57,22 +66,27 @@ class Project(FlowProject):
 )
 @Project.post.isfile("dipole_transitions.html")
 def create_webpage(job):
+    sections = list()
     for bulma_id, d in job.doc.bulma_jobs.items():
+        temperature = d["temperature"]
+        inset = bulma_id + "_inset.png"
         dipole_transitions = job.fn(bulma_id + "_dipole_transitions.h5")
-        # inset = job.fn(bulma_id + "_inset.png")
-        # temperature = d["temperature"]
 
         df = pd.read_hdf(dipole_transitions, key="dipole_transitions")
-
         table_html = df.to_html(
-            index=True,
             escape=False,
             float_format="%.2f",
             classes="table is-bordered is-striped is-narrow is-hoverable is-fullwidth",
         )
+        sections.append(Section(temperature, inset, table_html))
 
-    template = get_template("src/templates/dipole_transitions.j2")
-    rendered_template = template.render(dict(table=table_html))
+    atomic_symbol, mass_number = util.get_nucleus(
+        job.sp.proton_number, job.sp.neutron_number, joined=False
+    )
+    nucleus = f"<sup>{mass_number}</sup>{atomic_symbol} {job.sp.angular_momentum}<sup>{job.sp.parity}</sup>"
+
+    template = get_template("src/templates/transitions.j2")
+    rendered_template = template.render(dict(sections=sections, title=nucleus))
 
     with open(job.fn("dipole_transitions.html"), "w") as outfile:
         outfile.write(rendered_template)
