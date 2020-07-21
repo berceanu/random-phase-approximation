@@ -5,6 +5,7 @@ Iterates over all defined state points and initializes
 the associated job workspace directories."""
 import logging
 import pathlib
+import shutil
 
 import signac
 from mypackage import util
@@ -35,6 +36,9 @@ def main():
         sp = statepoint.copy()
         sp.update(dict(neutron_number=nn))
         html_job = html_proj.open_job(sp).init()
+        shutil.copy(
+            "src/templates/bulma.css", html_job.fn("bulma.css"),
+        )
 
         bulma_jobs_json = dict()
         for bulma_job in sorted(
