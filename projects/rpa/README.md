@@ -7,9 +7,3 @@ $ python src/init.py
 $ python src/project.py run --parallel
 $ python src/project.py status --pretty --full --stack
 ```
-
-```console
-$ python src/transerg_init.py
-$ python src/project.py run --parallel
-$ python src/project.py status --pretty --full --stack
-```
