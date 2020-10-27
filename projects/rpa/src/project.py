@@ -263,7 +263,9 @@ def nlargest_to_file(df, max_energy=10, n=3, fn="transerg.dat"):
 
 
 def _out_file_to_transerg(
-    job, temp, code_mapping=code_api.NameMapping(),
+    job,
+    temp,
+    code_mapping=code_api.NameMapping(),
 ):
     df = out_file_to_df(job, temp, code_mapping)
     nlargest_to_file(df, fn=job.fn("transerg.dat"))

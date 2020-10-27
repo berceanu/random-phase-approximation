@@ -279,7 +279,7 @@ def dict_to_fn(ordered_nested_dict, fname, proton_number):
 
     assert list(ond.keys())[0] == proton_number, "Z from dict and file does not match!"
 
-    col_header = f"  U[MeV]  fE1[mb/MeV]"
+    col_header = "  U[MeV]  fE1[mb/MeV]"
 
     with open(fname, "w") as f:
         for Z in ond.keys():

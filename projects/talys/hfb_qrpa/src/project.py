@@ -72,7 +72,7 @@ def plot_cross_section(job):
         cross_section["energy"],
         cross_section["xs"],
         color="black",
-        label=f"HFB-QRPA",
+        label="HFB-QRPA",
         title=text,
     )
 

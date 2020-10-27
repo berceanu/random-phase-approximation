@@ -151,7 +151,9 @@ def grid_figure(
             ax.set_yscale(ax_param.yscale)
             ax.set_xscale(ax_param.xscale)
             ax.annotate(
-                s=ann_col.s, xy=ann_col.xy, xycoords=ann_col.xycoords,
+                s=ann_col.s,
+                xy=ann_col.xy,
+                xycoords=ann_col.xycoords,
             )
 
     for ax in fig.axes[:-2]:  # all rows except bottom one

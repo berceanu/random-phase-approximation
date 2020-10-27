@@ -148,14 +148,14 @@ class GenerateInputs:
         transition_energy=9.78,
     ):
         """Args:
-            proton_number: atomic number Z
-            neutron_number: neutron number N
-            angular_momentum: 0 or 1
-            parity: + or -
-            temperature: eg. 2.0 (in MeV)
-            transition_energy: eg. 9.78 (in MeV)
-            load_matrix: flag that controls the matrix elements calculation, default is to perform the calculation
-            out_path: path of folder to write files to"""
+        proton_number: atomic number Z
+        neutron_number: neutron number N
+        angular_momentum: 0 or 1
+        parity: + or -
+        temperature: eg. 2.0 (in MeV)
+        transition_energy: eg. 9.78 (in MeV)
+        load_matrix: flag that controls the matrix elements calculation, default is to perform the calculation
+        out_path: path of folder to write files to"""
 
         assert (proton_number % 2 == 0) and (
             neutron_number % 2 == 0
