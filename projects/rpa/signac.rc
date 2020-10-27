@@ -1,2 +1,3 @@
-project=rpa
-workspace_dir=workspace
+project = rpa
+workspace_dir = workspace
+schema_version = 1
