@@ -1,2 +1,3 @@
-project=hfb_qrpa
-workspace_dir=workspace
+project = hfb_qrpa
+workspace_dir = workspace
+schema_version = 1
