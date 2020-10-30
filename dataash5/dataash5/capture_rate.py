@@ -10,13 +10,15 @@ logger = logging.getLogger(__name__)
 pd.options.display.max_rows = 20
 pd.options.display.max_columns = 10
 
+my_astroT = 0.0001
+
 
 def get_neutron_capture_rate(*, proj, protons=proton_number, api=TalysAPI()):
     dataframes = list()
     for job in proj.find_jobs(dict(proton_number=protons, astro="y")):
         ncr = api.read_neutron_capture_rate(job)
 
-        ncr = ncr.loc[(ncr["talys_temperature"] - 0.0001).abs().argsort()].head(1)
+        ncr = ncr.loc[(ncr["talys_temperature"] - my_astroT).abs().argsort()].head(1)
 
         ncr = ncr.rename(columns={"talys_temperature": "astroT"}).set_index("astroT")
 
