@@ -31,7 +31,7 @@ def main():
         marker="o",
         color=colourWheel[1 % len(colourWheel)],
         dashes=dashesStyles[1 % len(dashesStyles)],
-        label="astroT = %s x 10**9 K" % my_astroT,
+        label="astroT = %s x 10**9 K, psf T = 0 MeV" % my_astroT,
     )
     ax.set_yscale("log")
     ax.xaxis.set_major_locator(ticker.FixedLocator(massnum))
