@@ -13,7 +13,7 @@ def main():
     project = signac.init_project("rpa", workspace="workspace")
 
     for N in (76, 86, 96):
-        for T in (0.0, 0.862, 1.0, 2.0):
+        for T in (0.0,):
             statepoint = dict(
                 # atomic number Z
                 proton_number=50,  # fixed atomic number

@@ -29,20 +29,19 @@ def main():
             logger.info("Processing %s.." % rpa_job.workspace())
             sp = rpa_proj.open_job(id=rpa_job.id).statepoint()
 
-            for yn in "y", "n":
-                sp.update(
-                    dict(
-                        # flag for calculation of astrophysics reaction rate
-                        astro=yn
-                    )
+            sp.update(
+                dict(
+                    # flag for calculation of astrophysics reaction rate
+                    astro="y"
                 )
-                talys_job = talys_proj.open_job(sp).init()
+            )
+            talys_job = talys_proj.open_job(sp).init()
 
-                util.copy_file(source=rpa_job.fn(psf), destination=talys_job.fn(psf))
-                talys_job.doc.setdefault("photon_strength_function", psf)
+            util.copy_file(source=rpa_job.fn(psf), destination=talys_job.fn(psf))
+            talys_job.doc.setdefault("photon_strength_function", psf)
 
-                talys_api.energy_file(talys_job)
-                talys_api.input_file(talys_job)
+            talys_api.energy_file(talys_job)
+            talys_api.input_file(talys_job)
 
 
 if __name__ == "__main__":
