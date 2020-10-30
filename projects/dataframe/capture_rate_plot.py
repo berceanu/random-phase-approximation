@@ -39,7 +39,7 @@ def main():
     ax.set_xlabel("A")
     ax.set_xlim(left=massnum[0] - 1, right=massnum[-1] + 1)
 
-    ax.legend(loc="upper right", ncol=1, handlelength=1)
+    ax.legend(loc="lower left", ncol=1, handlelength=1)
 
     ax.annotate(s="Sn", xy=(0.1, 0.6), xycoords="axes fraction")
     ax.xaxis.set_minor_locator(ticker.NullLocator())
