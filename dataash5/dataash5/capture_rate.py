@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 pd.options.display.max_rows = 20
 pd.options.display.max_columns = 10
 
-my_astroT = 0.0001
+my_astroT = 10.0
 
 
 def get_neutron_capture_rate(*, proj, protons=proton_number, api=TalysAPI()):

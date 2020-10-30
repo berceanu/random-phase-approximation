@@ -4,7 +4,7 @@ from figstyle import colourWheel, dashesStyles, width, golden_ratio
 from dataash5 import df_path, units
 from matplotlib import pyplot, ticker
 
-my_astroT = 0.0001
+my_astroT = 10.0
 
 
 def main():
