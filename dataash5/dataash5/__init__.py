@@ -9,6 +9,15 @@ import pkg_resources
 proton_number = 50
 
 df_path = pathlib.Path(pkg_resources.resource_filename("dataash5", "data/dataframe.h5"))
+line_one_path = pathlib.Path(
+    pkg_resources.resource_filename("dataash5", "data/line_one_dataframe.h5")
+)
+line_two_path = pathlib.Path(
+    pkg_resources.resource_filename("dataash5", "data/line_two_dataframe.h5")
+)
+line_three_path = pathlib.Path(
+    pkg_resources.resource_filename("dataash5", "data/line_three_dataframe.h5")
+)
 
 units = dict()
 units["temperature"] = "[MeV]"  # T/T9
