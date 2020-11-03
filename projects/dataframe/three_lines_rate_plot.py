@@ -94,7 +94,7 @@ def main():
         path=line_two_path,
         astroT=10.0,
         psf_temperature=0.0,
-        marker="s",
+        marker="^",
         color=colourWheel[1],
         dashes=dashesStyles[1],
     )
