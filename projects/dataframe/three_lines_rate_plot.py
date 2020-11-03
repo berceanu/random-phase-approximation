@@ -8,6 +8,18 @@ from pathlib import PosixPath
 from typing import List
 
 
+def latex_float(f):
+    float_str = "{0:.2g}".format(f)
+    if "e" in float_str:
+        base, exponent = float_str.split("e")
+        if int(base) > 1:
+            return r"${0} \times 10^{{{1}}}$".format(base, int(exponent))
+        else:
+            return r"$10^{{{0}}}$".format(int(exponent))
+    else:
+        return float_str
+
+
 @dataclass
 class CaptureRateLine:
     """Holds data for each plot line in the capture rate plot."""
@@ -29,21 +41,22 @@ class CaptureRateLine:
             astroT = (astroT[0] / 1e6, "MeV", 0.0)
         return astroT
 
-    def label(self) -> str:
-        astroT = self.kelvin_to_electronvolt()
-        return (
-            fr"astroT = {astroT[0]:.2f} {astroT[1]}, T = {self.psf_temperature:.2f} MeV"
-        )
+    def label(self, electronvolt=True) -> str:
+        decimals = 2 if self.psf_temperature else 0
+
+        if electronvolt:
+            astroT = self.kelvin_to_electronvolt()
+            astroT_str = f"{astroT[0]:.2f}"
+        else:
+            astroT = (self.astroT * 1e9, "K", 0.0)
+            astroT_str = latex_float(astroT[0])
+        return fr"astroT = {astroT_str} {astroT[1]}, T = {self.psf_temperature:.{decimals}f} MeV"
 
     def series(self):
         ne_data = pd.read_hdf(self.path, "capture_rate").assign(
             mass_number=lambda frame: frame.proton_number + frame.neutron_number
         )
-        df = ne_data.drop(
-            columns=[
-                "proton_number",
-            ]
-        )
+        df = ne_data.drop(columns=["proton_number"])
         table = pd.pivot_table(
             df, index=["mass_number"], values=["capture_rate"], columns=["astroT"]
         )
@@ -60,7 +73,7 @@ class CaptureRateLine:
             marker=self.marker,
             color=self.color,
             dashes=self.dashes,
-            label=self.label(),
+            label=self.label(electronvolt=False),
         )
         ax.xaxis.set_major_locator(ticker.FixedLocator(self.mass_numbers()))
         ax.set_xlim(left=self.mass_numbers()[0] - 1, right=self.mass_numbers()[-1] + 1)
@@ -73,9 +86,9 @@ def main():
         path=line_one_path,
         astroT=0.0001,
         psf_temperature=0.0,
-        marker="o",
-        color=colourWheel[0],
-        dashes=dashesStyles[0],
+        marker="v",
+        color=colourWheel[2],
+        dashes=dashesStyles[2],
     )
     line_two = CaptureRateLine(
         path=line_two_path,
@@ -89,9 +102,9 @@ def main():
         path=line_three_path,
         astroT=10.0,
         psf_temperature=0.862,
-        marker="v",
-        color=colourWheel[2],
-        dashes=dashesStyles[2],
+        marker="o",
+        color=colourWheel[0],
+        dashes=dashesStyles[0],
     )
 
     fig, ax = pyplot.subplots()
@@ -106,7 +119,7 @@ def main():
 
     ax.legend(loc="lower left", ncol=1, handlelength=1)
 
-    ax.annotate(s="Sn", xy=(0.1, 0.7), xycoords="axes fraction")
+    ax.annotate(s="Sn", xy=(0.1, 0.8), xycoords="axes fraction")
     ax.xaxis.set_minor_locator(ticker.NullLocator())
 
     fig.set_size_inches(width, width / golden_ratio)
