@@ -1,11 +1,12 @@
 import pandas as pd
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from figstyle import colourWheel, dashesStyles, width, golden_ratio
 from dataash5 import line_one_path, line_two_path, line_three_path, units
 from matplotlib import pyplot, ticker
 from pathlib import PosixPath
 from typing import List
+import numpy as np
 
 
 def latex_float(f):
@@ -30,6 +31,14 @@ class CaptureRateLine:
     marker: str
     color: str
     dashes: List[int]
+    A: np.ndarray = field(init=False)
+    Y: np.ndarray = field(init=False)
+    legend: str = field(init=False)
+
+    def __post_init__(self):
+        self.A = self.mass_numbers()
+        self.Y = self.series().values
+        self.legend = self.label(electronvolt=False)
 
     def kelvin_to_electronvolt(self):
         from scipy.constants import physical_constants
@@ -111,7 +120,7 @@ def main():
     fig.subplots_adjust(left=0.14, bottom=0.14, right=0.97, top=0.97)
 
     for line in (line_one, line_two, line_three):
-        line.plot(ax)
+        print(line.legend)
 
     ax.set_yscale("log")
     ax.set_ylabel("Neutron Capture Rate %s" % units["capture_rate"])
@@ -124,6 +133,20 @@ def main():
 
     fig.set_size_inches(width, width / golden_ratio)
     fig.savefig("capture_rate_vs_A")
+
+    red_line = line_one
+    blue_line = line_two
+    black_line = line_three
+    mass_numbers = red_line.A
+
+    data = {
+        "A": mass_numbers,
+        "red": red_line.Y,
+        "blue": blue_line.Y,
+        "black": black_line.Y,
+    }
+    df = pd.DataFrame.from_dict(data)
+    df.to_csv("three_lines.csv", index=False)
 
 
 if __name__ == "__main__":
