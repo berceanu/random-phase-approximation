@@ -30,9 +30,8 @@ def read_transition_density(fname):
         skip_blank_lines=True,
         comment="#",
         usecols=[0, 2, 3],
-        names=["x", "neutron", "proton"],
+        names=["r", "neutron", "proton"],
     )
-    df.set_index("x", inplace=True)
     return df
 
 
@@ -67,7 +66,10 @@ def main():
                     transform=ax.transAxes,
                 )
                 df = read_transition_density(job.fn("ztes_transdens.out"))
+                df.proton *= -df.r ** 2
+                df.neutron *= -df.r ** 2
                 ax.plot(
+                    "r",
                     "neutron",
                     color="black",
                     linestyle="solid",
@@ -75,12 +77,14 @@ def main():
                     label="neutron",
                 )
                 ax.plot(
-                    "proton", color="black", linestyle="dashed", data=df, label="proton"
+                    "r",
+                    "proton",
+                    color="black",
+                    linestyle="dashed",
+                    data=df,
+                    label="proton",
                 )
                 ax.set_xlim(-0.2, 12.2)
-                ymax = np.abs(df.to_numpy()).max()
-                d_ymax = 0.2 * ymax
-                ax.set_ylim(-ymax - d_ymax, ymax + d_ymax)
 
                 ax.axhline(color="0.5", linestyle="dotted", linewidth=0.5)
 
@@ -95,7 +99,7 @@ def main():
             axes[0].legend(handlelength=1)
             axes[-1].set_xlabel(r"$r$ $[\mathrm{fm}]$")
 
-            fig.subplots_adjust(hspace=0.05, bottom=0.14)
+            fig.subplots_adjust(hspace=0.05, bottom=0.14, left=0.14)
             fig.savefig(nucleus)
             pyplot.close(fig)
 
