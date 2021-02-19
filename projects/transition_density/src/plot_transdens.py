@@ -4,6 +4,7 @@ import pandas as pd
 from matplotlib import pyplot, ticker
 from figstyle import width, golden_ratio
 import numpy as np
+import mypackage.util as util
 
 
 class Labeloffset:
@@ -23,10 +24,10 @@ class Labeloffset:
 def read_transition_density(fname):
     df = pd.read_csv(
         fname,
-        delim_whitespace=True,
-        comment="#",
-        skip_blank_lines=True,
         header=None,
+        delim_whitespace=True,
+        skip_blank_lines=True,
+        comment="#",
         usecols=[0, 2, 3],
         names=["x", "neutron", "proton"],
     )
@@ -39,52 +40,60 @@ def main():
     project = signac.get_project(search=False)
     print(f"project {project}")
 
-    for neutron_number, group in project.find_jobs(
-        {"transition_energy": {"$ne": 0.42}}
-    ).groupby("neutron_number"):
-        jobs = list(sorted(group, key=lambda job: job.sp.transition_energy))
-        num_jobs = len(jobs)
-        fig, axes = pyplot.subplots(
-            nrows=num_jobs, sharex=True, figsize=(width, width / golden_ratio)
-        )
-        fig.suptitle(
-            r"RQRPA transition densities in $\mathrm{{}^{%s}Sn}$"
-            % str(neutron_number + 50)
-        )
-        axes = np.atleast_1d(axes)
-        for ax, job in zip(axes, jobs):
-            ax.text(
-                0.65,
-                0.15,
-                f"E = {job.sp.transition_energy} MeV",
-                transform=ax.transAxes,
+    for proton_number in (
+        50,
+        58,
+    ):
+        for neutron_number, group in project.find_jobs(
+            {"transition_energy": {"$ne": 0.42}, "proton_number": proton_number}
+        ).groupby("neutron_number"):
+            jobs = list(sorted(group, key=lambda job: job.sp.transition_energy))
+            num_jobs = len(jobs)
+            fig, axes = pyplot.subplots(
+                nrows=num_jobs, sharex=True, figsize=(width, width / golden_ratio)
             )
-            df = read_transition_density(job.fn("ztes_transdens.out"))
-            ax.plot(
-                "neutron", color="black", linestyle="solid", data=df, label="neutron"
-            )
-            ax.plot(
-                "proton", color="black", linestyle="dashed", data=df, label="proton"
-            )
-            ax.set_xlim(-0.2, 12.2)
-            ymax = np.abs(df.to_numpy()).max()
-            d_ymax = 0.2 * ymax
-            ax.set_ylim(-ymax - d_ymax, ymax + d_ymax)
+            nucleus = util.get_nucleus(proton_number, neutron_number)
+            fig.suptitle(r"RQRPA transition densities in %s" % nucleus)
+            axes = np.atleast_1d(axes)
+            for ax, job in zip(axes, jobs):
+                ax.text(
+                    0.65,
+                    0.15,
+                    f"E = {job.sp.transition_energy:.2f} MeV",
+                    transform=ax.transAxes,
+                )
+                df = read_transition_density(job.fn("ztes_transdens.out"))
+                ax.plot(
+                    "neutron",
+                    color="black",
+                    linestyle="solid",
+                    data=df,
+                    label="neutron",
+                )
+                ax.plot(
+                    "proton", color="black", linestyle="dashed", data=df, label="proton"
+                )
+                ax.set_xlim(-0.2, 12.2)
+                ymax = np.abs(df.to_numpy()).max()
+                d_ymax = 0.2 * ymax
+                ax.set_ylim(-ymax - d_ymax, ymax + d_ymax)
 
-            ax.axhline(color="0.5", linestyle="dotted", linewidth=0.5)
+                ax.axhline(color="0.5", linestyle="dotted", linewidth=0.5)
 
-            formatter = ticker.ScalarFormatter(useMathText=False)
-            formatter.set_powerlimits((-2, 2))
-            ax.yaxis.set_major_formatter(formatter)
+                formatter = ticker.ScalarFormatter(useMathText=False)
+                formatter.set_powerlimits((-2, 2))
+                ax.yaxis.set_major_formatter(formatter)
 
-            _ = Labeloffset(ax, label=str(), axis="y")
+                _ = Labeloffset(
+                    ax, label=r"$r^2\delta \rho$ $[\mathrm{fm^{-1}}]$", axis="y"
+                )
 
-        axes[0].legend(handlelength=1)
-        axes[-1].set_xlabel("r [fm]")
+            axes[0].legend(handlelength=1)
+            axes[-1].set_xlabel(r"$r$ $[\mathrm{fm}]$")
 
-        fig.subplots_adjust(hspace=0.05, bottom=0.14)
-        fig.savefig(f"{neutron_number+50}Sn")
-        pyplot.close(fig)
+            fig.subplots_adjust(hspace=0.05, bottom=0.14)
+            fig.savefig(nucleus)
+            pyplot.close(fig)
 
 
 if __name__ == "__main__":
