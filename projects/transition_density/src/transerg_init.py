@@ -5,7 +5,7 @@ import signac
 import mypackage.util as util
 
 
-nuclei = {"76": (8.33,), "86": (6.04, 7.97), "96": (5.11, 7.54)}
+nuclei = {"76": (8.33,), "86": (6.04, 8.28), "96": (5.11, 7.54)}
 
 
 def main():

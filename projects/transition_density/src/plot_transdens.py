@@ -34,9 +34,6 @@ def read_transition_density(fname):
     return df
 
 
-# def flatten_axes()
-
-
 def main():
     """Main entry point."""
     project = signac.get_project(search=False)
@@ -83,17 +80,11 @@ def main():
             _ = Labeloffset(ax, label=str(), axis="y")
 
         axes[0].legend(handlelength=1)
-        axes[-1].set_xlabel("x")
+        axes[-1].set_xlabel("r [fm]")
 
         fig.subplots_adjust(hspace=0.05, bottom=0.14)
         fig.savefig(f"{neutron_number+50}Sn")
         pyplot.close(fig)
-
-        # each neutron_number / group combination is a separate figure
-        # each transition_energy is a separate subplot
-        # neutron and proton contibutions are separate lines
-
-    # for job in project.groupby("neutron_number")
 
 
 if __name__ == "__main__":
