@@ -47,7 +47,7 @@ def main():
     ):
         for neutron_number, group in project.find_jobs(
             {
-                "transition_energy": {"$ne": round(Decimal(0.42), 2)},
+                "transition_energy": {"$ne": str(round(Decimal(0.42), 2))},
                 "proton_number": proton_number,
             }
         ).groupby("neutron_number"):

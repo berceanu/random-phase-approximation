@@ -8,7 +8,7 @@ from flow import FlowProject, cmd
 from signac import get_project
 import mypackage.code_api as code_api
 from mypackage.util import arefiles, file_contains, isemptyfile
-
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 logfname = "project.log"
@@ -132,6 +132,49 @@ def run_zero_temp_ground_state(job):
 @Project.post(isemptyfile(code.stderr_file(temp="zero", state="excited")))
 def run_zero_temp_excited_state(job):
     return _run_code(job, temp="zero", state="excited", code_mapping=code)
+
+
+###########################
+# TOP TRANSITION ENERGIES #
+###########################
+
+
+def out_file_to_df(
+    job,
+    temp,
+    code_mapping=code_api.NameMapping(),
+    lorentzian_or_excitation="excitation",
+):
+    fn = job.fn(code_mapping.out_file(temp, "isovector", lorentzian_or_excitation))
+    dataframe = pd.read_csv(
+        fn,
+        delim_whitespace=True,
+        comment="#",
+        skip_blank_lines=True,
+        header=None,
+        names=["energy", "transition_strength"],
+    )
+    return dataframe
+
+
+def nlargest_to_file(df, max_energy=10, n=3, fn="transerg.dat"):
+    df = df[df.energy < max_energy]  # MeV
+    top_n = df.nlargest(n, columns="transition_strength")
+    top_n.to_csv(fn, float_format="%.6e", index_label="old_index", encoding="utf-8")
+
+
+def _out_file_to_transerg(
+    job, temp, code_mapping=code_api.NameMapping(),
+):
+    df = out_file_to_df(job, temp, code_mapping)
+    nlargest_to_file(df, fn=job.fn("transerg.dat"))
+
+
+@Project.operation
+@Project.pre(arefiles(code.out_files(temp="zero")))
+@Project.post.isfile("transerg.dat")
+def out_file_to_transerg_zero(job):
+    _out_file_to_transerg(job, temp="zero", code_mapping=code)
 
 
 if __name__ == "__main__":
