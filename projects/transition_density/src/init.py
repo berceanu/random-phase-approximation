@@ -1,6 +1,7 @@
 """Initialize the project's data space."""
 import logging
 
+from decimal import Decimal
 import signac
 import mypackage.util as util
 
@@ -27,7 +28,7 @@ def main():
                 # system temperature in MeV
                 temperature=0.0,
                 # transition energy in MeV
-                transition_energy=0.42,  # 0.42 is random
+                transition_energy=round(Decimal(0.42), 2),  # 0.42 is random
             )
             project.open_job(statepoint).init()
 

@@ -5,6 +5,7 @@ from matplotlib import pyplot, ticker
 from figstyle import width, golden_ratio
 import numpy as np
 import mypackage.util as util
+from decimal import Decimal
 
 
 class Labeloffset:
@@ -45,7 +46,10 @@ def main():
         58,
     ):
         for neutron_number, group in project.find_jobs(
-            {"transition_energy": {"$ne": 0.42}, "proton_number": proton_number}
+            {
+                "transition_energy": {"$ne": round(Decimal(0.42), 2)},
+                "proton_number": proton_number,
+            }
         ).groupby("neutron_number"):
             jobs = list(sorted(group, key=lambda job: job.sp.transition_energy))
             num_jobs = len(jobs)
@@ -59,7 +63,7 @@ def main():
                 ax.text(
                     0.65,
                     0.15,
-                    f"E = {job.sp.transition_energy:.2f} MeV",
+                    f"E = {job.sp.transition_energy} MeV",
                     transform=ax.transAxes,
                 )
                 df = read_transition_density(job.fn("ztes_transdens.out"))
