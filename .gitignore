@@ -64,3 +64,5 @@ revtexNotes.bib
 .snakemake/
 /out/
 document.pdf
+
+view/
