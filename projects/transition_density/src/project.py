@@ -157,14 +157,16 @@ def out_file_to_df(
     return dataframe
 
 
-def nlargest_to_file(df, max_energy=10, n=3, fn="transerg.dat"):
+def nlargest_to_file(df, max_energy=20, n=5, fn="transerg.dat"):
     df = df[df.energy < max_energy]  # MeV
     top_n = df.nlargest(n, columns="transition_strength")
     top_n.to_csv(fn, float_format="%.6e", index_label="old_index", encoding="utf-8")
 
 
 def _out_file_to_transerg(
-    job, temp, code_mapping=code_api.NameMapping(),
+    job,
+    temp,
+    code_mapping=code_api.NameMapping(),
 ):
     df = out_file_to_df(job, temp, code_mapping)
     nlargest_to_file(df, fn=job.fn("transerg.dat"))
@@ -173,6 +175,7 @@ def _out_file_to_transerg(
 @Project.operation
 @Project.pre(arefiles(code.out_files(temp="zero")))
 @Project.post.isfile("transerg.dat")
+@Project.post.never  # TODO remove after debugging
 def out_file_to_transerg_zero(job):
     _out_file_to_transerg(job, temp="zero", code_mapping=code)
 
