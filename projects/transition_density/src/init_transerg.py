@@ -16,7 +16,7 @@ nuclei = {
         "86": (two_digits(6.04), two_digits(8.28)),
         "96": (two_digits(5.11), two_digits(7.54)),
     },
-    "58": {"82": (two_digits(8.373686),)},
+    "58": {"82": (two_digits(8.373686), two_digits(15.01))},
 }
 
 
