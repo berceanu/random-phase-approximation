@@ -64,3 +64,4 @@ revtexNotes.bib
 .snakemake/
 /out/
 document.pdf
+projects/transition_density/
