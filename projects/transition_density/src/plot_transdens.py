@@ -35,14 +35,18 @@ def read_transition_density(fname):
     return df
 
 
+LETTERS = ("(a)", "(b)", "(c)", "(d)", "(e)")
+
+
 def main():
     """Main entry point."""
     project = signac.get_project(search=False)
     print(f"project {project}")
 
+    panel_counter = -1
     for proton_number in (
         50,
-        58,
+        # 58,
     ):
         for neutron_number, group in project.find_jobs(
             {
@@ -56,9 +60,19 @@ def main():
                 nrows=num_jobs, sharex=True, figsize=(width, width / golden_ratio)
             )
             nucleus = util.get_nucleus(proton_number, neutron_number)
-            fig.suptitle(r"RQRPA transition densities in %s" % nucleus)
+            # fig.suptitle(r"RQRPA transition densities in %s" % nucleus)
             axes = np.atleast_1d(axes)
+            upper_panel = True
             for ax, job in zip(axes, jobs):
+                panel_counter += 1
+                ax.text(
+                    0.05, 0.80, f"{LETTERS[panel_counter]}", transform=ax.transAxes,
+                )
+                if upper_panel:
+                    ax.text(
+                        0.15, 0.15, f"{nucleus}", transform=ax.transAxes,
+                    )
+                    upper_panel = False
                 ax.text(
                     0.65,
                     0.15,
@@ -99,7 +113,7 @@ def main():
             axes[0].legend(handlelength=1)
             axes[-1].set_xlabel(r"$r$ $[\mathrm{fm}]$")
 
-            fig.subplots_adjust(hspace=0.05, bottom=0.14, left=0.14)
+            fig.subplots_adjust(hspace=0.05, bottom=0.14, left=0.16)
             fig.savefig(nucleus)
             pyplot.close(fig)
 
