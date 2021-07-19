@@ -59,26 +59,32 @@ def main():
             fig, axes = pyplot.subplots(
                 nrows=num_jobs, sharex=True, figsize=(width, width / golden_ratio)
             )
-            nucleus = util.get_nucleus(proton_number, neutron_number)
+            nucleus = util.get_nucleus(proton_number, neutron_number, joined=False)
             # fig.suptitle(r"RQRPA transition densities in %s" % nucleus)
             axes = np.atleast_1d(axes)
             upper_panel = True
             for ax, job in zip(axes, jobs):
                 panel_counter += 1
                 ax.text(
-                    0.05, 0.80, f"{LETTERS[panel_counter]}", transform=ax.transAxes,
+                    0.05,
+                    0.80,
+                    f"{LETTERS[panel_counter]} {job.sp.transition_energy} MeV",
+                    transform=ax.transAxes,
                 )
                 if upper_panel:
                     ax.text(
-                        0.15, 0.15, f"{nucleus}", transform=ax.transAxes,
+                        0.15,
+                        0.15,
+                        r"$^{{{}}}${}".format(nucleus[1], nucleus[0]),
+                        transform=ax.transAxes,
                     )
                     upper_panel = False
-                ax.text(
-                    0.65,
-                    0.15,
-                    f"E = {job.sp.transition_energy} MeV",
-                    transform=ax.transAxes,
-                )
+                # ax.text(
+                #     0.65,
+                #     0.15,
+                #     f"{job.sp.transition_energy} MeV",
+                #     transform=ax.transAxes,
+                # )
                 df = read_transition_density(job.fn("ztes_transdens.out"))
                 df.proton *= -df.r ** 2
                 df.neutron *= -df.r ** 2
@@ -114,7 +120,7 @@ def main():
             axes[-1].set_xlabel(r"$r$ $[\mathrm{fm}]$")
 
             fig.subplots_adjust(hspace=0.05, bottom=0.14, left=0.16)
-            fig.savefig(nucleus)
+            fig.savefig(str(nucleus[1]) + nucleus[0])
             pyplot.close(fig)
 
 
